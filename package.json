@@ -1,0 +1,23 @@
+{
+  "author": "",
+  "description": "Figtree - Server Core",
+  "devDependencies": {
+    "@types/node": "^18.19.26",
+    "@typescript-eslint/eslint-plugin": "^7.4.0",
+    "@typescript-eslint/parser": "^7.4.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-prefer-arrow": "^1.2.3",
+    "typescript": "^5.4.3"
+  },
+  "keywords": [],
+  "main": "index.js",
+  "name": "figtree",
+  "scripts": {
+    "build": "npm run compile",
+    "compile": "tsc --project tsconfig.json",
+    "install": "npm run compile"
+  },
+  "type": "module",
+  "types": "src/index.ts",
+  "version": "1.0.0"
+}
