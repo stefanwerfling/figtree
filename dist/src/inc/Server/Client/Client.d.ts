@@ -8,4 +8,5 @@ export declare class Client {
     constructor(server: Server, socket: net.Socket);
     sendMessage(msg: Message): boolean;
     receiveMessage(msg: Message): void;
+    close(): void;
 }

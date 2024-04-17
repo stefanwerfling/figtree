@@ -31,7 +31,10 @@ export class Server {
         }
     }
     removeClient(client) {
-        this._clients.splice(this._clients.indexOf(client), 1);
+        const index = this._clients.indexOf(client);
+        if (index > -1) {
+            this._clients.splice(index, 1);
+        }
         return true;
     }
 }

@@ -28,4 +28,12 @@ export class Client {
         throw new Error(`Overwrite this methode! Message: ${msg.getData()}`);
     }
 
+    public close(): void {
+        if (!this._socket.closed) {
+            this._socket.destroy();
+        }
+
+        this._server.removeClient(this);
+    }
+
 }

@@ -18,5 +18,11 @@ export class Client {
     receiveMessage(msg) {
         throw new Error(`Overwrite this methode! Message: ${msg.getData()}`);
     }
+    close() {
+        if (!this._socket.closed) {
+            this._socket.destroy();
+        }
+        this._server.removeClient(this);
+    }
 }
 //# sourceMappingURL=Client.js.map

@@ -10,7 +10,7 @@
     "typescript": "^5.4.3"
   },
   "keywords": [],
-  "main": "index.js",
+  "main": "dist/src/index.js",
   "name": "figtree",
   "scripts": {
     "build": "npm run compile",
