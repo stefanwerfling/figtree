@@ -2,8 +2,12 @@ import path from 'path';
 import {Schema, Vts} from 'vts';
 import {Config} from '../Config/Config.js';
 import {ConfigBackend} from '../Config/ConfigBackend.js';
-import {DBEntitiesLoaderType} from '../Db/DBEntitiesLoader.js';
-import {DBHelper} from '../Db/DBHelper.js';
+import {DBEntitiesLoaderType} from '../Db/MariaDb/DBEntitiesLoader.js';
+import {DBHelper} from '../Db/MariaDb/DBHelper.js';
+import {InfluxDbHelper} from '../Db/InfluxDb/InfluxDbHelper.js';
+import {RedisChannel} from '../Db/RedisDb/RedisChannel.js';
+import {RedisClient} from '../Db/RedisDb/RedisClient.js';
+import {RedisSubscribe} from '../Db/RedisDb/RedisSubscribe.js';
 import {Args} from '../Env/Args.js';
 import {Logger} from '../Logger/Logger.js';
 import {DefaultArgs} from '../Schemas/Args/DefaultArgs.js';
@@ -137,12 +141,12 @@ export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions>
             const tConfig = Config.getInstance().get();
 
             if (tConfig === null) {
-                Logger.getLogger().error('Error while connecting to the database, check your config file exist!');
+                Logger.getLogger().error('Error while connecting to the MariaDB, check your config file exist!');
                 return false;
             }
 
             if (!SchemaConfigBackendOptions.validate(tConfig, [])) {
-                Logger.getLogger().error('Error while connecting to the database, check your config is correct setup!');
+                Logger.getLogger().error('Error while connecting to the MariaDB, check your config is correct setup!');
                 return false;
             }
 
@@ -159,7 +163,74 @@ export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions>
                 synchronize: true
             });
         } catch (error) {
-            Logger.getLogger().error('Error while connecting to the database: %s', error);
+            Logger.getLogger().error('Error while connecting to the MariaDB: %s', error);
+            return false;
+        }
+
+        return true;
+    }
+
+    protected async _startInfluxDBService(): Promise<boolean> {
+        try {
+            const tConfig = Config.getInstance().get();
+
+            if (tConfig === null) {
+                Logger.getLogger().error('Error while connecting to the InfluxDB, check your config file exist!');
+                return false;
+            }
+
+            if (!SchemaConfigBackendOptions.validate(tConfig, [])) {
+                Logger.getLogger().error('Error while connecting to the InfluxDB, check your config is correct setup!');
+                return false;
+            }
+
+            if (tConfig.db.influx) {
+                await InfluxDbHelper.init({
+                    url: tConfig.db.influx.url,
+                    token: tConfig.db.influx.token,
+                    org: tConfig.db.influx.org,
+                    bucket: tConfig.db.influx.bucket
+                });
+            }
+        } catch(error) {
+            Logger.getLogger().error('Error while connecting to the InfluxDB: %s', error);
+            return false;
+        }
+
+        return true;
+    }
+
+    protected async _startRedisDBService(channels: RedisChannel<any>[]): Promise<boolean> {
+        try {
+            const tConfig = Config.getInstance().get();
+
+            if (tConfig === null) {
+                Logger.getLogger().error('Error while connecting to the RedisDB, check your config file exist!');
+                return false;
+            }
+
+            if (!SchemaConfigBackendOptions.validate(tConfig, [])) {
+                Logger.getLogger().error('Error while connecting to the RedisDB, check your config is correct setup!');
+                return false;
+            }
+
+            if (tConfig.db.redis && tConfig.db.redis.url) {
+                const redisSubscribe = RedisSubscribe.getInstance({
+                    url: tConfig.db.redis.url,
+                    password: tConfig.db.redis.password
+                }, true);
+
+                const redisClient = RedisClient.getInstance();
+                await redisClient.connect();
+
+                await redisSubscribe.connect();
+                await redisSubscribe.registerChannels(channels);
+            } else {
+                Logger.getLogger().error('Error while connecting to the RedisDB, check your config is empty!');
+                return false
+            }
+        } catch(error) {
+            Logger.getLogger().error('Error while connecting to the RedisDB: %s', error);
             return false;
         }
 
