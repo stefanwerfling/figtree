@@ -1,39 +1,28 @@
-import * as net from 'net';
-import {Message} from '../Base/Message.js';
-import {Server} from '../Server.js';
-
+import { Message } from '../Base/Message.js';
 export class Client {
-
-    protected _server: Server;
-    protected _socket: net.Socket;
-
-    public constructor(server: Server, socket: net.Socket) {
+    _server;
+    _socket;
+    constructor(server, socket) {
         this._server = server;
         this._socket = socket;
-
         socket.on('end', () => {
             this._server.removeClient(this);
         });
-
-        socket.on('data', (data: Buffer) => {
+        socket.on('data', (data) => {
             this.receiveMessage(new Message(data));
         });
     }
-
-    public sendMessage(msg: Message): boolean {
+    sendMessage(msg) {
         return this._socket.write(msg.getData());
     }
-
-    public receiveMessage(msg: Message): void {
+    receiveMessage(msg) {
         throw new Error(`Overwrite this methode! Message: ${msg.getData()}`);
     }
-
-    public close(): void {
+    close() {
         if (!this._socket.closed) {
             this._socket.destroy();
         }
-
         this._server.removeClient(this);
     }
-
 }
+//# sourceMappingURL=Client.js.map
