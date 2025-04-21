@@ -15,5 +15,6 @@ export declare abstract class BackendApp<A extends DefaultArgs, C extends Config
     protected _startMariaDBService(entitiesLoader: DBEntitiesLoaderType): Promise<boolean>;
     protected _startInfluxDBService(): Promise<boolean>;
     protected _startRedisDBService(channels: RedisChannel<any>[]): Promise<boolean>;
+    protected _startHttpServerService(): Promise<boolean>;
     protected _startServices(): Promise<void>;
 }

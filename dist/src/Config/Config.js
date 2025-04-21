@@ -14,6 +14,7 @@ export class Config {
     }
     _schema = null;
     _appName = null;
+    _appTitle = '';
     _config = null;
     constructor(schema) {
         this._schema = schema;
@@ -23,6 +24,12 @@ export class Config {
     }
     getAppName() {
         return this._appName;
+    }
+    setAppTitle(title) {
+        this._appTitle = title;
+    }
+    getAppTitle() {
+        return this._appTitle;
     }
     set(aConfig) {
         this._config = aConfig;

@@ -47,6 +47,12 @@ export class Config<T extends ConfigOptions = ConfigOptions> {
     private _appName: string | null = null;
 
     /**
+     * App title
+     * @private
+     */
+    private _appTitle: string = '';
+
+    /**
      * global config
      * @private
      */
@@ -65,7 +71,7 @@ export class Config<T extends ConfigOptions = ConfigOptions> {
      * Set App name
      * @param {string} name
      */
-    public setAppName(name: string) {
+    public setAppName(name: string): void {
         this._appName = name;
     }
 
@@ -75,6 +81,22 @@ export class Config<T extends ConfigOptions = ConfigOptions> {
      */
     public getAppName(): string | null {
         return this._appName;
+    }
+
+    /**
+     * Set app title
+     * @param {string} title
+     */
+    public setAppTitle(title: string): void {
+        this._appTitle = title;
+    }
+
+    /**
+     * Get app title
+     * @return {string}
+     */
+    public getAppTitle(): string {
+        return this._appTitle;
     }
 
     /**

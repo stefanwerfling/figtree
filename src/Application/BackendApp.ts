@@ -1,5 +1,6 @@
 import path from 'path';
-import {Schema, Vts} from 'vts';
+import {Schema} from 'vts';
+import {v4 as uuid} from 'uuid';
 import {Config} from '../Config/Config.js';
 import {ConfigBackend} from '../Config/ConfigBackend.js';
 import {DBEntitiesLoaderType} from '../Db/MariaDb/DBEntitiesLoader.js';
@@ -13,6 +14,7 @@ import {Logger} from '../Logger/Logger.js';
 import {DefaultArgs} from '../Schemas/Args/DefaultArgs.js';
 import {SchemaConfigBackendOptions} from '../Schemas/Config/ConfigBackendOptions.js';
 import {ConfigOptions} from '../Schemas/Config/ConfigOptions.js';
+import {BaseHttpServer} from '../Server/HttpServer/BaseHttpServer.js';
 import {FileHelper} from '../Utils/FileHelper.js';
 import exitHook from 'async-exit-hook';
 
@@ -231,6 +233,84 @@ export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions>
             }
         } catch(error) {
             Logger.getLogger().error('Error while connecting to the RedisDB: %s', error);
+            return false;
+        }
+
+        return true;
+    }
+
+    protected async _startHttpServerService(): Promise<boolean> {
+        try {
+            const tConfig = Config.getInstance().get();
+
+            if (tConfig === null) {
+                Logger.getLogger().error('Error while create the HTTPServer, check your config file exist!');
+                return false;
+            }
+
+            if (!SchemaConfigBackendOptions.validate(tConfig, [])) {
+                Logger.getLogger().error('Error while create the HTTPServer, check your config is correct setup!');
+                return false;
+            }
+
+            let aport = 3000;
+            let public_dir = '';
+            let ssl_path = '';
+            let session_secret = uuid();
+            let session_cookie_path = '/';
+            let session_cookie_max_age = 6000000;
+
+            if (tConfig.httpserver) {
+                if (tConfig.httpserver.port) {
+                    aport = tConfig.httpserver.port;
+                }
+
+                if (tConfig.httpserver.publicdir) {
+                    public_dir = tConfig.httpserver.publicdir;
+                }
+
+                if (tConfig.httpserver.session) {
+                    if (tConfig.httpserver.session.secret) {
+                        session_secret = tConfig.httpserver.session.secret;
+                    }
+
+                    if (tConfig.httpserver.session.cookie_path) {
+                        session_cookie_path = tConfig.httpserver.session.cookie_path;
+                    }
+
+                    if (tConfig.httpserver.session.cookie_max_age) {
+                        session_cookie_max_age = tConfig.httpserver.session.cookie_max_age;
+                    }
+                }
+
+                if (tConfig.httpserver.sslpath) {
+                    ssl_path = tConfig.httpserver.sslpath;
+                }
+            }
+
+            const mServer = new BaseHttpServer({
+                realm: Config.getInstance().getAppTitle(),
+                port: aport,
+                session: {
+                    secret: session_secret,
+                    cookie_path: session_cookie_path,
+                    ssl_path: ssl_path,
+                    max_age: session_cookie_max_age
+                },
+                routes: [
+
+                ],
+                publicDir: public_dir,
+                crypt: {
+                    sslPath: ssl_path,
+                    key: 'server.pem',
+                    crt: 'server.crt'
+                }
+            });
+
+            await mServer.listen();
+        } catch(error) {
+            Logger.getLogger().error('Error while create the HTTPServer: %s', error);
             return false;
         }
 
