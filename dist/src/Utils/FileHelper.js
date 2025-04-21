@@ -1,12 +1,21 @@
 import { stat, rename, unlink, lstat, readFile } from 'fs/promises';
 import { Logger } from '../Logger/Logger.js';
 export class FileHelper {
+    static logDebugging = false;
     static async isOlderHours(filename, durationHours) {
         let stats;
         try {
             stats = await stat(filename);
         }
         catch (e) {
+            if (FileHelper.logDebugging) {
+                if (Logger.hasLogger()) {
+                    Logger.getLogger().silly(`FileHelper::isOlderHours: exception by file: ${filename}`, e);
+                }
+                else {
+                    console.error(e);
+                }
+            }
             return true;
         }
         const fileDate = new Date(stats.mtime);
@@ -25,11 +34,13 @@ export class FileHelper {
             }
         }
         catch (e) {
-            if (Logger.hasLogger()) {
-                Logger.getLogger().silly(`FileHelper::fileExist: exception by file: ${file}`, e);
-            }
-            else {
-                console.error(e);
+            if (FileHelper.logDebugging) {
+                if (Logger.hasLogger()) {
+                    Logger.getLogger().silly(`FileHelper::fileExist: exception by file: ${file}`, e);
+                }
+                else {
+                    console.error(e);
+                }
             }
         }
         if (allowLink) {
@@ -39,11 +50,13 @@ export class FileHelper {
                 }
             }
             catch (e) {
-                if (Logger.hasLogger()) {
-                    Logger.getLogger().silly(`FileHelper::fileExist: exception by file link: ${file}`, e);
-                }
-                else {
-                    console.error(e);
+                if (FileHelper.logDebugging) {
+                    if (Logger.hasLogger()) {
+                        Logger.getLogger().silly(`FileHelper::fileExist: exception by file link: ${file}`, e);
+                    }
+                    else {
+                        console.error(e);
+                    }
                 }
             }
         }
@@ -54,6 +67,14 @@ export class FileHelper {
             return (await stat(file)).size;
         }
         catch (e) {
+            if (FileHelper.logDebugging) {
+                if (Logger.hasLogger()) {
+                    Logger.getLogger().silly(`FileHelper::fileSize: exception by file: ${file}`, e);
+                }
+                else {
+                    console.error(e);
+                }
+            }
             return -1;
         }
     }
@@ -62,6 +83,14 @@ export class FileHelper {
             await rename(filePath, targetPath);
         }
         catch (e) {
+            if (FileHelper.logDebugging) {
+                if (Logger.hasLogger()) {
+                    Logger.getLogger().silly(`FileHelper::fileRename: exception by file: ${filePath}`, e);
+                }
+                else {
+                    console.error(e);
+                }
+            }
             return false;
         }
         return true;
@@ -71,6 +100,14 @@ export class FileHelper {
             await unlink(file);
         }
         catch (e) {
+            if (FileHelper.logDebugging) {
+                if (Logger.hasLogger()) {
+                    Logger.getLogger().silly(`FileHelper::fileDelete: exception by file: ${file}`, e);
+                }
+                else {
+                    console.error(e);
+                }
+            }
             return false;
         }
         return true;

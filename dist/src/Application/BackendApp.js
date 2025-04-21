@@ -43,9 +43,14 @@ export class BackendApp {
         }
         if (configfile === null) {
             const defaultConfig = path.join(path.resolve(), `/${Config.DEFAULT_CONFIG_FILE}`);
-            if (await FileHelper.fileExist(defaultConfig)) {
-                console.log(`Found and use setup config: ${defaultConfig} ....`);
-                configfile = defaultConfig;
+            try {
+                if (await FileHelper.fileExist(defaultConfig)) {
+                    console.log(`Found and use setup config: ${defaultConfig} ....`);
+                    configfile = defaultConfig;
+                }
+            }
+            catch (e) {
+                console.log(`Default config file not found: ${defaultConfig} ....`);
             }
         }
         let useEnv = false;

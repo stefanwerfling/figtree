@@ -1,4 +1,5 @@
 export declare class FileHelper {
+    static logDebugging: boolean;
     static isOlderHours(filename: string, durationHours: number): Promise<boolean>;
     static fileRead(file: string, encoding?: BufferEncoding): Promise<string>;
     static fileExist(file: string, allowLink?: boolean): Promise<boolean>;
