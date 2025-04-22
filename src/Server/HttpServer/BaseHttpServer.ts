@@ -8,8 +8,8 @@ import Path from 'path';
 import {Logger} from '../../Logger/Logger.js';
 import {DirHelper} from '../../Utils/DirHelper.js';
 import {FileHelper} from '../../Utils/FileHelper.js';
-import {ITlsClientError} from './ITlsClientError.js';
-import {ITlsSocket} from './ITlsSocket.js';
+import {ITlsClientError} from './Tls/ITlsClientError.js';
+import {ITlsSocket} from './Tls/ITlsSocket.js';
 import {DefaultRoute} from './Routes/DefaultRoute.js';
 
 /**

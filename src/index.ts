@@ -69,10 +69,11 @@ export {Client as RawClient} from './Server/RawServer/Client/Client.js';
 
 // HTTP Server ---------------------------------------------------------------------------------------------------------
 export {DefaultRouteHandlerGet, DefaultRouteHandlerPost, DefaultRoute} from './Server/HttpServer/Routes/DefaultRoute.js';
-export {ITlsClientError} from './Server/HttpServer/ITlsClientError.js';
-export {ITlsSocket} from './Server/HttpServer/ITlsSocket.js';
+export {ITlsClientError} from './Server/HttpServer/Tls/ITlsClientError.js';
+export {ITlsSocket} from './Server/HttpServer/Tls/ITlsSocket.js';
 export {Session} from './Server/HttpServer/Session.js';
 export {BaseHttpCertKey, BaseHttpServerOptionCrypt, BaseHttpServerOptionSession, BaseHttpServerOptions, BaseHttpServer} from './Server/HttpServer/BaseHttpServer.js';
+export {USHttpServerOptions, USHttpServer} from './Server/HttpServer/USHttpServer.js';
 
 // Application ---------------------------------------------------------------------------------------------------------
 export {BackendApp} from './Application/BackendApp.js';

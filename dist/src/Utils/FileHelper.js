@@ -1,4 +1,5 @@
-import { stat, rename, unlink, lstat, readFile } from 'fs/promises';
+import { Ets } from 'ets';
+import { stat, rename, unlink, readFile, chmod, writeFile, realpath } from 'fs/promises';
 import { Logger } from '../Logger/Logger.js';
 export class FileHelper {
     static logDebugging = false;
@@ -27,40 +28,30 @@ export class FileHelper {
             encoding: encoding
         });
     }
-    static async fileExist(file, allowLink = false) {
+    static async fileExist(file, isLink = false, isSocket = false) {
+        let fileStat;
         try {
-            if ((await stat(file)).isFile()) {
-                return true;
-            }
+            fileStat = await stat(file);
         }
         catch (e) {
             if (FileHelper.logDebugging) {
                 if (Logger.hasLogger()) {
-                    Logger.getLogger().silly(`FileHelper::fileExist: exception by file: ${file}`, e);
+                    Logger.getLogger().silly('FileHelper::fileExist: exception stat by file: %s', file);
+                    Logger.getLogger().silly('FileHelper::fileExist: Trace: %s', Ets.formate(e, true, true));
                 }
                 else {
                     console.error(e);
                 }
             }
+            return false;
         }
-        if (allowLink) {
-            try {
-                if ((await lstat(file)).isSymbolicLink()) {
-                    return true;
-                }
-            }
-            catch (e) {
-                if (FileHelper.logDebugging) {
-                    if (Logger.hasLogger()) {
-                        Logger.getLogger().silly(`FileHelper::fileExist: exception by file link: ${file}`, e);
-                    }
-                    else {
-                        console.error(e);
-                    }
-                }
-            }
+        if (fileStat.isFile()) {
+            return true;
         }
-        return false;
+        if (isLink && fileStat.isSymbolicLink()) {
+            return true;
+        }
+        return isSocket && fileStat.isSocket();
     }
     static async fileSize(file) {
         try {
@@ -111,6 +102,15 @@ export class FileHelper {
             return false;
         }
         return true;
+    }
+    static async chmod(apath, mode) {
+        return chmod(apath, mode);
+    }
+    static async create(file, content) {
+        return writeFile(file, content);
+    }
+    static async realPath(apath) {
+        return realpath(apath);
     }
 }
 //# sourceMappingURL=FileHelper.js.map

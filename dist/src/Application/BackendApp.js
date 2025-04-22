@@ -9,7 +9,7 @@ import { RedisSubscribe } from '../Db/RedisDb/RedisSubscribe.js';
 import { Args } from '../Env/Args.js';
 import { Logger } from '../Logger/Logger.js';
 import { SchemaConfigBackendOptions } from '../Schemas/Config/ConfigBackendOptions.js';
-import { BaseHttpServer } from '../Server/HttpServer/BaseHttpServer.js';
+import { HttpServer } from '../Server/HttpServer/HttpServer.js';
 import { FileHelper } from '../Utils/FileHelper.js';
 import exitHook from 'async-exit-hook';
 export class BackendApp {
@@ -219,7 +219,7 @@ export class BackendApp {
                     ssl_path = tConfig.httpserver.sslpath;
                 }
             }
-            const mServer = new BaseHttpServer({
+            const mServer = new HttpServer({
                 realm: Config.getInstance().getAppTitle(),
                 port: aport,
                 session: {

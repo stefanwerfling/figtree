@@ -14,7 +14,7 @@ import {Logger} from '../Logger/Logger.js';
 import {DefaultArgs} from '../Schemas/Args/DefaultArgs.js';
 import {SchemaConfigBackendOptions} from '../Schemas/Config/ConfigBackendOptions.js';
 import {ConfigOptions} from '../Schemas/Config/ConfigOptions.js';
-import {BaseHttpServer} from '../Server/HttpServer/BaseHttpServer.js';
+import {HttpServer} from '../Server/HttpServer/HttpServer.js';
 import {FileHelper} from '../Utils/FileHelper.js';
 import exitHook from 'async-exit-hook';
 
@@ -288,7 +288,7 @@ export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions>
                 }
             }
 
-            const mServer = new BaseHttpServer({
+            const mServer = new HttpServer({
                 realm: Config.getInstance().getAppTitle(),
                 port: aport,
                 session: {
