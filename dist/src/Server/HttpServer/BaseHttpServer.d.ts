@@ -37,6 +37,7 @@ export declare class BaseHttpServer {
     private _routes;
     private _assets;
     protected _checkKeyFile(keyFile: string): Promise<boolean>;
+    protected _getCertAndKey(options: BaseHttpServerOptionCrypt): Promise<BaseHttpCertKey | null>;
     listen(): Promise<void>;
     close(): void;
 }

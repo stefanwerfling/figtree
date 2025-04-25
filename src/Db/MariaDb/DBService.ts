@@ -98,7 +98,7 @@ export abstract class DBService<T extends DBBaseEntityId> {
 
     /**
      * Save an entry object extend from DBBaseEntityId.
-     * @param {T extend DBBaseEntityId} entity
+     * @param {T extends DBBaseEntityId} entity
      * @returns {T}
      */
     public async save(entity: T): Promise<T> {

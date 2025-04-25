@@ -1,7 +1,7 @@
 import {Schema} from 'vts';
 import {BackendApp} from '../../Application/BackendApp.js';
 import {Config} from '../../Config/Config.js';
-import {DBEntitiesLoader} from '../../Db/MariaDb/DBEntitiesLoader.js';
+import {DBLoader} from '../../Db/MariaDb/DBLoader.js';
 import {DefaultArgs, SchemaDefaultArgs} from '../../Schemas/Args/DefaultArgs.js';
 import {ConfigOptions} from '../../Schemas/Config/ConfigOptions.js';
 
@@ -20,7 +20,7 @@ export class ExampleBackend extends BackendApp<DefaultArgs, ConfigOptions> {
 
     protected async _startServices(): Promise<void> {
         await super._startServices();
-        await this._startMariaDBService(DBEntitiesLoader);
+        await this._startMariaDBService(DBLoader);
         await this._startInfluxDBService();
         await this._startRedisDBService([]);
     }

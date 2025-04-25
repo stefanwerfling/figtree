@@ -1,11 +1,17 @@
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import {Request, Response} from 'express';
+import {Config} from '../../Config/Config.js';
+import {CertificateHelper} from '../../Crypto/CertificateHelper.js';
 import {Logger} from '../../Logger/Logger.js';
 import {SchemaRequestData} from '../../Schemas/Server/RequestData.js';
-import {BaseHttpServer} from './BaseHttpServer.js';
+import {DirHelper} from '../../Utils/DirHelper.js';
+import {BaseHttpCertKey, BaseHttpServer, BaseHttpServerOptionCrypt} from './BaseHttpServer.js';
 import {Session} from './Session.js';
 
+/**
+ * HttpServer
+ */
 export class HttpServer extends BaseHttpServer {
 
     /**
@@ -104,5 +110,128 @@ export class HttpServer extends BaseHttpServer {
         Logger.getLogger().warn('HttpServer::_limiterHandler: Too Many Requests: %s is blocked for %s.', req.ip, req.url);
 
         res.status(429).json({ message: "Too Many Requests" });
+    }
+
+    /**
+     * Generate Cert and Key
+     * @return {BaseHttpCertKey}
+     * @protected
+     */
+    protected async _generateCertAndKey(): Promise<BaseHttpCertKey> {
+        const appTitle = Config.getInstance().getAppTitle();
+        const keyPair = await CertificateHelper.generateKeyPair(2048);
+        const certPair = await CertificateHelper.generateCertificate(
+            keyPair.private,
+            keyPair.public,
+            [{
+                name: 'commonName',
+                value: appTitle
+            }, {
+                name: 'countryName',
+                value: 'ZZ'
+            }, {
+                shortName: 'ST',
+                value: 'None'
+            }, {
+                name: 'organizationName',
+                value: appTitle
+            }, {
+                name: 'organizationalUnitName',
+                value: appTitle
+            }],
+            [
+                {
+                    name: 'basicConstraints',
+                    cA: true,
+                },
+                {
+                    name: 'keyUsage',
+                    keyCertSign: true,
+                    digitalSignature: true,
+                    nonRepudiation: true,
+                    keyEncipherment: true,
+                    dataEncipherment: true
+                },
+                {
+                    name: 'extKeyUsage',
+                    serverAuth: true,
+                    clientAuth: true,
+                    codeSigning: true,
+                    emailProtection: true,
+                    timeStamping: true
+                },
+                {
+                    name: 'nsCertType',
+                    client: true,
+                    server: true,
+                    email: true,
+                    objsign: true,
+                    sslCA: true,
+                    emailCA: true,
+                    objCA: true
+                },
+                {
+                    name: 'subjectAltName',
+                    altNames: [
+                        {
+                            // IP
+                            type: 7,
+                            ip: '127.0.0.1'
+                        },
+                        {
+                            // DNS
+                            type: 2,
+                            value: 'localhost'
+                        },
+                        {
+                            // URI
+                            type: 6,
+                            value: 'https://localhost'
+                        }
+                    ]
+                },
+                {
+                    name: 'subjectKeyIdentifier'
+                }
+            ]
+        );
+
+        return {
+            key: certPair.privateKey,
+            crt: certPair.cert
+        };
+    }
+
+    /**
+     * Get Cert and key
+     * @param {BaseHttpServerOptionCrypt} options
+     * @return {BaseHttpCertKey|null}
+     * @protected
+     */
+    protected async _getCertAndKey(options: BaseHttpServerOptionCrypt): Promise<BaseHttpCertKey|null> {
+        let ck: BaseHttpCertKey|null = null;
+
+        if (options.key && options.crt) {
+            ck = await super._getCertAndKey(options);
+        } else if(options.sslPath) {
+            try {
+                await DirHelper.mkdir(options.sslPath, true);
+                ck = await super._getCertAndKey(options);
+            } catch (e) {
+                Logger.getLogger().error(`HttpServer::_getCertAndKey: Can not create key and cert by ssl path: ${options.sslPath}`);
+            }
+        }
+
+        // -------------------------------------------------------------------------------------------------------------
+
+        if(ck === null) {
+            Logger.getLogger().error(
+                'HttpServer::_getCertAndKey: Key and Certificat can not read/parse by config! Create a temporary memory Key & Certificate'
+            );
+
+            ck = await this._generateCertAndKey();
+        }
+
+        return ck;
     }
 }

@@ -3,7 +3,7 @@ import {Schema} from 'vts';
 import {v4 as uuid} from 'uuid';
 import {Config} from '../Config/Config.js';
 import {ConfigBackend} from '../Config/ConfigBackend.js';
-import {DBEntitiesLoaderType} from '../Db/MariaDb/DBEntitiesLoader.js';
+import {DBLoaderType} from '../Db/MariaDb/DBLoader.js';
 import {DBHelper} from '../Db/MariaDb/DBHelper.js';
 import {InfluxDbHelper} from '../Db/InfluxDb/InfluxDbHelper.js';
 import {RedisChannel} from '../Db/RedisDb/RedisChannel.js';
@@ -138,7 +138,7 @@ export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions>
         await this._startServices();
     }
 
-    protected async _startMariaDBService(entitiesLoader: DBEntitiesLoaderType): Promise<boolean> {
+    protected async _startMariaDBService(entitiesLoader: DBLoaderType): Promise<boolean> {
         try {
             const tConfig = Config.getInstance().get();
 
@@ -160,7 +160,7 @@ export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions>
                 password: tConfig.db.mysql.password,
                 database: tConfig.db.mysql.database,
                 entities: await entitiesLoader.loadEntities(),
-                migrations: [],
+                migrations: entitiesLoader.loadMigrations(),
                 migrationsRun: true,
                 synchronize: true
             });

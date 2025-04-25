@@ -111,7 +111,7 @@ export class BackendApp {
                 password: tConfig.db.mysql.password,
                 database: tConfig.db.mysql.database,
                 entities: await entitiesLoader.loadEntities(),
-                migrations: [],
+                migrations: entitiesLoader.loadMigrations(),
                 migrationsRun: true,
                 synchronize: true
             });

@@ -1,11 +1,11 @@
+import fs from 'fs';
 import https from 'https';
 import express from 'express';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
-import Path from 'path';
+import { PemHelper } from '../../Crypto/PemHelper.js';
 import { Logger } from '../../Logger/Logger.js';
-import { DirHelper } from '../../Utils/DirHelper.js';
 import { FileHelper } from '../../Utils/FileHelper.js';
 export class BaseHttpServer {
     static _listenHost = 'localhost';
@@ -79,17 +79,42 @@ export class BaseHttpServer {
         }
         return false;
     }
+    async _getCertAndKey(options) {
+        if (options.key && options.crt) {
+            let strKey;
+            let strCrt;
+            if (await FileHelper.fileExist(options.key)) {
+                strKey = fs.readFileSync(options.key).toString();
+            }
+            else if (PemHelper.isPemStr(options.key)) {
+                strKey = options.key;
+            }
+            else {
+                return null;
+            }
+            if (await FileHelper.fileExist(options.crt)) {
+                strCrt = fs.readFileSync(options.crt).toString();
+            }
+            else if (PemHelper.isPemStr(options.crt)) {
+                strCrt = options.crt;
+            }
+            else {
+                return null;
+            }
+            return {
+                key: strKey,
+                crt: strCrt
+            };
+        }
+        return null;
+    }
     async listen() {
         if (this._crypt) {
-            await DirHelper.mkdir(this._crypt.sslPath, true);
-            const keyFile = Path.join(this._crypt.sslPath, this._crypt.key);
-            const crtFile = Path.join(this._crypt.sslPath, this._crypt.crt);
-            if (await this._checkKeyFile(keyFile)) {
-                const privateKey = await FileHelper.fileRead(keyFile);
-                const crt = await FileHelper.fileRead(crtFile);
+            const ck = await this._getCertAndKey(this._crypt);
+            if (ck) {
                 this._server = https.createServer({
-                    key: privateKey,
-                    cert: crt
+                    key: ck.key,
+                    cert: ck.crt
                 }, this._express);
                 this._server.on('tlsClientError', (err, atlsSocket) => {
                     const tlsError = err;
@@ -99,15 +124,11 @@ export class BaseHttpServer {
                             tTlsSocket._parent.write('HTTP/1.1 302 Found\n' +
                                 `Location: https://${BaseHttpServer._listenHost}:${this._port}`);
                         }
-                        Logger.getLogger().error('The client call the Server over HTTP protocol. Please use HTTPS, example: https://%s:%d', BaseHttpServer._listenHost, this._port, {
-                            class: 'BaseHttpServer::listen'
-                        });
+                        Logger.getLogger().error('BaseHttpServer::listen: The client call the Server over HTTP protocol. Please use HTTPS, example: https://%s:%d', BaseHttpServer._listenHost, this._port);
                     }
                 });
                 this._server.listen(this._port, () => {
-                    Logger.getLogger().info('%s listening on the https://%s:%d', this._realm, BaseHttpServer._listenHost, this._port, {
-                        class: 'BaseHttpServer::listen'
-                    });
+                    Logger.getLogger().info('BaseHttpServer::listen: %s listening on the https://%s:%d', this._realm, BaseHttpServer._listenHost, this._port);
                 });
             }
             else {

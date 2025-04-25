@@ -1,3 +1,4 @@
+import fs from 'fs';
 import https from 'https';
 import * as http from 'node:http';
 import express, {Application, NextFunction, Request, Response} from 'express';
@@ -5,6 +6,7 @@ import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import Path from 'path';
+import {PemHelper} from '../../Crypto/PemHelper.js';
 import {Logger} from '../../Logger/Logger.js';
 import {DirHelper} from '../../Utils/DirHelper.js';
 import {FileHelper} from '../../Utils/FileHelper.js';
@@ -212,22 +214,51 @@ export class BaseHttpServer {
     }
 
     /**
+     * Get Cert and Key
+     * @param {BaseHttpServerOptionCrypt} options
+     * @protected {BaseHttpCertKey|null}
+     */
+    protected async _getCertAndKey(options: BaseHttpServerOptionCrypt): Promise<BaseHttpCertKey|null> {
+        if (options.key && options.crt) {
+            let strKey: string;
+            let strCrt: string;
+
+            if (await FileHelper.fileExist(options.key)) {
+                strKey = fs.readFileSync(options.key).toString();
+            } else if (PemHelper.isPemStr(options.key)) {
+                strKey = options.key;
+            } else {
+                return null;
+            }
+
+            if (await FileHelper.fileExist(options.crt)) {
+                strCrt = fs.readFileSync(options.crt).toString();
+            } else if (PemHelper.isPemStr(options.crt)) {
+                strCrt = options.crt;
+            } else {
+                return null;
+            }
+
+            return {
+                key: strKey,
+                crt: strCrt
+            };
+        }
+
+        return null;
+    }
+
+    /**
      * listen
      */
     public async listen(): Promise<void> {
         if (this._crypt) {
-            await DirHelper.mkdir(this._crypt.sslPath, true);
+            const ck = await this._getCertAndKey(this._crypt);
 
-            const keyFile = Path.join(this._crypt.sslPath, this._crypt.key);
-            const crtFile = Path.join(this._crypt.sslPath, this._crypt.crt);
-
-            if (await this._checkKeyFile(keyFile)) {
-                const privateKey = await FileHelper.fileRead(keyFile);
-                const crt = await FileHelper.fileRead(crtFile);
-
+            if (ck) {
                 this._server = https.createServer({
-                    key: privateKey,
-                    cert: crt
+                    key: ck.key,
+                    cert: ck.crt
                 }, this._express);
 
                 this._server.on('tlsClientError', (err, atlsSocket) => {
@@ -242,25 +273,19 @@ export class BaseHttpServer {
                         }
 
                         Logger.getLogger().error(
-                            'The client call the Server over HTTP protocol. Please use HTTPS, example: https://%s:%d',
+                            'BaseHttpServer::listen: The client call the Server over HTTP protocol. Please use HTTPS, example: https://%s:%d',
                             BaseHttpServer._listenHost,
-                            this._port,
-                            {
-                                class: 'BaseHttpServer::listen'
-                            }
+                            this._port
                         );
                     }
                 });
 
                 this._server.listen(this._port, () => {
                     Logger.getLogger().info(
-                        '%s listening on the https://%s:%d',
+                        'BaseHttpServer::listen: %s listening on the https://%s:%d',
                         this._realm,
                         BaseHttpServer._listenHost,
-                        this._port,
-                        {
-                            class: 'BaseHttpServer::listen'
-                        }
+                        this._port
                     );
                 });
             } else {
