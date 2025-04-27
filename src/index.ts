@@ -42,6 +42,7 @@ export {ENV_OPTIONAL, ConfigBackend} from './Config/ConfigBackend.js';
 export {DirHelper} from './Utils/DirHelper.js';
 export {FileHelper} from './Utils/FileHelper.js';
 export {BufferHelper} from './Utils/BufferHelper.js';
+export {StringHelper} from './Utils/StringHelper.js';
 
 // Crypt ---------------------------------------------------------------------------------------------------------------
 export {PemError} from './Crypto/Pem/PemError.js';
@@ -90,5 +91,10 @@ export {
 export {USHttpServerOptions, USHttpServer} from './Server/HttpServer/USHttpServer.js';
 export {HttpUploadChunkInfo, FnHttpUploadHandleSuccess, HttpUpload} from './Server/HttpServer/HttpUpload.js';
 
+// Service -------------------------------------------------------------------------------------------------------------
+
+export {ServiceStatus, ServiceType, ServiceAbstract} from './Service/ServiceAbstract.js';
+
 // Application ---------------------------------------------------------------------------------------------------------
 export {BackendApp} from './Application/BackendApp.js';
+export {MariaDbService} from './Application/Services/MariaDbService.js';

@@ -92,4 +92,13 @@ export class DBHelper {
         return null;
     }
 
+    /**
+     * Close all sources connection
+     */
+    public static async closeAllSources(): Promise<void> {
+        for await (const [key, dataSource] of DBHelper._sources) {
+            await dataSource.destroy();
+            DBHelper._sources.delete(key);
+        }
+    }
 }

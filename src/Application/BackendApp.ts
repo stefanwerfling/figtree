@@ -14,6 +14,7 @@ import {Logger} from '../Logger/Logger.js';
 import {DefaultArgs} from '../Schemas/Args/DefaultArgs.js';
 import {SchemaConfigBackendOptions} from '../Schemas/Config/ConfigBackendOptions.js';
 import {ConfigOptions} from '../Schemas/Config/ConfigOptions.js';
+import {HttpRouteLoaderType} from '../Server/HttpServer/HttpRouteLoader.js';
 import {HttpServer} from '../Server/HttpServer/HttpServer.js';
 import {FileHelper} from '../Utils/FileHelper.js';
 import exitHook from 'async-exit-hook';
@@ -138,7 +139,13 @@ export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions>
         await this._startServices();
     }
 
-    protected async _startMariaDBService(entitiesLoader: DBLoaderType): Promise<boolean> {
+    /**
+     * Start the MariaDB Service
+     * @param {DBLoaderType} loader
+     * @protected
+     * @return {boolean}
+     */
+    protected async _startMariaDBService(loader: DBLoaderType): Promise<boolean> {
         try {
             const tConfig = Config.getInstance().get();
 
@@ -159,8 +166,8 @@ export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions>
                 username: tConfig.db.mysql.username,
                 password: tConfig.db.mysql.password,
                 database: tConfig.db.mysql.database,
-                entities: await entitiesLoader.loadEntities(),
-                migrations: entitiesLoader.loadMigrations(),
+                entities: await loader.loadEntities(),
+                migrations: loader.loadMigrations(),
                 migrationsRun: true,
                 synchronize: true
             });
@@ -172,6 +179,11 @@ export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions>
         return true;
     }
 
+    /**
+     * Start Influx DB Service
+     * @protected
+     * @return {boolean}
+     */
     protected async _startInfluxDBService(): Promise<boolean> {
         try {
             const tConfig = Config.getInstance().get();
@@ -202,6 +214,12 @@ export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions>
         return true;
     }
 
+    /**
+     * Start Redis DB Service
+     * @param {RedisChannel<any>[]} channels
+     * @protected
+     * @return {boolean}
+     */
     protected async _startRedisDBService(channels: RedisChannel<any>[]): Promise<boolean> {
         try {
             const tConfig = Config.getInstance().get();
@@ -239,7 +257,13 @@ export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions>
         return true;
     }
 
-    protected async _startHttpServerService(): Promise<boolean> {
+    /**
+     * Start HttpServer Service
+     * @param {HttpRouteLoaderType} loader
+     * @protected
+     * @return {boolean}
+     */
+    protected async _startHttpServerService(loader: HttpRouteLoaderType): Promise<boolean> {
         try {
             const tConfig = Config.getInstance().get();
 
@@ -297,9 +321,7 @@ export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions>
                     ssl_path: ssl_path,
                     max_age: session_cookie_max_age
                 },
-                routes: [
-
-                ],
+                routes: await loader.loadRoutes(),
                 publicDir: public_dir,
                 crypt: {
                     sslPath: ssl_path,

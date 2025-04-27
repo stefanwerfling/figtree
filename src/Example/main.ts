@@ -1,7 +1,5 @@
 import {ExampleBackend} from './inc/ExampleBackend.js';
 
-
-
 /**
  * Main
  */

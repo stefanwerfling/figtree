@@ -92,7 +92,7 @@ export class BackendApp {
         });
         await this._startServices();
     }
-    async _startMariaDBService(entitiesLoader) {
+    async _startMariaDBService(loader) {
         try {
             const tConfig = Config.getInstance().get();
             if (tConfig === null) {
@@ -110,8 +110,8 @@ export class BackendApp {
                 username: tConfig.db.mysql.username,
                 password: tConfig.db.mysql.password,
                 database: tConfig.db.mysql.database,
-                entities: await entitiesLoader.loadEntities(),
-                migrations: entitiesLoader.loadMigrations(),
+                entities: await loader.loadEntities(),
+                migrations: loader.loadMigrations(),
                 migrationsRun: true,
                 synchronize: true
             });
@@ -180,7 +180,7 @@ export class BackendApp {
         }
         return true;
     }
-    async _startHttpServerService() {
+    async _startHttpServerService(loader) {
         try {
             const tConfig = Config.getInstance().get();
             if (tConfig === null) {
@@ -228,7 +228,7 @@ export class BackendApp {
                     ssl_path: ssl_path,
                     max_age: session_cookie_max_age
                 },
-                routes: [],
+                routes: await loader.loadRoutes(),
                 publicDir: public_dir,
                 crypt: {
                     sslPath: ssl_path,
