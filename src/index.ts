@@ -94,7 +94,11 @@ export {HttpUploadChunkInfo, FnHttpUploadHandleSuccess, HttpUpload} from './Serv
 // Service -------------------------------------------------------------------------------------------------------------
 
 export {ServiceStatus, ServiceType, ServiceAbstract} from './Service/ServiceAbstract.js';
+export {ServiceList} from './Service/ServiceList.js';
 
 // Application ---------------------------------------------------------------------------------------------------------
 export {BackendApp} from './Application/BackendApp.js';
-export {MariaDbService} from './Application/Services/MariaDbService.js';
+export {MariaDBService} from './Application/Services/MariaDBService.js';
+export {InfluxDBService} from './Application/Services/InfluxDBService.js';
+export {RedisDBService} from './Application/Services/RedisDBService.js';
+export {HttpService} from './Application/Services/HttpService.js';

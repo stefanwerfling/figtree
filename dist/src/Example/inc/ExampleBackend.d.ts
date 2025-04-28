@@ -6,5 +6,5 @@ import { ConfigOptions } from '../../Schemas/Config/ConfigOptions.js';
 export declare class ExampleBackend extends BackendApp<DefaultArgs, ConfigOptions> {
     protected _getConfigInstance(): Config<ConfigOptions>;
     protected _getArgSchema(): Schema<DefaultArgs> | null;
-    protected _startServices(): Promise<void>;
+    protected _initServices(): Promise<void>;
 }

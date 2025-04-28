@@ -7,4 +7,5 @@ export declare class DBHelper {
     static getDataSource(sourceName?: string): DataSource;
     static getRepository<Entity extends ObjectLiteral>(target: EntityTarget<Entity>, sourceName?: string): Repository<Entity>;
     static getVersionRepository(): Repository<Version> | null;
+    static closeAllSources(): Promise<void>;
 }

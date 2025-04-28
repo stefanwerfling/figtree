@@ -20,7 +20,7 @@ export class InfluxDbHelper {
         return this._connection;
     }
     static getBucket() {
-        return InfluxDbHelper._options.bucket;
+        return this._options.bucket;
     }
     static _getWriter() {
         const writeApi = InfluxDbHelper.getConnection().getWriteApi(InfluxDbHelper._options.org, InfluxDbHelper._options.bucket, 'ms');

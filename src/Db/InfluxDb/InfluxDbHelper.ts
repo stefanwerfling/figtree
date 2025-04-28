@@ -66,7 +66,7 @@ export class InfluxDbHelper {
      * @return {string}
      */
     public static getBucket(): string {
-        return InfluxDbHelper._options.bucket;
+        return this._options.bucket;
     }
 
     /**

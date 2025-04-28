@@ -1,9 +1,12 @@
 import {Schema} from 'vts';
 import {BackendApp} from '../../Application/BackendApp.js';
+import {HttpService} from '../../Application/Services/HttpService.js';
+import {MariaDBService} from '../../Application/Services/MariaDBService.js';
 import {Config} from '../../Config/Config.js';
 import {DBLoader} from '../../Db/MariaDb/DBLoader.js';
 import {DefaultArgs, SchemaDefaultArgs} from '../../Schemas/Args/DefaultArgs.js';
 import {ConfigOptions} from '../../Schemas/Config/ConfigOptions.js';
+import {HttpRouteLoader} from '../../Server/HttpServer/HttpRouteLoader.js';
 
 export class ExampleBackend extends BackendApp<DefaultArgs, ConfigOptions> {
 
@@ -18,10 +21,9 @@ export class ExampleBackend extends BackendApp<DefaultArgs, ConfigOptions> {
         return SchemaDefaultArgs;
     }
 
-    protected async _startServices(): Promise<void> {
-        await super._startServices();
-        await this._startMariaDBService(DBLoader);
-        await this._startInfluxDBService();
-        await this._startRedisDBService([]);
+    protected async _initServices(): Promise<void> {
+        this._serviceList.add(new MariaDBService(DBLoader));
+        this._serviceList.add(new HttpService(HttpRouteLoader));
     }
+
 }

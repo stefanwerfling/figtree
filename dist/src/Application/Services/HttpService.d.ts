@@ -1,0 +1,10 @@
+import { HttpRouteLoaderType } from '../../Server/HttpServer/HttpRouteLoader.js';
+import { HttpServer } from '../../Server/HttpServer/HttpServer.js';
+import { ServiceAbstract } from '../../Service/ServiceAbstract.js';
+export declare class HttpService extends ServiceAbstract {
+    protected _loader: HttpRouteLoaderType;
+    protected _server: HttpServer | null;
+    constructor(loader: HttpRouteLoaderType);
+    start(): Promise<void>;
+    stop(forced?: boolean): Promise<void>;
+}

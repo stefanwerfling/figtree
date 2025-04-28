@@ -38,5 +38,11 @@ export class DBHelper {
         }
         return null;
     }
+    static async closeAllSources() {
+        for await (const [key, dataSource] of DBHelper._sources) {
+            await dataSource.destroy();
+            DBHelper._sources.delete(key);
+        }
+    }
 }
 //# sourceMappingURL=DBHelper.js.map

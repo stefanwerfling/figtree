@@ -1,7 +1,10 @@
 import { BackendApp } from '../../Application/BackendApp.js';
+import { HttpService } from '../../Application/Services/HttpService.js';
+import { MariaDBService } from '../../Application/Services/MariaDBService.js';
 import { Config } from '../../Config/Config.js';
 import { DBLoader } from '../../Db/MariaDb/DBLoader.js';
 import { SchemaDefaultArgs } from '../../Schemas/Args/DefaultArgs.js';
+import { HttpRouteLoader } from '../../Server/HttpServer/HttpRouteLoader.js';
 export class ExampleBackend extends BackendApp {
     _getConfigInstance() {
         const config = Config.getInstance();
@@ -11,11 +14,9 @@ export class ExampleBackend extends BackendApp {
     _getArgSchema() {
         return SchemaDefaultArgs;
     }
-    async _startServices() {
-        await super._startServices();
-        await this._startMariaDBService(DBLoader);
-        await this._startInfluxDBService();
-        await this._startRedisDBService([]);
+    async _initServices() {
+        this._serviceList.add(new MariaDBService(DBLoader));
+        this._serviceList.add(new HttpService(HttpRouteLoader));
     }
 }
 //# sourceMappingURL=ExampleBackend.js.map
