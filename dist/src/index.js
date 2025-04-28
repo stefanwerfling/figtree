@@ -37,6 +37,7 @@ export { Server as RawServer } from './Server/RawServer/Server.js';
 export { Client as RawClient } from './Server/RawServer/Client/Client.js';
 export { DefaultRoute } from './Server/HttpServer/Routes/DefaultRoute.js';
 export { Session } from './Server/HttpServer/Session.js';
+export { HttpRouteLoader } from './Server/HttpServer/HttpRouteLoader.js';
 export { BaseHttpServer } from './Server/HttpServer/BaseHttpServer.js';
 export { USHttpServer } from './Server/HttpServer/USHttpServer.js';
 export { HttpUpload } from './Server/HttpServer/HttpUpload.js';

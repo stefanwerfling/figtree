@@ -81,6 +81,7 @@ export {DefaultRouteHandlerGet, DefaultRouteHandlerPost, DefaultRoute} from './S
 export {ITlsClientError} from './Server/HttpServer/Tls/ITlsClientError.js';
 export {ITlsSocket} from './Server/HttpServer/Tls/ITlsSocket.js';
 export {Session} from './Server/HttpServer/Session.js';
+export {HttpRouteLoader, HttpRouteLoaderType} from './Server/HttpServer/HttpRouteLoader.js';
 export {
     BaseHttpCertKey,
     BaseHttpServerOptionCrypt,

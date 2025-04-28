@@ -40,6 +40,7 @@ export { DefaultRouteHandlerGet, DefaultRouteHandlerPost, DefaultRoute } from '.
 export { ITlsClientError } from './Server/HttpServer/Tls/ITlsClientError.js';
 export { ITlsSocket } from './Server/HttpServer/Tls/ITlsSocket.js';
 export { Session } from './Server/HttpServer/Session.js';
+export { HttpRouteLoader, HttpRouteLoaderType } from './Server/HttpServer/HttpRouteLoader.js';
 export { BaseHttpCertKey, BaseHttpServerOptionCrypt, BaseHttpServerOptionSession, BaseHttpServerOptions, BaseHttpServer } from './Server/HttpServer/BaseHttpServer.js';
 export { USHttpServerOptions, USHttpServer } from './Server/HttpServer/USHttpServer.js';
 export { HttpUploadChunkInfo, FnHttpUploadHandleSuccess, HttpUpload } from './Server/HttpServer/HttpUpload.js';
