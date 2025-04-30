@@ -16,6 +16,8 @@ export { DirHelper } from './Utils/DirHelper.js';
 export { FileHelper } from './Utils/FileHelper.js';
 export { BufferHelper } from './Utils/BufferHelper.js';
 export { StringHelper } from './Utils/StringHelper.js';
+export { DateHelper } from './Utils/DateHelper.js';
+export { IPHelper } from './Utils/IPHelper.js';
 export { PemError } from './Crypto/Pem/PemError.js';
 export { PemObject } from './Crypto/Pem/PemObject.js';
 export { PemHelper } from './Crypto/PemHelper.js';
@@ -44,6 +46,7 @@ export { HttpRouteLoader, HttpRouteLoaderType } from './Server/HttpServer/HttpRo
 export { BaseHttpCertKey, BaseHttpServerOptionCrypt, BaseHttpServerOptionSession, BaseHttpServerOptions, BaseHttpServer } from './Server/HttpServer/BaseHttpServer.js';
 export { USHttpServerOptions, USHttpServer } from './Server/HttpServer/USHttpServer.js';
 export { HttpUploadChunkInfo, FnHttpUploadHandleSuccess, HttpUpload } from './Server/HttpServer/HttpUpload.js';
+export { ProcessAwait } from './Process/ProcessAwait.js';
 export { ServiceStatus, ServiceType, ServiceAbstract } from './Service/ServiceAbstract.js';
 export { ServiceList } from './Service/ServiceList.js';
 export { BackendApp } from './Application/BackendApp.js';
