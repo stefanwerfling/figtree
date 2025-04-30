@@ -32,6 +32,7 @@
     "typeorm": "0.3.20",
     "typeorm-versions": "^0.4.0",
     "uuid": "^11.1.0",
+    "ws": "^8.18.1",
     "vts": "git+https://github.com/OpenSourcePKG/vts.git",
     "winston": "^3.13.0",
     "winston-daily-rotate-file": "^5.0.0"
@@ -45,5 +46,5 @@
   },
   "type": "module",
   "types": "src/index.ts",
-  "version": "1.0.7"
+  "version": "1.0.8"
 }

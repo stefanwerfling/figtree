@@ -12,6 +12,7 @@ export class BaseHttpServer {
     _port = 3000;
     _express;
     _server = null;
+    _sessionParser = null;
     _realm;
     _session;
     _crypt;
@@ -43,23 +44,27 @@ export class BaseHttpServer {
             Logger.getLogger().error(error.stack);
         });
     }
+    _getSessionStore() {
+        return new session.MemoryStore();
+    }
     _initServer() {
         this._express.use(bodyParser.urlencoded({ extended: true }));
         this._express.use(bodyParser.json());
         this._express.use(cookieParser());
         if (this._session) {
-            this._express.use(session({
+            this._sessionParser = session({
                 secret: this._session.secret,
                 proxy: true,
                 resave: true,
                 saveUninitialized: true,
-                store: new session.MemoryStore(),
+                store: this._getSessionStore(),
                 cookie: {
                     path: this._session.cookie_path,
                     secure: this._session.ssl_path !== '',
                     maxAge: this._session.max_age
                 }
-            }));
+            });
+            this._express.use(this._sessionParser);
         }
     }
     _routes(routes) {

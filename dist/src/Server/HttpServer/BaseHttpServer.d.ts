@@ -1,5 +1,6 @@
 import * as http from 'node:http';
-import { Application } from 'express';
+import express, { Application } from 'express';
+import { Store } from 'express-session';
 import { DefaultRoute } from './Routes/DefaultRoute.js';
 export type BaseHttpServerOptionCrypt = {
     sslPath: string;
@@ -29,10 +30,12 @@ export declare class BaseHttpServer {
     protected readonly _port: number;
     protected readonly _express: Application;
     protected _server: http.Server | null;
+    protected _sessionParser: express.RequestHandler | null;
     protected readonly _realm: string;
     protected readonly _session?: BaseHttpServerOptionSession;
     protected readonly _crypt?: BaseHttpServerOptionCrypt;
     constructor(serverInit: BaseHttpServerOptions);
+    protected _getSessionStore(): Store;
     protected _initServer(): void;
     private _routes;
     private _assets;

@@ -4,7 +4,7 @@ import * as http from 'node:http';
 import express, {Application, NextFunction, Request, Response} from 'express';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import session from 'express-session';
+import session, {Store} from 'express-session';
 import Path from 'path';
 import {PemHelper} from '../../Crypto/PemHelper.js';
 import {Logger} from '../../Logger/Logger.js';
@@ -82,6 +82,11 @@ export class BaseHttpServer {
      */
     protected _server: http.Server|null = null;
 
+    /**
+     * Server session express parser
+     * @protected
+     */
+    protected _sessionParser: express.RequestHandler|null = null;
 
     /**
      * realm
@@ -147,6 +152,15 @@ export class BaseHttpServer {
     }
 
     /**
+     * Return the session store, default is Memory Store
+     * @protected
+     * @return {Store}
+     */
+    protected _getSessionStore(): Store {
+        return new session.MemoryStore();
+    }
+
+    /**
      * _initServer
      * @protected
      */
@@ -158,20 +172,20 @@ export class BaseHttpServer {
         // -------------------------------------------------------------------------------------------------------------
 
         if (this._session) {
-            this._express.use(
-                session({
-                    secret: this._session.secret,
-                    proxy: true,
-                    resave: true,
-                    saveUninitialized: true,
-                    store: new session.MemoryStore(),
-                    cookie: {
-                        path: this._session.cookie_path,
-                        secure: this._session.ssl_path !== '',
-                        maxAge: this._session.max_age
-                    }
-                })
-            );
+            this._sessionParser = session({
+                secret: this._session.secret,
+                proxy: true,
+                resave: true,
+                saveUninitialized: true,
+                store: this._getSessionStore(),
+                cookie: {
+                    path: this._session.cookie_path,
+                    secure: this._session.ssl_path !== '',
+                    maxAge: this._session.max_age
+                }
+            });
+
+            this._express.use(this._sessionParser);
         }
     }
 
