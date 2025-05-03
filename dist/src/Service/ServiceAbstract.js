@@ -10,8 +10,15 @@ export var ServiceStatus;
     ServiceStatus["Success"] = "success";
     ServiceStatus["Error"] = "error";
 })(ServiceStatus || (ServiceStatus = {}));
+export var ServiceImportance;
+(function (ServiceImportance) {
+    ServiceImportance[ServiceImportance["Optional"] = 0] = "Optional";
+    ServiceImportance[ServiceImportance["Important"] = 1] = "Important";
+    ServiceImportance[ServiceImportance["Critical"] = 2] = "Critical";
+})(ServiceImportance || (ServiceImportance = {}));
 export class ServiceAbstract {
     _type;
+    _importance = ServiceImportance.Optional;
     _status = ServiceStatus.None;
     _statusMsg = '';
     _inProcess = false;
@@ -20,6 +27,9 @@ export class ServiceAbstract {
     }
     getType() {
         return this._type;
+    }
+    getImportance() {
+        return this._importance;
     }
     isProcess() {
         return this._inProcess;

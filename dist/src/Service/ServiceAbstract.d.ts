@@ -8,13 +8,20 @@ export declare enum ServiceStatus {
     Success = "success",
     Error = "error"
 }
+export declare enum ServiceImportance {
+    Optional = 0,
+    Important = 1,
+    Critical = 2
+}
 export declare class ServiceAbstract {
     protected _type: ServiceType;
+    protected readonly _importance: ServiceImportance;
     protected _status: ServiceStatus;
     protected _statusMsg: string;
     protected _inProcess: boolean;
     constructor();
     getType(): ServiceType;
+    getImportance(): ServiceImportance;
     isProcess(): boolean;
     getStatus(): string | ServiceStatus;
     getStatusMsg(): string;

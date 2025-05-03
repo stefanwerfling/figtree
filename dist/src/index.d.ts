@@ -47,7 +47,8 @@ export { BaseHttpCertKey, BaseHttpServerOptionCrypt, BaseHttpServerOptionSession
 export { USHttpServerOptions, USHttpServer } from './Server/HttpServer/USHttpServer.js';
 export { HttpUploadChunkInfo, FnHttpUploadHandleSuccess, HttpUpload } from './Server/HttpServer/HttpUpload.js';
 export { ProcessAwait } from './Process/ProcessAwait.js';
-export { ServiceStatus, ServiceType, ServiceAbstract } from './Service/ServiceAbstract.js';
+export { ServiceError } from './Service/ServiceError.js';
+export { ServiceStatus, ServiceType, ServiceAbstract, ServiceImportance } from './Service/ServiceAbstract.js';
 export { ServiceList } from './Service/ServiceList.js';
 export { BackendApp } from './Application/BackendApp.js';
 export { MariaDBService } from './Application/Services/MariaDBService.js';

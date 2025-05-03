@@ -98,7 +98,8 @@ export {HttpUploadChunkInfo, FnHttpUploadHandleSuccess, HttpUpload} from './Serv
 export {ProcessAwait} from './Process/ProcessAwait.js';
 
 // Service -------------------------------------------------------------------------------------------------------------
-export {ServiceStatus, ServiceType, ServiceAbstract} from './Service/ServiceAbstract.js';
+export {ServiceError} from './Service/ServiceError.js';
+export {ServiceStatus, ServiceType, ServiceAbstract, ServiceImportance} from './Service/ServiceAbstract.js';
 export {ServiceList} from './Service/ServiceList.js';
 
 // Application ---------------------------------------------------------------------------------------------------------

@@ -3,13 +3,19 @@ import {DBHelper} from '../../Db/MariaDb/DBHelper.js';
 import {DBLoaderType} from '../../Db/MariaDb/DBLoader.js';
 import {Logger} from '../../Logger/Logger.js';
 import {SchemaConfigBackendOptions} from '../../Schemas/Config/ConfigBackendOptions.js';
-import {ServiceAbstract, ServiceStatus} from '../../Service/ServiceAbstract.js';
+import {ServiceAbstract, ServiceImportance, ServiceStatus} from '../../Service/ServiceAbstract.js';
+import {ServiceError} from '../../Service/ServiceError.js';
 import {StringHelper} from '../../Utils/StringHelper.js';
 
 /**
  * Maria DB Service
  */
 export class MariaDBService extends ServiceAbstract {
+
+    /**
+     * Importance
+     */
+    protected readonly _importance: ServiceImportance = ServiceImportance.Critical;
 
     /**
      * Loader
@@ -30,29 +36,24 @@ export class MariaDBService extends ServiceAbstract {
      * Start the service
      */
     public override async start(): Promise<void> {
+        this._inProcess = true;
         this._status = ServiceStatus.Progress;
 
         try {
             const tConfig = Config.getInstance().get();
 
             if (tConfig === null) {
-                this._status = ServiceStatus.Error;
-                this._statusMsg = 'MariaDBService::start: Error while connecting to the MariaDB, check your config file exist!';
-
-                Logger.getLogger().error(this._statusMsg);
-
-                this._inProcess = false;
-                return;
+                throw new ServiceError(
+                    this.constructor.name,
+                    'Config is null. Check your config file exists!'
+                );
             }
 
             if (!SchemaConfigBackendOptions.validate(tConfig, [])) {
-                this._status = ServiceStatus.Error;
-                this._statusMsg = 'MariaDBService::start: Error while connecting to the MariaDB, check your config is correct setup!';
-
-                Logger.getLogger().error(this._statusMsg);
-
-                this._inProcess = false;
-                return;
+                throw new ServiceError(
+                    this.constructor.name,
+                    'Configuration is invalid. Check your config file format and values.'
+                );
             }
 
             await DBHelper.init({
@@ -69,16 +70,21 @@ export class MariaDBService extends ServiceAbstract {
             });
         } catch (error) {
             this._status = ServiceStatus.Error;
-            this._statusMsg = StringHelper.sprintf('MariaDBService::start: Error while connecting to the MariaDB: %e', error);
+            this._inProcess = false;
+
+            this._statusMsg = StringHelper.sprintf(
+                'MariaDBService::start: Error while connecting to the MariaDB: %e',
+                error
+            );
 
             Logger.getLogger().error(this._statusMsg);
 
-            this._inProcess = false;
-            return;
+            throw error;
         }
 
+        this._statusMsg = '';
         this._status = ServiceStatus.Success;
-        this._inProcess = true;
+        this._inProcess = false;
     }
 
     /**

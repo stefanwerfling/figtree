@@ -17,6 +17,15 @@ export enum ServiceStatus {
 }
 
 /**
+ * Service Importance
+ */
+export enum ServiceImportance {
+    Optional,
+    Important,
+    Critical
+}
+
+/**
  * Service Abstract
  */
 export class ServiceAbstract {
@@ -26,6 +35,11 @@ export class ServiceAbstract {
      * @protected
      */
     protected _type: ServiceType;
+
+    /**
+     * Importance
+     */
+    protected readonly _importance: ServiceImportance = ServiceImportance.Optional;
 
     /**
      * Service status
@@ -61,6 +75,14 @@ export class ServiceAbstract {
     }
 
     /**
+     * Return the Service importance
+     * @return {ServiceImportance}
+     */
+    public getImportance(): ServiceImportance {
+        return this._importance;
+    }
+
+    /**
      * Return, is service in process
      * @returns {boolean}
      */
@@ -86,6 +108,7 @@ export class ServiceAbstract {
 
     /**
      * Start the service
+     * @throws Error
      */
     public async start(): Promise<void> {}
 
@@ -104,4 +127,5 @@ export class ServiceAbstract {
      * Reload the service
      */
     public async reload(): Promise<void> {}
+
 }
