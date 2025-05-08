@@ -54,6 +54,9 @@
     },
     "@types/node-forge": {
       "optional": true
+    },
+    "@types/swagger-ui-express": {
+      "optional": true
     }
   },
   "devDependencies": {
