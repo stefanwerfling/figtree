@@ -93,6 +93,7 @@ export {
 } from './Server/HttpServer/BaseHttpServer.js';
 export {USHttpServerOptions, USHttpServer} from './Server/HttpServer/USHttpServer.js';
 export {HttpUploadChunkInfo, FnHttpUploadHandleSuccess, HttpUpload} from './Server/HttpServer/HttpUpload.js';
+export {SwaggerUIRoute} from './Server/HttpServer/Routes/SwaggerUIRoute.js';
 
 // Process -------------------------------------------------------------------------------------------------------------
 export {ProcessAwait} from './Process/ProcessAwait.js';

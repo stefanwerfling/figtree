@@ -64,6 +64,7 @@
     "@types/express-session": "^1.18.1",
     "@types/node": "^20.17.16",
     "@types/node-forge": "git+https://github.com/stefanwerfling/node-forge-types.git",
+    "@types/swagger-ui-express": "^4.1.8",
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^8.21.0",
     "@typescript-eslint/parser": "^8.21.0",

@@ -46,6 +46,7 @@ export { HttpRouteLoader, HttpRouteLoaderType } from './Server/HttpServer/HttpRo
 export { BaseHttpCertKey, BaseHttpServerOptionCrypt, BaseHttpServerOptionSession, BaseHttpServerOptions, BaseHttpServer } from './Server/HttpServer/BaseHttpServer.js';
 export { USHttpServerOptions, USHttpServer } from './Server/HttpServer/USHttpServer.js';
 export { HttpUploadChunkInfo, FnHttpUploadHandleSuccess, HttpUpload } from './Server/HttpServer/HttpUpload.js';
+export { SwaggerUIRoute } from './Server/HttpServer/Routes/SwaggerUIRoute.js';
 export { ProcessAwait } from './Process/ProcessAwait.js';
 export { ServiceError } from './Service/ServiceError.js';
 export { ServiceStatus, ServiceType, ServiceAbstract, ServiceImportance } from './Service/ServiceAbstract.js';

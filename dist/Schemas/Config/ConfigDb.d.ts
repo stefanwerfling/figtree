@@ -15,43 +15,43 @@ export declare enum ENV_OPTIONAL_DB {
     DB_REDIS_PASSWORD = "DB_REDIS_PASSWORD"
 }
 export declare const SchemaConfigDbOptionsMySql: import("vts/dist/schemas/objectSchema.js").ObjectSchema<{
-    host: import("vts/dist/schemas/stringSchema.js").StringSchema;
+    host: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
     port: import("vts/dist/schemas/numberSchema.js").NumberSchema;
-    username: import("vts/dist/schemas/stringSchema.js").StringSchema;
-    password: import("vts/dist/schemas/stringSchema.js").StringSchema;
-    database: import("vts/dist/schemas/stringSchema.js").StringSchema;
+    username: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
+    password: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
+    database: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
 }>;
 export declare const SchemaConfigDbOptionsInflux: import("vts/dist/schemas/objectSchema.js").ObjectSchema<{
-    url: import("vts/dist/schemas/stringSchema.js").StringSchema;
-    token: import("vts/dist/schemas/stringSchema.js").StringSchema;
-    org: import("vts/dist/schemas/stringSchema.js").StringSchema;
-    bucket: import("vts/dist/schemas/stringSchema.js").StringSchema;
-    username: import("vts/dist/schemas/stringSchema.js").StringSchema;
-    password: import("vts/dist/schemas/stringSchema.js").StringSchema;
+    url: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
+    token: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
+    org: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
+    bucket: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
+    username: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
+    password: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
 }>;
 export declare const SchemaConfigDbOptionsRedis: import("vts/dist/schemas/objectSchema.js").ObjectSchema<{
-    url: import("vts/dist/schemas/stringSchema.js").StringSchema;
-    password: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/stringSchema.js").StringSchema>;
+    url: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
+    password: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>>;
 }>;
 export declare const SchemaConfigDbOptions: import("vts/dist/schemas/objectSchema.js").ObjectSchema<{
     mysql: import("vts/dist/schemas/objectSchema.js").ObjectSchema<{
-        host: import("vts/dist/schemas/stringSchema.js").StringSchema;
+        host: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
         port: import("vts/dist/schemas/numberSchema.js").NumberSchema;
-        username: import("vts/dist/schemas/stringSchema.js").StringSchema;
-        password: import("vts/dist/schemas/stringSchema.js").StringSchema;
-        database: import("vts/dist/schemas/stringSchema.js").StringSchema;
+        username: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
+        password: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
+        database: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
     }>;
     influx: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/objectSchema.js").ObjectSchema<{
-        url: import("vts/dist/schemas/stringSchema.js").StringSchema;
-        token: import("vts/dist/schemas/stringSchema.js").StringSchema;
-        org: import("vts/dist/schemas/stringSchema.js").StringSchema;
-        bucket: import("vts/dist/schemas/stringSchema.js").StringSchema;
-        username: import("vts/dist/schemas/stringSchema.js").StringSchema;
-        password: import("vts/dist/schemas/stringSchema.js").StringSchema;
+        url: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
+        token: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
+        org: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
+        bucket: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
+        username: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
+        password: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
     }>>;
     redis: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/objectSchema.js").ObjectSchema<{
-        url: import("vts/dist/schemas/stringSchema.js").StringSchema;
-        password: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/stringSchema.js").StringSchema>;
+        url: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
+        password: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>>;
     }>>;
 }>;
 export type ConfigDbOptions = ExtractSchemaResultType<typeof SchemaConfigDbOptions>;
