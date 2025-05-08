@@ -37,11 +37,12 @@ export class SwaggerUIRoute extends DefaultRoute {
      * @returns {Router}
      */
     public getExpressRouter(): Router {
-        this._routes.use('/swagger', (req, res, next) => {
-            swaggerUi.setup(this._openApiSpec)(req, res, next);
-        });
-
         this._routes.use('/swagger', swaggerUi.serve);
+
+        this._routes.get('/swagger', (req, res, next) => {
+            const handler = swaggerUi.setup(this._openApiSpec);
+            handler(req, res, next); // gibt HTML zurück
+        });
 
         return super.getExpressRouter();
     }

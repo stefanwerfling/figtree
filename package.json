@@ -1,6 +1,6 @@
 {
   "name": "figtree",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "Figtree - Server Core",
   "author": "Stefan Werfling",
   "main": "dist/index.js",
