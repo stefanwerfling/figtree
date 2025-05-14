@@ -1,8 +1,8 @@
 import { BackendApp } from '../../Application/BackendApp.js';
 import { HttpService } from '../../Application/Services/HttpService.js';
 import { SchemaDefaultArgs } from '../../Schemas/Args/DefaultArgs.js';
-import { HttpRouteLoader } from '../../Server/HttpServer/HttpRouteLoader.js';
-import { ExampleConfig } from './ExampleConfig.js';
+import { ExampleConfig } from '../Config/ExampleConfig.js';
+import { ExampleRouteLoader } from '../Routes/ExampleRouteLoader.js';
 export class ExampleBackend extends BackendApp {
     _getConfigInstance() {
         const config = ExampleConfig.getInstance();
@@ -13,7 +13,7 @@ export class ExampleBackend extends BackendApp {
         return SchemaDefaultArgs;
     }
     async _initServices() {
-        this._serviceList.add(new HttpService(HttpRouteLoader));
+        this._serviceList.add(new HttpService(ExampleRouteLoader));
     }
 }
 //# sourceMappingURL=ExampleBackend.js.map

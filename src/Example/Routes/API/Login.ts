@@ -1,0 +1,53 @@
+import {Router} from 'express';
+import {StatusCodes} from '../../../Schemas/Server/Routes/StatusCodes.js';
+import {DefaultRoute} from '../../../Server/HttpServer/Routes/DefaultRoute.js';
+import {IsLogin, SchemaIsLogin} from '../../Schemas/Routes/Login/Login.js';
+
+export class Login extends DefaultRoute {
+
+    /**
+     * Base URL string
+     */
+    public static BASE = 'login';
+
+    /**
+     * Return the express router
+     * @returns {Router}
+     */
+    public getExpressRouter(): Router {
+        this._get(
+            this._getUrl('v1', Login.BASE, 'islogin'),
+            false,
+            async(
+                req,
+                res,
+                description
+            ) => {
+
+                // Your code -------------------------------------------------------------------------------------------
+                // Handler todo start ----------------------------------------------------------------------------------
+
+                if (this.isUserLogin(req, res, false)) {
+                    res.status(200).json({
+                        statusCode: StatusCodes.OK,
+                        status: true
+                    } as IsLogin);
+                } else {
+                    res.status(200).json({
+                        statusCode: StatusCodes.OK,
+                        status: false
+                    } as IsLogin);
+                }
+
+                // Handler todo end ----------------------------------------------------------------------------------
+            },
+            {
+                description: 'Is a user login and return a status to the current session',
+                responseBodySchema: SchemaIsLogin
+            }
+        );
+
+        return super.getExpressRouter();
+    }
+
+}

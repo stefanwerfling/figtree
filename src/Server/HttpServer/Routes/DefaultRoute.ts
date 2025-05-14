@@ -6,16 +6,30 @@ import {Session} from '../Session.js';
 import {DefaultReturn} from './../../../Schemas/Server/Routes/DefaultReturn.js';
 import path from 'path';
 import {Schema, SchemaErrors} from 'vts';
+import {RouteError} from './RouteError.js';
+import {SwaggerUIRoute} from './SwaggerUIRoute.js';
 
 /**
  * DefaultRouteHandlerGet
  */
-export type DefaultRouteHandlerGet = (request: Request, response: Response) => void;
+export type DefaultRouteHandlerGet<T> = (request: Request, response: Response, description: DefaultRouteMethodeDescription<T>) => void;
 
 /**
  * DefaultRouteHandlerPost
  */
-export type DefaultRouteHandlerPost = (request: Request, response: Response) => void;
+export type DefaultRouteHandlerPost<T> = (request: Request, response: Response, description: DefaultRouteMethodeDescription<T>) => void;
+
+/**
+ * DefaultRouteMethodeDescription
+ */
+export type DefaultRouteMethodeDescription<T> = {
+    description?: string;
+    requestHeaderSchema?: Schema<T>;
+    requestParamSchema?: Schema<T>;
+    requestBodySchema?: Schema<T>;
+    responseBodySchema?: Schema<T>;
+    responseHeaderSchema?: Schema<T>;
+};
 
 /**
  * DefaultRoute
@@ -97,9 +111,7 @@ export class DefaultRoute {
         }
 
         if (sendAutoResoonse) {
-            res.status(200).json({
-                statusCode: StatusCodes.UNAUTHORIZED
-            } as DefaultReturn);
+            throw new RouteError(StatusCodes.UNAUTHORIZED, 'User is unauthorized!');
         }
 
         return false;
@@ -118,9 +130,10 @@ export class DefaultRoute {
      * @param {string} uriPath
      * @param {boolean} checkUserLogin
      * @param {DefaultRouteHandlerGet} handler
+     * @param {DefaultRouteMethodeDescription} description
      * @protected
      */
-    protected _get(uriPath: string, checkUserLogin: boolean, handler: DefaultRouteHandlerGet): void {
+    protected _get<T>(uriPath: string, checkUserLogin: boolean, handler: DefaultRouteHandlerGet<T>, description: DefaultRouteMethodeDescription<T>): void {
         try {
             this._routes.get(uriPath, async(req, res) => {
                 try {
@@ -130,11 +143,25 @@ export class DefaultRoute {
                         }
                     }
 
-                    handler(req, res);
+                    handler(req, res, description);
                 } catch (ie) {
+                    if (ie instanceof RouteError) {
+                        if (ie.asJson()) {
+                            res.status(200).json(ie.defaultReturn());
+                        } else {
+                            res.status(ie.getStatus()).send(ie.getRawMsg());
+                        }
+
+                        return;
+                    }
+
                     Logger.getLogger().error('DefaultRoute::_get: Exception intern, path can not call: %0', uriPath);
                 }
             });
+
+            if (SwaggerUIRoute.hasInstance()) {
+                SwaggerUIRoute.getInstance().registerGet(uriPath, description);
+            }
         } catch (e) {
             Logger.getLogger().error(`DefaultRoute::_get: Exception extern, path can not call: %0$`, uriPath);
         }
@@ -145,9 +172,11 @@ export class DefaultRoute {
      * @param {string} uriPath
      * @param {boolean} checkUserLogin
      * @param {DefaultRouteHandlerPost} handler
+     * @param {T} schema
+     * @param {string} description
      * @protected
      */
-    protected _post(uriPath: string, checkUserLogin: boolean, handler: DefaultRouteHandlerPost): void {
+    protected _post<T>(uriPath: string, checkUserLogin: boolean, handler: DefaultRouteHandlerPost<T>, description: DefaultRouteMethodeDescription<T>): void {
         try {
             this._routes.post(uriPath, async(req, res) => {
                 try {
@@ -157,11 +186,15 @@ export class DefaultRoute {
                         }
                     }
 
-                    handler(req, res);
+                    handler(req, res, description);
                 } catch (ie) {
                     Logger.getLogger().error('DefaultRoute::_post: Exception intern, path can not call: %0', uriPath);
                 }
             });
+
+            if (SwaggerUIRoute.hasInstance()) {
+                SwaggerUIRoute.getInstance().registerPost(uriPath, description);
+            }
         } catch (e) {
             Logger.getLogger().error('DefaultRoute::_post: Exception extern, path can not call: %0', uriPath);
         }

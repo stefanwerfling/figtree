@@ -1,4 +1,4 @@
-import {ExampleBackend} from './inc/ExampleBackend.js';
+import {ExampleBackend} from './Application/ExampleBackend.js';
 
 /**
  * Main
