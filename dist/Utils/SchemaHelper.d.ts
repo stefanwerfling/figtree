@@ -17,5 +17,6 @@ export declare class SchemaHelper {
     static _convertByType(descript: object): object | null;
     static convertSchemaToSwagger<T>(schema: Schema<T>): any;
     static convertSchemaToSwaggerResponse<T>(statusCode: string, schema: Schema<T>): any;
+    static convertSchemaToSwaggerRequest<T>(schema: Schema<T>): any;
     static convertSchemaToSwaggerParameter<T>(instr: SchemaHelperSwaggerIn, schema: Schema<T>): SchemaHelperSwaggerReturnParam[];
 }

@@ -28,6 +28,7 @@ export class SwaggerUIRoute {
         let swagUrl = url;
         const spec = {
             summary: description.description,
+            requestBody: undefined,
             responses: undefined,
             parameters: undefined
         };
@@ -45,8 +46,14 @@ export class SwaggerUIRoute {
         if (description.headerSchema) {
             parameters.push(...SchemaHelper.convertSchemaToSwaggerParameter('header', description.headerSchema));
         }
+        if (description.cookieSchema) {
+            parameters.push(...SchemaHelper.convertSchemaToSwaggerParameter('cookie', description.cookieSchema));
+        }
         if (parameters.length > 0) {
             spec.parameters = parameters;
+        }
+        if (description.bodySchema) {
+            spec.requestBody = SchemaHelper.convertSchemaToSwaggerRequest(description.bodySchema);
         }
         if (description.responseBodySchema) {
             spec.responses = SchemaHelper.convertSchemaToSwaggerResponse('200', description.responseBodySchema);

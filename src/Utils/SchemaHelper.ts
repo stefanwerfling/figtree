@@ -168,11 +168,30 @@ export class SchemaHelper {
 
         return {
             [statusCode]: {
-            description: description || '',
+                description: description || '',
                 content: {
                     'application/json': {
                         schema: tSchema
                     }
+                }
+            }
+        };
+    }
+
+    public static convertSchemaToSwaggerRequest<T>(schema: Schema<T>): any {
+        const tSchema = this.convertSchemaToSwagger(schema);
+        let description = 'Unknow descripted';
+
+        if (('description' in tSchema) && (typeof tSchema.description === 'string')) {
+            description = tSchema.description;
+        }
+
+        return {
+            required: true,
+            description: description || '',
+            content: {
+                'application/json': {
+                    schema: tSchema
                 }
             }
         };

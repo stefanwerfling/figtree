@@ -110,6 +110,22 @@ export class SchemaHelper {
             }
         };
     }
+    static convertSchemaToSwaggerRequest(schema) {
+        const tSchema = this.convertSchemaToSwagger(schema);
+        let description = 'Unknow descripted';
+        if (('description' in tSchema) && (typeof tSchema.description === 'string')) {
+            description = tSchema.description;
+        }
+        return {
+            required: true,
+            description: description || '',
+            content: {
+                'application/json': {
+                    schema: tSchema
+                }
+            }
+        };
+    }
     static convertSchemaToSwaggerParameter(instr, schema) {
         const params = [];
         const descript = schema.describe();

@@ -62,6 +62,7 @@ export class SwaggerUIRoute implements IDefaultRoute {
         let swagUrl = url;
         const spec = {
             summary: description.description,
+            requestBody: undefined as undefined | object,
             responses: undefined as undefined | object,
             parameters: undefined as undefined | object[]
         };
@@ -86,8 +87,16 @@ export class SwaggerUIRoute implements IDefaultRoute {
             parameters.push(...SchemaHelper.convertSchemaToSwaggerParameter('header', description.headerSchema));
         }
 
+        if (description.cookieSchema) {
+            parameters.push(...SchemaHelper.convertSchemaToSwaggerParameter('cookie', description.cookieSchema));
+        }
+
         if (parameters.length > 0) {
             spec.parameters = parameters;
+        }
+
+        if (description.bodySchema) {
+            spec.requestBody = SchemaHelper.convertSchemaToSwaggerRequest(description.bodySchema);
         }
 
         if (description.responseBodySchema) {
