@@ -84,6 +84,15 @@ export class DefaultRoute {
                     handler(req, res, description);
                 }
                 catch (ie) {
+                    if (ie instanceof RouteError) {
+                        if (ie.asJson()) {
+                            res.status(200).json(ie.defaultReturn());
+                        }
+                        else {
+                            res.status(parseInt(ie.getStatus(), 10) ?? 500).send(ie.getRawMsg());
+                        }
+                        return;
+                    }
                     Logger.getLogger().error('DefaultRoute::_post: Exception intern, path can not call: %0', uriPath);
                 }
             });

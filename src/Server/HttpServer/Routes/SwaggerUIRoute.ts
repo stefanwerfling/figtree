@@ -58,7 +58,7 @@ export class SwaggerUIRoute implements IDefaultRoute {
         this._openApiSpec.info.version = version;
     }
 
-    protected _addRouteToSwagger<T>(url: string, method: string, description: DefaultRouteMethodeDescription<T>) {
+    protected _addRouteToSwagger<A, B, C, D, E, F, G>(url: string, method: string, description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G>) {
         let swagUrl = url;
         const spec = {
             summary: description.description,
@@ -99,7 +99,7 @@ export class SwaggerUIRoute implements IDefaultRoute {
         this._openApiSpec.paths[swagUrl][method] = spec;
     }
 
-    public registerPost<T>(url: string, description: DefaultRouteMethodeDescription<T>): void {
+    public registerPost<A, B, C, D, E, F, G>(url: string, description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G>): void {
         this._addRouteToSwagger(url, 'post', description);
         /*this._addRouteToSwagger(url, 'post', {
             summary: description.description,
@@ -114,7 +114,7 @@ export class SwaggerUIRoute implements IDefaultRoute {
         });*/
     }
 
-    public registerGet<T>(url: string, description: DefaultRouteMethodeDescription<T>): void {
+    public registerGet<A, B, C, D, E, F, G>(url: string, description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G>): void {
         this._addRouteToSwagger(url, 'get', description);
     }
 

@@ -13,25 +13,25 @@ import {SwaggerUIRoute} from './SwaggerUIRoute.js';
 /**
  * DefaultRouteHandlerGet
  */
-export type DefaultRouteHandlerGet<T> = (request: Request, response: Response, description: DefaultRouteMethodeDescription<T>) => void;
+export type DefaultRouteHandlerGet<A, B, C, D, E, F, G> = (request: Request, response: Response, description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G>) => void;
 
 /**
  * DefaultRouteHandlerPost
  */
-export type DefaultRouteHandlerPost<T> = (request: Request, response: Response, description: DefaultRouteMethodeDescription<T>) => void;
+export type DefaultRouteHandlerPost<A, B, C, D, E, F, G> = (request: Request, response: Response, description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G>) => void;
 
 /**
  * DefaultRouteMethodeDescription
  */
-export type DefaultRouteMethodeDescription<T> = {
+export type DefaultRouteMethodeDescription<A, B, C, D, E, F, G> = {
     description?: string;
-    headerSchema?: Schema<T>;
-    querySchema?: Schema<T>;
-    pathSchema?: Schema<T>;
-    cookieSchema?: Schema<T>;
-    bodySchema?: Schema<T>;
-    responseBodySchema?: Schema<T>;
-    responseHeaderSchema?: Schema<T>;
+    headerSchema?: Schema<A>;
+    querySchema?: Schema<B>;
+    pathSchema?: Schema<C>;
+    cookieSchema?: Schema<D>;
+    bodySchema?: Schema<E>;
+    responseBodySchema?: Schema<F>;
+    responseHeaderSchema?: Schema<G>;
 };
 
 /**
@@ -136,7 +136,7 @@ export class DefaultRoute implements IDefaultRoute {
      * @param {DefaultRouteMethodeDescription} description
      * @protected
      */
-    protected _get<T>(uriPath: string, checkUserLogin: boolean, handler: DefaultRouteHandlerGet<T>, description: DefaultRouteMethodeDescription<T>): void {
+    protected _get<A, B, C, D, E, F, G>(uriPath: string, checkUserLogin: boolean, handler: DefaultRouteHandlerGet<A, B, C, D, E, F, G>, description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G>): void {
         try {
             this._routes.get(uriPath, async(req, res) => {
                 try {
@@ -175,11 +175,10 @@ export class DefaultRoute implements IDefaultRoute {
      * @param {string} uriPath
      * @param {boolean} checkUserLogin
      * @param {DefaultRouteHandlerPost} handler
-     * @param {T} schema
-     * @param {string} description
+     * @param {DefaultRouteMethodeDescription} description
      * @protected
      */
-    protected _post<T>(uriPath: string, checkUserLogin: boolean, handler: DefaultRouteHandlerPost<T>, description: DefaultRouteMethodeDescription<T>): void {
+    protected _post<A, B, C, D, E, F, G>(uriPath: string, checkUserLogin: boolean, handler: DefaultRouteHandlerPost<A, B, C, D, E, F, G>, description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G>): void {
         try {
             this._routes.post(uriPath, async(req, res) => {
                 try {
@@ -191,6 +190,16 @@ export class DefaultRoute implements IDefaultRoute {
 
                     handler(req, res, description);
                 } catch (ie) {
+                    if (ie instanceof RouteError) {
+                        if (ie.asJson()) {
+                            res.status(200).json(ie.defaultReturn());
+                        } else {
+                            res.status(parseInt(ie.getStatus(), 10) ?? 500).send(ie.getRawMsg());
+                        }
+
+                        return;
+                    }
+
                     Logger.getLogger().error('DefaultRoute::_post: Exception intern, path can not call: %0', uriPath);
                 }
             });
