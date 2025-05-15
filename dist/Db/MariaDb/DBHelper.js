@@ -1,15 +1,10 @@
 import { DataSource } from 'typeorm';
-import { VersionRepository, versionsConfig } from 'typeorm-versions';
 export class DBHelper {
     static _sources = new Map();
     static _useHistory = true;
     static async init(options, useHistory = true) {
         this._useHistory = useHistory;
-        let dbOptions = options;
-        if (this._useHistory) {
-            dbOptions = versionsConfig(dbOptions);
-        }
-        const dataSource = new DataSource(dbOptions);
+        const dataSource = new DataSource(options);
         await dataSource.initialize();
         let name = 'default';
         if (options.name) {
@@ -31,12 +26,6 @@ export class DBHelper {
     static getRepository(target, sourceName) {
         const dataSource = DBHelper.getDataSource(sourceName);
         return dataSource.getRepository(target);
-    }
-    static getVersionRepository() {
-        if (this._useHistory) {
-            return VersionRepository(DBHelper.getDataSource());
-        }
-        return null;
     }
     static async closeAllSources() {
         for await (const [key, dataSource] of DBHelper._sources) {

@@ -1,7 +1,6 @@
 import { __decorate, __metadata } from "tslib";
-import { PrimaryGeneratedColumn } from 'typeorm';
-import { VersionedBaseEntity } from 'typeorm-versions';
-export class DBBaseEntityUnid extends VersionedBaseEntity {
+import { PrimaryGeneratedColumn, BaseEntity } from 'typeorm';
+export class DBBaseEntityUnid extends BaseEntity {
     unid;
 }
 __decorate([

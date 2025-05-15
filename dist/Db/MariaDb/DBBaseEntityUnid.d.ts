@@ -1,4 +1,4 @@
-import { VersionedBaseEntity } from 'typeorm-versions';
-export declare class DBBaseEntityUnid extends VersionedBaseEntity {
+import { BaseEntity } from 'typeorm';
+export declare class DBBaseEntityUnid extends BaseEntity {
     unid: string;
 }

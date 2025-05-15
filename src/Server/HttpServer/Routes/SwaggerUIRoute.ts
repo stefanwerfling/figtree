@@ -1,13 +1,6 @@
 import {Router} from 'express';
-import {Schema, Vts} from 'vts';
-import {ObjectSchemaItems} from 'vts/src/schemas/objectSchema.js';
 import {DefaultRoute, DefaultRouteMethodeDescription} from './DefaultRoute.js';
 import swaggerUi from 'swagger-ui-express';
-
-export type SwaggerUIRouteDescription = {
-    description: string;
-    requestBodySchema: ObjectSchemaItems
-};
 
 /**
  * Swagger UI Route

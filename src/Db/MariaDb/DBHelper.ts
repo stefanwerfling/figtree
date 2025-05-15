@@ -5,7 +5,6 @@ import {
     ObjectLiteral,
     Repository
 } from 'typeorm';
-import {Version, VersionRepository, versionsConfig} from 'typeorm-versions';
 
 /**
  * Database helper
@@ -31,13 +30,7 @@ export class DBHelper {
     public static async init(options: DataSourceOptions, useHistory: boolean = true): Promise<void> {
         this._useHistory = useHistory;
 
-        let dbOptions = options;
-
-        if (this._useHistory) {
-            dbOptions = versionsConfig(dbOptions);
-        }
-
-        const dataSource = new DataSource(dbOptions);
+        const dataSource = new DataSource(options);
         await dataSource.initialize();
 
         let name = 'default';
@@ -78,18 +71,6 @@ export class DBHelper {
     public static getRepository<Entity extends ObjectLiteral>(target: EntityTarget<Entity>, sourceName?: string): Repository<Entity> {
         const dataSource = DBHelper.getDataSource(sourceName);
         return dataSource.getRepository(target);
-    }
-
-    /**
-     * Return the version repository
-     * @returns {Repository<Version>|null}
-     */
-    public static getVersionRepository(): Repository<Version>|null {
-        if (this._useHistory) {
-            return VersionRepository(DBHelper.getDataSource());
-        }
-
-        return null;
     }
 
     /**

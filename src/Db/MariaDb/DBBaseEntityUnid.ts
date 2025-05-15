@@ -1,10 +1,9 @@
-import {PrimaryGeneratedColumn} from 'typeorm';
-import {VersionedBaseEntity} from 'typeorm-versions';
+import {PrimaryGeneratedColumn, BaseEntity} from 'typeorm';
 
 /**
  * Database base entity unid
  */
-export class DBBaseEntityUnid extends VersionedBaseEntity {
+export class DBBaseEntityUnid extends BaseEntity {
 
     /**
      * id
