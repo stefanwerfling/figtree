@@ -24,9 +24,11 @@ export type DefaultRouteHandlerPost<T> = (request: Request, response: Response, 
  */
 export type DefaultRouteMethodeDescription<T> = {
     description?: string;
-    requestHeaderSchema?: Schema<T>;
-    requestParamSchema?: Schema<T>;
-    requestBodySchema?: Schema<T>;
+    headerSchema?: Schema<T>;
+    querySchema?: Schema<T>;
+    pathSchema?: Schema<T>;
+    cookieSchema?: Schema<T>;
+    bodySchema?: Schema<T>;
     responseBodySchema?: Schema<T>;
     responseHeaderSchema?: Schema<T>;
 };
@@ -149,7 +151,7 @@ export class DefaultRoute {
                         if (ie.asJson()) {
                             res.status(200).json(ie.defaultReturn());
                         } else {
-                            res.status(ie.getStatus()).send(ie.getRawMsg());
+                            res.status(parseInt(ie.getStatus(), 10) ?? 500).send(ie.getRawMsg());
                         }
 
                         return;

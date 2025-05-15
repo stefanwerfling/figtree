@@ -1,7 +1,7 @@
 export var StatusCodes;
 (function (StatusCodes) {
-    StatusCodes[StatusCodes["OK"] = 200] = "OK";
-    StatusCodes[StatusCodes["UNAUTHORIZED"] = 401] = "UNAUTHORIZED";
-    StatusCodes[StatusCodes["INTERNAL_ERROR"] = 500] = "INTERNAL_ERROR";
+    StatusCodes["OK"] = "200";
+    StatusCodes["UNAUTHORIZED"] = "401";
+    StatusCodes["INTERNAL_ERROR"] = "500";
 })(StatusCodes || (StatusCodes = {}));
 //# sourceMappingURL=StatusCodes.js.map

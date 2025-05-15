@@ -5,9 +5,11 @@ export type DefaultRouteHandlerGet<T> = (request: Request, response: Response, d
 export type DefaultRouteHandlerPost<T> = (request: Request, response: Response, description: DefaultRouteMethodeDescription<T>) => void;
 export type DefaultRouteMethodeDescription<T> = {
     description?: string;
-    requestHeaderSchema?: Schema<T>;
-    requestParamSchema?: Schema<T>;
-    requestBodySchema?: Schema<T>;
+    headerSchema?: Schema<T>;
+    querySchema?: Schema<T>;
+    pathSchema?: Schema<T>;
+    cookieSchema?: Schema<T>;
+    bodySchema?: Schema<T>;
     responseBodySchema?: Schema<T>;
     responseHeaderSchema?: Schema<T>;
 };

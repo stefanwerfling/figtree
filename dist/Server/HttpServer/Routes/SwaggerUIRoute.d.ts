@@ -6,9 +6,8 @@ export declare class SwaggerUIRoute extends DefaultRoute {
     static hasInstance(): boolean;
     protected _openApiSpec: any;
     setInfo(title?: string, version?: string): void;
-    protected _convertToOpenApiResponse(obj: any, statusCode?: string): any;
+    protected _addRouteToSwagger<T>(url: string, method: string, description: DefaultRouteMethodeDescription<T>): void;
     registerPost<T>(url: string, description: DefaultRouteMethodeDescription<T>): void;
     registerGet<T>(url: string, description: DefaultRouteMethodeDescription<T>): void;
-    protected _addRouteToSwagger(path: string, method: string, spec: any): void;
     getExpressRouter(): Router;
 }

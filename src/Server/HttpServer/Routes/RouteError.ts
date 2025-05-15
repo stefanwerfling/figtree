@@ -9,7 +9,7 @@ export class RouteError extends Error {
      * Status
      * @protected
      */
-    protected _status: number;
+    protected _status: string;
 
     /**
      * Message
@@ -29,7 +29,7 @@ export class RouteError extends Error {
      * @param {string} msg
      * @param {boolean} returnAsJson
      */
-    public constructor(status: number, msg: string, returnAsJson: boolean = true) {
+    public constructor(status: string, msg: string, returnAsJson: boolean = true) {
         super(`[${status}] ${msg}`);
         this._status = status;
         this._msg = msg;
@@ -58,7 +58,7 @@ export class RouteError extends Error {
      * Return the status
      * @return {number}
      */
-    public getStatus(): number {
+    public getStatus(): string {
         return this._status;
     }
 

@@ -57,7 +57,7 @@ export class DefaultRoute {
                             res.status(200).json(ie.defaultReturn());
                         }
                         else {
-                            res.status(ie.getStatus()).send(ie.getRawMsg());
+                            res.status(parseInt(ie.getStatus(), 10) ?? 500).send(ie.getRawMsg());
                         }
                         return;
                     }
