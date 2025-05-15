@@ -1,12 +1,13 @@
 import {Router} from 'express';
 import {SchemaHelper} from '../../../Utils/SchemaHelper.js';
-import {DefaultRoute, DefaultRouteMethodeDescription} from './DefaultRoute.js';
+import {DefaultRouteMethodeDescription} from './DefaultRoute.js';
+import {IDefaultRoute} from './IDefaultRoute.js';
 import swaggerUi from 'swagger-ui-express';
 
 /**
  * Swagger UI Route
  */
-export class SwaggerUIRoute extends DefaultRoute {
+export class SwaggerUIRoute implements IDefaultRoute {
 
     /**
      * Instance
@@ -122,13 +123,14 @@ export class SwaggerUIRoute extends DefaultRoute {
      * @returns {Router}
      */
     public getExpressRouter(): Router {
-        this._routes.use('/swagger', swaggerUi.serve);
+        const routes = Router();
 
-        this._routes.get('/swagger', (req, res, next) => {
+        routes.use('/swagger', swaggerUi.serve);
+        routes.get('/swagger', (req, res, next) => {
             const handler = swaggerUi.setup(this._openApiSpec);
             handler(req, res, next); // gibt HTML zurück
         });
 
-        return super.getExpressRouter();
+        return routes;
     }
 }

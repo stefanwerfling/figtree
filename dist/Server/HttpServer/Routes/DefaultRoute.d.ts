@@ -1,6 +1,7 @@
 import { Request, Response, Router } from 'express';
 import { RequestData } from '../../../Schemas/Server/RequestData.js';
 import { Schema } from 'vts';
+import { IDefaultRoute } from './IDefaultRoute.js';
 export type DefaultRouteHandlerGet<T> = (request: Request, response: Response, description: DefaultRouteMethodeDescription<T>) => void;
 export type DefaultRouteHandlerPost<T> = (request: Request, response: Response, description: DefaultRouteMethodeDescription<T>) => void;
 export type DefaultRouteMethodeDescription<T> = {
@@ -13,7 +14,7 @@ export type DefaultRouteMethodeDescription<T> = {
     responseBodySchema?: Schema<T>;
     responseHeaderSchema?: Schema<T>;
 };
-export declare class DefaultRoute {
+export declare class DefaultRoute implements IDefaultRoute {
     protected _routes: Router;
     protected _uriBase: string;
     constructor();

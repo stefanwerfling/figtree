@@ -1,7 +1,7 @@
 import * as http from 'node:http';
 import express, { Application } from 'express';
 import { Store } from 'express-session';
-import { DefaultRoute } from './Routes/DefaultRoute.js';
+import { IDefaultRoute } from './Routes/IDefaultRoute.js';
 export type BaseHttpServerOptionCrypt = {
     sslPath: string;
     key: string;
@@ -16,7 +16,7 @@ export type BaseHttpServerOptionSession = {
 export type BaseHttpServerOptions = {
     realm: string;
     port?: number;
-    routes?: DefaultRoute[];
+    routes?: IDefaultRoute[];
     session: BaseHttpServerOptionSession;
     publicDir?: string;
     crypt?: BaseHttpServerOptionCrypt;

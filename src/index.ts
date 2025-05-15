@@ -45,6 +45,7 @@ export {BufferHelper} from './Utils/BufferHelper.js';
 export {StringHelper} from './Utils/StringHelper.js';
 export {DateHelper} from './Utils/DateHelper.js';
 export {IPHelper} from './Utils/IPHelper.js';
+export {SchemaHelperSwaggerIn, SchemaHelperSwaggerReturnParam, SchemaHelper} from './Utils/SchemaHelper.js';
 
 // Crypt ---------------------------------------------------------------------------------------------------------------
 export {PemError} from './Crypto/Pem/PemError.js';
@@ -79,6 +80,8 @@ export {Server as RawServer} from './Server/RawServer/Server.js';
 export {Client as RawClient} from './Server/RawServer/Client/Client.js';
 
 // HTTP Server ---------------------------------------------------------------------------------------------------------
+export {IDefaultRoute} from './Server/HttpServer/Routes/IDefaultRoute.js';
+export {RouteError} from './Server/HttpServer/Routes/RouteError.js';
 export {DefaultRouteHandlerGet, DefaultRouteHandlerPost, DefaultRoute} from './Server/HttpServer/Routes/DefaultRoute.js';
 export {ITlsClientError} from './Server/HttpServer/Tls/ITlsClientError.js';
 export {ITlsSocket} from './Server/HttpServer/Tls/ITlsSocket.js';

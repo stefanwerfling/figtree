@@ -1,8 +1,8 @@
-import { DefaultRoute } from './Routes/DefaultRoute.js';
+import { IDefaultRoute } from './Routes/IDefaultRoute.js';
 export declare class HttpRouteLoader {
-    static loadRoutes(): Promise<DefaultRoute[]>;
+    static loadRoutes(): Promise<IDefaultRoute[]>;
 }
 export type HttpRouteLoaderType = {
     new (): HttpRouteLoader;
-    loadRoutes(): Promise<DefaultRoute[]>;
+    loadRoutes(): Promise<IDefaultRoute[]>;
 };

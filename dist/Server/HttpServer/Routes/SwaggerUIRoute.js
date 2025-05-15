@@ -1,7 +1,7 @@
+import { Router } from 'express';
 import { SchemaHelper } from '../../../Utils/SchemaHelper.js';
-import { DefaultRoute } from './DefaultRoute.js';
 import swaggerUi from 'swagger-ui-express';
-export class SwaggerUIRoute extends DefaultRoute {
+export class SwaggerUIRoute {
     static _instance = null;
     static getInstance() {
         if (SwaggerUIRoute._instance === null) {
@@ -61,12 +61,13 @@ export class SwaggerUIRoute extends DefaultRoute {
         this._addRouteToSwagger(url, 'get', description);
     }
     getExpressRouter() {
-        this._routes.use('/swagger', swaggerUi.serve);
-        this._routes.get('/swagger', (req, res, next) => {
+        const routes = Router();
+        routes.use('/swagger', swaggerUi.serve);
+        routes.get('/swagger', (req, res, next) => {
             const handler = swaggerUi.setup(this._openApiSpec);
             handler(req, res, next);
         });
-        return super.getExpressRouter();
+        return routes;
     }
 }
 //# sourceMappingURL=SwaggerUIRoute.js.map

@@ -6,6 +6,7 @@ import {Session} from '../Session.js';
 import {DefaultReturn} from './../../../Schemas/Server/Routes/DefaultReturn.js';
 import path from 'path';
 import {Schema, SchemaErrors} from 'vts';
+import {IDefaultRoute} from './IDefaultRoute.js';
 import {RouteError} from './RouteError.js';
 import {SwaggerUIRoute} from './SwaggerUIRoute.js';
 
@@ -36,7 +37,7 @@ export type DefaultRouteMethodeDescription<T> = {
 /**
  * DefaultRoute
  */
-export class DefaultRoute {
+export class DefaultRoute implements IDefaultRoute {
 
     /**
      * routes

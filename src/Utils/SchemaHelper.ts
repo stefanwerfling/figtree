@@ -110,9 +110,6 @@ export class SchemaHelper {
 
     public static _convertByType(descript: object): object|null {
         if ('type' in descript) {
-            console.log(descript);
-            console.log(descript.type);
-
             // object
             // array
             // object2

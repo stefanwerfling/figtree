@@ -8,8 +8,8 @@ import session, {Store} from 'express-session';
 import Path from 'path';
 import {PemHelper} from '../../Crypto/PemHelper.js';
 import {Logger} from '../../Logger/Logger.js';
-import {DirHelper} from '../../Utils/DirHelper.js';
 import {FileHelper} from '../../Utils/FileHelper.js';
+import {IDefaultRoute} from './Routes/IDefaultRoute.js';
 import {ITlsClientError} from './Tls/ITlsClientError.js';
 import {ITlsSocket} from './Tls/ITlsSocket.js';
 import {DefaultRoute} from './Routes/DefaultRoute.js';
@@ -39,7 +39,7 @@ export type BaseHttpServerOptionSession = {
 export type BaseHttpServerOptions = {
     realm: string;
     port?: number;
-    routes?: DefaultRoute[];
+    routes?: IDefaultRoute[];
     session: BaseHttpServerOptionSession;
     publicDir?: string;
     crypt?: BaseHttpServerOptionCrypt;
@@ -191,10 +191,10 @@ export class BaseHttpServer {
 
     /**
      * _routes
-     * @param {DefaultRoute[]} routes
+     * @param {IDefaultRoute[]} routes
      * @private
      */
-    private _routes(routes: DefaultRoute[]): void {
+    private _routes(routes: IDefaultRoute[]): void {
         routes.forEach((route) => {
             this._express.use(route.getExpressRouter());
         });

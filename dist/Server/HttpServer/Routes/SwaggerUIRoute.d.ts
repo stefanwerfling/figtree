@@ -1,6 +1,7 @@
 import { Router } from 'express';
-import { DefaultRoute, DefaultRouteMethodeDescription } from './DefaultRoute.js';
-export declare class SwaggerUIRoute extends DefaultRoute {
+import { DefaultRouteMethodeDescription } from './DefaultRoute.js';
+import { IDefaultRoute } from './IDefaultRoute.js';
+export declare class SwaggerUIRoute implements IDefaultRoute {
     protected static _instance: SwaggerUIRoute | null;
     static getInstance(): SwaggerUIRoute;
     static hasInstance(): boolean;

@@ -1,4 +1,4 @@
-import {DefaultRoute} from './Routes/DefaultRoute.js';
+import {IDefaultRoute} from './Routes/IDefaultRoute.js';
 
 export class HttpRouteLoader {
 
@@ -6,7 +6,7 @@ export class HttpRouteLoader {
      * Load routes for HTTP Server
      * @return {DefaultRoute[]}
      */
-    public static async loadRoutes(): Promise<DefaultRoute[]> {
+    public static async loadRoutes(): Promise<IDefaultRoute[]> {
         throw new Error('HttpRouteLoader::loadRoutes: please set your own class!');
     }
 
@@ -19,7 +19,7 @@ export type HttpRouteLoaderType = { new(): HttpRouteLoader;
 
     /**
      * Load routes for HTTP Server
-     * @return {DefaultRoute[]}
+     * @return {IDefaultRoute[]}
      */
-    loadRoutes(): Promise<DefaultRoute[]>;
+    loadRoutes(): Promise<IDefaultRoute[]>;
 };

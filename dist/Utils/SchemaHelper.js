@@ -75,8 +75,6 @@ export class SchemaHelper {
     }
     static _convertByType(descript) {
         if ('type' in descript) {
-            console.log(descript);
-            console.log(descript.type);
             switch (descript.type) {
                 case 'object':
                 case 'object2':
