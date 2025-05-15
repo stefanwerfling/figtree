@@ -16,7 +16,7 @@ export const SchemaTest = Vts.object({
  */
 export const SchemaIsLogin = SchemaDefaultReturn.extend({
     status: Vts.boolean({description: 'Status is the user login'}),
-    more: SchemaTest
+    more: Vts.optional(SchemaTest)
 });
 
 /**

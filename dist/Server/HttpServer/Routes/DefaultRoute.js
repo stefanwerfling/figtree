@@ -15,13 +15,15 @@ export class DefaultRoute {
     _getUrl(version, base, controller) {
         return path.join(this._uriBase, version, base, controller);
     }
-    isSchemaValidate(schema, data, res) {
+    isSchemaValidate(schema, data, res, autoSend = true) {
         const errors = [];
         if (!schema.validate(data, errors)) {
-            res.status(200).json({
-                statusCode: StatusCodes.INTERNAL_ERROR,
-                msg: JSON.stringify(errors, null, 2)
-            });
+            if (autoSend) {
+                res.status(200).json({
+                    statusCode: StatusCodes.INTERNAL_ERROR,
+                    msg: JSON.stringify(errors, null, 2)
+                });
+            }
             return false;
         }
         return true;
@@ -49,7 +51,59 @@ export class DefaultRoute {
                             return;
                         }
                     }
-                    handler(req, res, description);
+                    let headers = undefined;
+                    let params = undefined;
+                    let query = undefined;
+                    let cookies = undefined;
+                    let session = undefined;
+                    if (description.headerSchema) {
+                        if (this.isSchemaValidate(description.headerSchema, req.headers, res)) {
+                            headers = req.headers;
+                        }
+                        else {
+                            return;
+                        }
+                    }
+                    if (description.pathSchema) {
+                        if (this.isSchemaValidate(description.pathSchema, req.params, res)) {
+                            params = req.params;
+                        }
+                        else {
+                            return;
+                        }
+                    }
+                    if (description.querySchema) {
+                        if (this.isSchemaValidate(description.querySchema, req.query, res)) {
+                            query = req.query;
+                        }
+                        else {
+                            return;
+                        }
+                    }
+                    if (description.cookieSchema) {
+                        if (this.isSchemaValidate(description.cookieSchema, req.cookies, res)) {
+                            cookies = req.cookies;
+                        }
+                        else {
+                            return;
+                        }
+                    }
+                    if (description.sessionSchema) {
+                        if (this.isSchemaValidate(description.sessionSchema, req.session, res)) {
+                            session = req.session;
+                        }
+                        else {
+                            return;
+                        }
+                    }
+                    const result = await handler(req, res, {
+                        headers: headers,
+                        params: params,
+                        query: query,
+                        cookies: cookies,
+                        session: session
+                    });
+                    res.status(200).json(result);
                 }
                 catch (ie) {
                     if (ie instanceof RouteError) {
@@ -81,7 +135,69 @@ export class DefaultRoute {
                             return;
                         }
                     }
-                    handler(req, res, description);
+                    let headers = undefined;
+                    let params = undefined;
+                    let query = undefined;
+                    let cookies = undefined;
+                    let session = undefined;
+                    let body = undefined;
+                    if (description.headerSchema) {
+                        if (this.isSchemaValidate(description.headerSchema, req.headers, res)) {
+                            headers = req.headers;
+                        }
+                        else {
+                            return;
+                        }
+                    }
+                    if (description.pathSchema) {
+                        if (this.isSchemaValidate(description.pathSchema, req.params, res)) {
+                            params = req.params;
+                        }
+                        else {
+                            return;
+                        }
+                    }
+                    if (description.querySchema) {
+                        if (this.isSchemaValidate(description.querySchema, req.query, res)) {
+                            query = req.query;
+                        }
+                        else {
+                            return;
+                        }
+                    }
+                    if (description.cookieSchema) {
+                        if (this.isSchemaValidate(description.cookieSchema, req.cookies, res)) {
+                            cookies = req.cookies;
+                        }
+                        else {
+                            return;
+                        }
+                    }
+                    if (description.sessionSchema) {
+                        if (this.isSchemaValidate(description.sessionSchema, req.session, res)) {
+                            session = req.session;
+                        }
+                        else {
+                            return;
+                        }
+                    }
+                    if (description.bodySchema) {
+                        if (this.isSchemaValidate(description.bodySchema, req.body, res)) {
+                            body = req.body;
+                        }
+                        else {
+                            return;
+                        }
+                    }
+                    const result = await handler(req, res, {
+                        headers: headers,
+                        params: params,
+                        query: query,
+                        cookies: cookies,
+                        session: session,
+                        body: body
+                    });
+                    res.status(200).json(result);
                 }
                 catch (ie) {
                     if (ie instanceof RouteError) {

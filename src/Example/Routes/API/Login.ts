@@ -26,23 +26,23 @@ export class Login extends DefaultRoute {
             async(
                 req,
                 res,
-                description
-            ) => {
+                data
+            ): Promise<IsLogin> => {
 
                 // Your code -------------------------------------------------------------------------------------------
                 // Handler todo start ----------------------------------------------------------------------------------
 
                 if (this.isUserLogin(req, res, false)) {
-                    res.status(200).json({
+                    return {
                         statusCode: StatusCodes.OK,
                         status: true
-                    } as IsLogin);
-                } else {
-                    res.status(200).json({
-                        statusCode: StatusCodes.OK,
-                        status: false
-                    } as IsLogin);
+                    };
                 }
+
+                return {
+                    statusCode: StatusCodes.OK,
+                    status: false
+                };
 
                 // Handler todo end ----------------------------------------------------------------------------------
             },

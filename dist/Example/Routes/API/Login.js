@@ -4,19 +4,17 @@ import { SchemaIsLogin, SchemaIsLoginParameter, SchemaIsLoginParameterPath } fro
 export class Login extends DefaultRoute {
     static BASE = 'login';
     getExpressRouter() {
-        this._get(this._getUrl('v1', Login.BASE, 'islogin/:userid'), false, async (req, res, description) => {
+        this._get(this._getUrl('v1', Login.BASE, 'islogin/:userid'), false, async (req, res, data) => {
             if (this.isUserLogin(req, res, false)) {
-                res.status(200).json({
+                return {
                     statusCode: StatusCodes.OK,
                     status: true
-                });
+                };
             }
-            else {
-                res.status(200).json({
-                    statusCode: StatusCodes.OK,
-                    status: false
-                });
-            }
+            return {
+                statusCode: StatusCodes.OK,
+                status: false
+            };
         }, {
             description: 'Is a user login and return a status to the current session',
             responseBodySchema: SchemaIsLogin,

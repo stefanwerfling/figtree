@@ -58,7 +58,14 @@ export class SwaggerUIRoute implements IDefaultRoute {
         this._openApiSpec.info.version = version;
     }
 
-    protected _addRouteToSwagger<A, B, C, D, E, F, G>(url: string, method: string, description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G>) {
+    /**
+     * Add route to swagger
+     * @param {string} url
+     * @param {string} method
+     * @param {DefaultRouteMethodeDescription} description
+     * @protected
+     */
+    protected _addRouteToSwagger<A, B, C, D, E, F, G, S>(url: string, method: string, description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G, S>) {
         let swagUrl = url;
         const spec = {
             summary: description.description,
@@ -108,22 +115,21 @@ export class SwaggerUIRoute implements IDefaultRoute {
         this._openApiSpec.paths[swagUrl][method] = spec;
     }
 
-    public registerPost<A, B, C, D, E, F, G>(url: string, description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G>): void {
+    /**
+     * Register post
+     * @param {string} url
+     * @param {DefaultRouteMethodeDescription} description
+     */
+    public registerPost<A, B, C, D, E, F, G, S>(url: string, description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G, S>): void {
         this._addRouteToSwagger(url, 'post', description);
-        /*this._addRouteToSwagger(url, 'post', {
-            summary: description.description,
-            requestBody: {
-                required: true,
-                content: {
-                    'application/json': {
-
-                    }
-                }
-            }
-        });*/
     }
 
-    public registerGet<A, B, C, D, E, F, G>(url: string, description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G>): void {
+    /**
+     * Register get
+     * @param {string} url
+     * @param {DefaultRouteMethodeDescription} description
+     */
+    public registerGet<A, B, C, D, E, F, G, S>(url: string, description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G, S>): void {
         this._addRouteToSwagger(url, 'get', description);
     }
 

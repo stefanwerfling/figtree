@@ -13,17 +13,38 @@ import {SwaggerUIRoute} from './SwaggerUIRoute.js';
 /**
  * DefaultRouteHandlerGet
  */
-export type DefaultRouteHandlerGet<A, B, C, D, E, F, G> = (request: Request, response: Response, description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G>) => void;
+export type DefaultRouteHandlerGet<A, B, C, D, E, F, G, S> = (
+    request: Request,
+    response: Response,
+    data: {
+        headers: A|undefined
+        params: C|undefined,
+        query: B|undefined,
+        cookies: D|undefined,
+        session: S|undefined
+    }
+) => Promise<F>;
 
 /**
  * DefaultRouteHandlerPost
  */
-export type DefaultRouteHandlerPost<A, B, C, D, E, F, G> = (request: Request, response: Response, description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G>) => void;
+export type DefaultRouteHandlerPost<A, B, C, D, E, F, G, S> = (
+    request: Request,
+    response: Response,
+    data: {
+        headers: A|undefined
+        params: C|undefined,
+        query: B|undefined,
+        cookies: D|undefined,
+        session: S|undefined,
+        body: E|undefined
+    }
+) => Promise<F>;
 
 /**
  * DefaultRouteMethodeDescription
  */
-export type DefaultRouteMethodeDescription<A, B, C, D, E, F, G> = {
+export type DefaultRouteMethodeDescription<A, B, C, D, E, F, G, S> = {
     description?: string;
     headerSchema?: Schema<A>;
     querySchema?: Schema<B>;
@@ -32,6 +53,7 @@ export type DefaultRouteMethodeDescription<A, B, C, D, E, F, G> = {
     bodySchema?: Schema<E>;
     responseBodySchema?: Schema<F>;
     responseHeaderSchema?: Schema<G>;
+    sessionSchema?: Schema<S>;
 };
 
 /**
@@ -74,21 +96,25 @@ export class DefaultRoute implements IDefaultRoute {
      * @param {Schema<T>} schema
      * @param {unknown} data
      * @param {Response} res
+     * @param {boolean} autoSend
      * @template T
      * @return {T}
      */
     public isSchemaValidate<T>(
         schema: Schema<T>,
         data: unknown,
-        res: Response
+        res: Response,
+        autoSend: boolean = true
     ): data is T {
         const errors: SchemaErrors = [];
 
         if (!schema.validate(data, errors)) {
-            res.status(200).json({
-                statusCode: StatusCodes.INTERNAL_ERROR,
-                msg: JSON.stringify(errors, null, 2)
-            } as DefaultReturn);
+            if (autoSend) {
+                res.status(200).json({
+                    statusCode: StatusCodes.INTERNAL_ERROR,
+                    msg: JSON.stringify(errors, null, 2)
+                } as DefaultReturn);
+            }
 
             return false;
         }
@@ -136,7 +162,12 @@ export class DefaultRoute implements IDefaultRoute {
      * @param {DefaultRouteMethodeDescription} description
      * @protected
      */
-    protected _get<A, B, C, D, E, F, G>(uriPath: string, checkUserLogin: boolean, handler: DefaultRouteHandlerGet<A, B, C, D, E, F, G>, description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G>): void {
+    protected _get<A, B, C, D, E, F, G, S>(
+        uriPath: string,
+        checkUserLogin: boolean,
+        handler: DefaultRouteHandlerGet<A, B, C, D, E, F, G, S>,
+        description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G, S>
+    ): void {
         try {
             this._routes.get(uriPath, async(req, res) => {
                 try {
@@ -146,7 +177,65 @@ export class DefaultRoute implements IDefaultRoute {
                         }
                     }
 
-                    handler(req, res, description);
+                    let headers: undefined|A = undefined;
+                    let params: undefined|C = undefined;
+                    let query: undefined|B = undefined;
+                    let cookies: undefined|D = undefined;
+                    let session: undefined|S = undefined;
+
+                    if (description.headerSchema) {
+                        if (this.isSchemaValidate(description.headerSchema, req.headers, res)) {
+                            headers = req.headers;
+                        } else {
+                            return;
+                        }
+                    }
+
+                    if (description.pathSchema) {
+                        if (this.isSchemaValidate(description.pathSchema, req.params, res)) {
+                            params = req.params;
+                        } else {
+                            return;
+                        }
+                    }
+
+                    if (description.querySchema) {
+                        if (this.isSchemaValidate(description.querySchema, req.query, res)) {
+                            query = req.query;
+                        } else {
+                            return;
+                        }
+                    }
+
+                    if (description.cookieSchema) {
+                        if (this.isSchemaValidate(description.cookieSchema, req.cookies, res)) {
+                            cookies = req.cookies;
+                        } else {
+                            return;
+                        }
+                    }
+
+                    if (description.sessionSchema) {
+                        if (this.isSchemaValidate(description.sessionSchema, req.session, res)) {
+                            session = req.session;
+                        } else {
+                            return;
+                        }
+                    }
+
+                    const result = await handler(
+                        req,
+                        res,
+                        {
+                            headers: headers,
+                            params: params,
+                            query: query,
+                            cookies: cookies,
+                            session: session
+                        }
+                    );
+
+                    res.status(200).json(result);
                 } catch (ie) {
                     if (ie instanceof RouteError) {
                         if (ie.asJson()) {
@@ -178,7 +267,12 @@ export class DefaultRoute implements IDefaultRoute {
      * @param {DefaultRouteMethodeDescription} description
      * @protected
      */
-    protected _post<A, B, C, D, E, F, G>(uriPath: string, checkUserLogin: boolean, handler: DefaultRouteHandlerPost<A, B, C, D, E, F, G>, description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G>): void {
+    protected _post<A, B, C, D, E, F, G, S>(
+        uriPath: string,
+        checkUserLogin: boolean,
+        handler: DefaultRouteHandlerPost<A, B, C, D, E, F, G, S>,
+        description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G, S>
+    ): void {
         try {
             this._routes.post(uriPath, async(req, res) => {
                 try {
@@ -188,7 +282,75 @@ export class DefaultRoute implements IDefaultRoute {
                         }
                     }
 
-                    handler(req, res, description);
+                    let headers: undefined|A = undefined;
+                    let params: undefined|C = undefined;
+                    let query: undefined|B = undefined;
+                    let cookies: undefined|D = undefined;
+                    let session: undefined|S = undefined;
+                    let body: undefined|E = undefined;
+
+                    if (description.headerSchema) {
+                        if (this.isSchemaValidate(description.headerSchema, req.headers, res)) {
+                            headers = req.headers;
+                        } else {
+                            return;
+                        }
+                    }
+
+                    if (description.pathSchema) {
+                        if (this.isSchemaValidate(description.pathSchema, req.params, res)) {
+                            params = req.params;
+                        } else {
+                            return;
+                        }
+                    }
+
+                    if (description.querySchema) {
+                        if (this.isSchemaValidate(description.querySchema, req.query, res)) {
+                            query = req.query;
+                        } else {
+                            return;
+                        }
+                    }
+
+                    if (description.cookieSchema) {
+                        if (this.isSchemaValidate(description.cookieSchema, req.cookies, res)) {
+                            cookies = req.cookies;
+                        } else {
+                            return;
+                        }
+                    }
+
+                    if (description.sessionSchema) {
+                        if (this.isSchemaValidate(description.sessionSchema, req.session, res)) {
+                            session = req.session;
+                        } else {
+                            return;
+                        }
+                    }
+
+                    if (description.bodySchema) {
+                        if (this.isSchemaValidate(description.bodySchema, req.body, res)) {
+                            body = req.body;
+                        } else {
+                            return;
+                        }
+                    }
+
+                    const result = await handler(
+                        req,
+                        res,
+                        {
+                            headers: headers,
+                            params: params,
+                            query: query,
+                            cookies: cookies,
+                            session: session,
+                            body: body
+                        }
+                    );
+
+                    res.status(200).json(result);
                 } catch (ie) {
                     if (ie instanceof RouteError) {
                         if (ie.asJson()) {
