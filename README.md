@@ -46,3 +46,32 @@ npm install --save-dev \
   git+https://github.com/stefanwerfling/node-forge-types.git
 ```
 
+## Used
+### Routes and Swagger
+Using schemas as route registered on the HTTP server can be automatically generated (for OpenAPI) for the Swagger UI API. The process consists of defining the schema, registering the route, and its types. Generics ensure that all types are correct in the route handle. Data that does not match the schema is automatically returned with an error. This reduces the development process and allows the focus to be on functionality.
+
+<table>
+    <tr>
+        <td>
+            <img src="doc/images/route_schema_body.png" alt="Login page" width="150px" />
+        </td>
+        <td>
+⟶
+        </td>
+        <td>
+            <img src="doc/images/route_register.png" alt="Login page" width="150px" />
+        </td>
+        <td>
+⟶
+        </td>
+        <td>
+            <img src="doc/images/route_handle.png" alt="Login page" width="150px" />
+        </td>
+        <td>
+⟶
+        </td>
+        <td>
+            <img src="doc/images/route_swagger_api.png" alt="Login page" width="150px" />
+        </td>
+    </tr>
+</table>
