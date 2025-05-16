@@ -1,17 +1,34 @@
 {
-  "name": "figtree",
-  "version": "1.0.14",
-  "description": "Figtree - Server Core",
   "author": "Stefan Werfling",
-  "main": "dist/index.js",
-  "types": "src/index.ts",
-  "type": "module",
-  "keywords": [],
-  "scripts": {
-    "clean": "rm -rf dist",
-    "build": "npm run clean && npm run compile",
-    "compile": "tsc --project tsconfig.json"
+  "description": "Figtree - Server Core",
+  "devDependencies": {
+    "@stylistic/eslint-plugin-ts": "^3.0.0",
+    "@types/async-exit-hook": "^2.0.2",
+    "@types/cookie-parser": "^1.4.7",
+    "@types/express": "^5.0.1",
+    "@types/express-session": "^1.18.1",
+    "@types/node": "^20.17.16",
+    "@types/node-forge": "git+https://github.com/stefanwerfling/node-forge-types.git",
+    "@types/swagger-ui-express": "^4.1.8",
+    "@types/uuid": "^10.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.21.0",
+    "@typescript-eslint/parser": "^8.21.0",
+    "eslint": "^9.19.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-prefer-arrow": "^1.2.3",
+    "typescript": "^5.7.3"
   },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "keywords": [
+    "backend", "http-server", "api", "core", "config", "logging", "db", "raw-server"
+  ],
+  "name": "figtree",
   "peerDependencies": {
     "@influxdata/influxdb-client": "^1.35.0",
     "async-exit-hook": "^2.0.1",
@@ -33,19 +50,16 @@
     "ws": "^8.18.1"
   },
   "peerDependenciesMeta": {
-    "@types/express": {
-      "optional": true
-    },
-    "@types/express-session": {
-      "optional": true
-    },
     "@types/async-exit-hook": {
       "optional": true
     },
     "@types/cookie-parser": {
       "optional": true
     },
-    "@types/uuid": {
+    "@types/express": {
+      "optional": true
+    },
+    "@types/express-session": {
       "optional": true
     },
     "@types/node": {
@@ -56,23 +70,17 @@
     },
     "@types/swagger-ui-express": {
       "optional": true
+    },
+    "@types/uuid": {
+      "optional": true
     }
   },
-  "devDependencies": {
-    "@stylistic/eslint-plugin-ts": "^3.0.0",
-    "@types/async-exit-hook": "^2.0.2",
-    "@types/cookie-parser": "^1.4.7",
-    "@types/express": "^5.0.1",
-    "@types/express-session": "^1.18.1",
-    "@types/node": "^20.17.16",
-    "@types/node-forge": "git+https://github.com/stefanwerfling/node-forge-types.git",
-    "@types/swagger-ui-express": "^4.1.8",
-    "@types/uuid": "^10.0.0",
-    "@typescript-eslint/eslint-plugin": "^8.21.0",
-    "@typescript-eslint/parser": "^8.21.0",
-    "eslint": "^9.19.0",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-prefer-arrow": "^1.2.3",
-    "typescript": "^5.7.3"
-  }
+  "scripts": {
+    "build": "npm run clean && npm run compile",
+    "clean": "rm -rf dist",
+    "compile": "tsc --project tsconfig.json"
+  },
+  "type": "module",
+  "types": "dist/index.d.ts",
+  "version": "1.0.15"
 }
