@@ -22,8 +22,31 @@ export class ServiceAbstract {
     _status = ServiceStatus.None;
     _statusMsg = '';
     _inProcess = false;
-    constructor() {
+    _serviceName = '';
+    _serviceDependencies = [];
+    constructor(serviceName, serviceDependencies) {
         this._type = ServiceType.runner;
+        if (serviceName) {
+            this.setServiceName(serviceName);
+        }
+        else {
+            this.setServiceName(this.constructor.name);
+        }
+        if (serviceDependencies) {
+            this.setServiceDependencies(serviceDependencies);
+        }
+    }
+    getServiceName() {
+        return this._serviceName;
+    }
+    setServiceName(name) {
+        this._serviceName = name;
+    }
+    getServiceDependencies() {
+        return this._serviceDependencies;
+    }
+    setServiceDependencies(dependencies) {
+        this._serviceDependencies = dependencies;
     }
     getType() {
         return this._type;

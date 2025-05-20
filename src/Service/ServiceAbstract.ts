@@ -60,10 +60,66 @@ export class ServiceAbstract {
     protected _inProcess: boolean = false;
 
     /**
-     * Constructor
+     * Name of service
+     * @protected
      */
-    public constructor() {
+    protected _serviceName: string = '';
+
+    /**
+     * service dependencies
+     * @protected
+     */
+    protected _serviceDependencies: string[] = [];
+
+    /**
+     * Constructor
+     * @param {[string]} serviceName
+     * @param {[string[]]} serviceDependencies
+     */
+    public constructor(serviceName?: string, serviceDependencies?: string[]) {
         this._type = ServiceType.runner;
+
+        if (serviceName) {
+            this.setServiceName(serviceName);
+        } else {
+            this.setServiceName(this.constructor.name);
+        }
+
+        if (serviceDependencies) {
+            this.setServiceDependencies(serviceDependencies);
+        }
+    }
+
+    /**
+     * Return the service name
+     * @return {string}
+     */
+    public getServiceName(): string {
+        return this._serviceName;
+    }
+
+    /**
+     * Set the service name
+     * @param {string} name
+     */
+    public setServiceName(name: string): void {
+        this._serviceName = name;
+    }
+
+    /**
+     * Return the service dependencies
+     * @return {string[]}
+     */
+    public getServiceDependencies(): string[] {
+        return this._serviceDependencies;
+    }
+
+    /**
+     * Set the service dependencies
+     * @param {string[]} dependencies
+     */
+    public setServiceDependencies(dependencies: string[]): void {
+        this._serviceDependencies = dependencies;
     }
 
     /**

@@ -19,7 +19,13 @@ export declare class ServiceAbstract {
     protected _status: ServiceStatus;
     protected _statusMsg: string;
     protected _inProcess: boolean;
-    constructor();
+    protected _serviceName: string;
+    protected _serviceDependencies: string[];
+    constructor(serviceName?: string, serviceDependencies?: string[]);
+    getServiceName(): string;
+    setServiceName(name: string): void;
+    getServiceDependencies(): string[];
+    setServiceDependencies(dependencies: string[]): void;
     getType(): ServiceType;
     getImportance(): ServiceImportance;
     isProcess(): boolean;
