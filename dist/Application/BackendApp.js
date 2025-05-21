@@ -7,9 +7,20 @@ import { ServiceList } from '../Service/ServiceList.js';
 import { FileHelper } from '../Utils/FileHelper.js';
 import exitHook from 'async-exit-hook';
 export class BackendApp {
+    static _instances = new Map();
+    static getInstance(name) {
+        if (BackendApp._instances.has(name)) {
+            return BackendApp._instances.get(name) ?? null;
+        }
+        return null;
+    }
     _appName = 'figtree';
     _args = null;
     _serviceList = new ServiceList();
+    constructor(name = 'figtree') {
+        this._appName = name;
+        BackendApp._instances.set(name, this);
+    }
     _getArgSchema() {
         return null;
     }
@@ -90,6 +101,9 @@ export class BackendApp {
         Logger.getLogger().info('Start %s Service ...', Config.getInstance().getAppName());
         await this._initServices();
         await this._serviceList.startAll();
+    }
+    getServiceList() {
+        return this._serviceList;
     }
 }
 //# sourceMappingURL=BackendApp.js.map

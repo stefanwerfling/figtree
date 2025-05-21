@@ -16,6 +16,25 @@ import exitHook from 'async-exit-hook';
 export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions> {
 
     /**
+     * Hold all instances
+     * @private
+     */
+    private static _instances: Map<string, BackendApp<any, any>> = new Map<string, BackendApp<any, any>>();
+
+    /**
+     * Return a global instance from backend by name
+     * @param {string} name
+     * @return {BackendApp<any, any>|null}
+     */
+    public static getInstance(name: string): BackendApp<any, any>|null {
+        if (BackendApp._instances.has(name)) {
+            return BackendApp._instances.get(name) ?? null;
+        }
+
+        return null;
+    }
+
+    /**
      * Default appname, override this
      * @protected
      */
@@ -32,6 +51,15 @@ export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions>
      * @protected
      */
     protected _serviceList: ServiceList = new ServiceList();
+
+    /**
+     * constructor
+     * @param {string} name
+     */
+    public constructor(name: string = 'figtree') {
+        this._appName = name;
+        BackendApp._instances.set(name, this);
+    }
 
     /**
      * Return the Arg Schema
@@ -159,6 +187,14 @@ export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions>
         Logger.getLogger().info('Start %s Service ...', Config.getInstance().getAppName());
         await this._initServices();
         await this._serviceList.startAll();
+    }
+
+    /**
+     * Return the service list
+     * @return {ServiceList}
+     */
+    public getServiceList(): ServiceList {
+        return this._serviceList;
     }
 
 }
