@@ -10,11 +10,23 @@ export const SchemaConfigHttpServerSession = Vts.object({
 });
 
 /**
+ * Schema Config Http server proxy
+ */
+export const SchemaConfigHttpServerProxy = Vts.object({
+    trust: Vts.or([
+        Vts.string(),
+        Vts.boolean(),
+        Vts.array(Vts.string())
+    ])
+});
+
+/**
  * Schema config http server
  */
 export const SchemaConfigHttpServer = Vts.object({
     port: Vts.optional(Vts.number()),
     publicdir: Vts.string(),
     session: Vts.optional(SchemaConfigHttpServerSession),
-    sslpath: Vts.optional(Vts.string())
+    sslpath: Vts.optional(Vts.string()),
+    proxy: Vts.optional(SchemaConfigHttpServerProxy)
 });

@@ -16,6 +16,7 @@ export class BaseHttpServer {
     _realm;
     _session;
     _crypt;
+    _proxy;
     constructor(serverInit) {
         if (serverInit.port) {
             this._port = serverInit.port;
@@ -23,6 +24,9 @@ export class BaseHttpServer {
         this._realm = serverInit.realm;
         if (serverInit.session) {
             this._session = serverInit.session;
+        }
+        if (serverInit.proxy) {
+            this._proxy = serverInit.proxy;
         }
         this._express = express();
         this._express.use((req, _, next) => {
@@ -65,6 +69,9 @@ export class BaseHttpServer {
                 }
             });
             this._express.use(this._sessionParser);
+        }
+        if (this._proxy) {
+            this._express.set('trust proxy', this._proxy.trust);
         }
     }
     _routes(routes) {

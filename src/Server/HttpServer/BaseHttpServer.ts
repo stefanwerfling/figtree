@@ -34,6 +34,13 @@ export type BaseHttpServerOptionSession = {
 };
 
 /**
+ * Base http server option proxy
+ */
+export type BaseHttpServerOptionProxy = {
+    trust: string|true|string[]
+};
+
+/**
  * Base http server options
  */
 export type BaseHttpServerOptions = {
@@ -43,6 +50,7 @@ export type BaseHttpServerOptions = {
     session: BaseHttpServerOptionSession;
     publicDir?: string;
     crypt?: BaseHttpServerOptionCrypt;
+    proxy?: BaseHttpServerOptionProxy;
 };
 
 /**
@@ -107,6 +115,12 @@ export class BaseHttpServer {
     protected readonly _crypt?: BaseHttpServerOptionCrypt;
 
     /**
+     * use proxy
+     * @protected
+     */
+    protected readonly _proxy?: BaseHttpServerOptionProxy;
+
+    /**
      * constructor
      * @param {BaseHttpServerOptions} serverInit
      */
@@ -119,6 +133,10 @@ export class BaseHttpServer {
 
         if (serverInit.session) {
             this._session = serverInit.session;
+        }
+
+        if (serverInit.proxy) {
+            this._proxy = serverInit.proxy;
         }
 
         this._express = express();
@@ -186,6 +204,12 @@ export class BaseHttpServer {
             });
 
             this._express.use(this._sessionParser);
+        }
+
+        // -------------------------------------------------------------------------------------------------------------
+
+        if (this._proxy) {
+            this._express.set('trust proxy', this._proxy.trust);
         }
     }
 
