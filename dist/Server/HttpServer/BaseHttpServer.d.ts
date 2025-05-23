@@ -14,7 +14,7 @@ export type BaseHttpServerOptionSession = {
     secret: string;
 };
 export type BaseHttpServerOptionProxy = {
-    trust: string | true | string[];
+    trust: string | boolean | string[];
 };
 export type BaseHttpServerOptions = {
     realm: string;

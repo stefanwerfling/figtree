@@ -53,6 +53,12 @@ export class HttpService extends ServiceAbstract {
                     ssl_path = tConfig.httpserver.sslpath;
                 }
             }
+            let proxy = undefined;
+            if (tConfig.httpserver.proxy) {
+                proxy = {
+                    trust: tConfig.httpserver.proxy.trust
+                };
+            }
             this._server = new HttpServer({
                 realm: Config.getInstance().getAppTitle(),
                 port: aport,
@@ -68,7 +74,8 @@ export class HttpService extends ServiceAbstract {
                     sslPath: ssl_path,
                     key: 'server.pem',
                     crt: 'server.crt'
-                }
+                },
+                proxy: proxy
             });
             await this._server.listen();
         }

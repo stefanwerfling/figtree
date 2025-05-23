@@ -2,6 +2,7 @@ import {v4 as uuid} from 'uuid';
 import {Config} from '../../Config/Config.js';
 import {Logger} from '../../Logger/Logger.js';
 import {SchemaConfigBackendOptions} from '../../Schemas/Config/ConfigBackendOptions.js';
+import {BaseHttpServerOptionProxy} from '../../Server/HttpServer/BaseHttpServer.js';
 import {HttpRouteLoaderType} from '../../Server/HttpServer/HttpRouteLoader.js';
 import {HttpServer} from '../../Server/HttpServer/HttpServer.js';
 import {ServiceAbstract, ServiceImportance, ServiceStatus} from '../../Service/ServiceAbstract.js';
@@ -98,6 +99,14 @@ export class HttpService extends ServiceAbstract {
                 }
             }
 
+            let proxy: BaseHttpServerOptionProxy| undefined = undefined;
+
+            if (tConfig.httpserver.proxy) {
+                proxy = {
+                    trust: tConfig.httpserver.proxy.trust
+                };
+            }
+
             this._server = new HttpServer({
                 realm: Config.getInstance().getAppTitle(),
                 port: aport,
@@ -113,7 +122,8 @@ export class HttpService extends ServiceAbstract {
                     sslPath: ssl_path,
                     key: 'server.pem',
                     crt: 'server.crt'
-                }
+                },
+                proxy: proxy
             });
 
             await this._server.listen();

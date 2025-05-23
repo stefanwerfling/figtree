@@ -37,7 +37,7 @@ export type BaseHttpServerOptionSession = {
  * Base http server option proxy
  */
 export type BaseHttpServerOptionProxy = {
-    trust: string|true|string[]
+    trust: string|boolean|string[]
 };
 
 /**
