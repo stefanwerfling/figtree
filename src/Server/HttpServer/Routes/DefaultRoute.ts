@@ -235,7 +235,15 @@ export class DefaultRoute implements IDefaultRoute {
                         }
                     );
 
-                    res.status(200).json(result);
+                    if (description.responseBodySchema) {
+                        const error: SchemaErrors = [];
+
+                        if (description.responseBodySchema.validate(result, error)) {
+                            res.status(200).json(result);
+                        } else {
+                            throw new Error(`The result have a error in: ${description.responseBodySchema.describe().description}`);
+                        }
+                    }
                 } catch (ie) {
                     if (ie instanceof RouteError) {
                         if (ie.asJson()) {
@@ -350,7 +358,15 @@ export class DefaultRoute implements IDefaultRoute {
                         }
                     );
 
-                    res.status(200).json(result);
+                    if (description.responseBodySchema) {
+                        const error: SchemaErrors = [];
+
+                        if (description.responseBodySchema.validate(result, error)) {
+                            res.status(200).json(result);
+                        } else {
+                            throw new Error(`The result have a error in: ${description.responseBodySchema.describe().description}`);
+                        }
+                    }
                 } catch (ie) {
                     if (ie instanceof RouteError) {
                         if (ie.asJson()) {

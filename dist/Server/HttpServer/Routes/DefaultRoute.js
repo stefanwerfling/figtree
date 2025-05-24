@@ -103,7 +103,15 @@ export class DefaultRoute {
                         cookies: cookies,
                         session: session
                     });
-                    res.status(200).json(result);
+                    if (description.responseBodySchema) {
+                        const error = [];
+                        if (description.responseBodySchema.validate(result, error)) {
+                            res.status(200).json(result);
+                        }
+                        else {
+                            throw new Error(`The result have a error in: ${description.responseBodySchema.describe().description}`);
+                        }
+                    }
                 }
                 catch (ie) {
                     if (ie instanceof RouteError) {
@@ -197,7 +205,15 @@ export class DefaultRoute {
                         session: session,
                         body: body
                     });
-                    res.status(200).json(result);
+                    if (description.responseBodySchema) {
+                        const error = [];
+                        if (description.responseBodySchema.validate(result, error)) {
+                            res.status(200).json(result);
+                        }
+                        else {
+                            throw new Error(`The result have a error in: ${description.responseBodySchema.describe().description}`);
+                        }
+                    }
                 }
                 catch (ie) {
                     if (ie instanceof RouteError) {
