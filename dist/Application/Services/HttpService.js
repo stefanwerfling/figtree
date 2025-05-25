@@ -10,8 +10,8 @@ export class HttpService extends ServiceAbstract {
     _importance = ServiceImportance.Important;
     _loader;
     _server = null;
-    constructor(loader) {
-        super();
+    constructor(loader, serviceName, serviceDependencies) {
+        super(serviceName, serviceDependencies);
         this._loader = loader;
     }
     async start() {

@@ -5,7 +5,7 @@ export declare class HttpService extends ServiceAbstract {
     protected readonly _importance: ServiceImportance;
     protected _loader: HttpRouteLoaderType;
     protected _server: HttpServer | null;
-    constructor(loader: HttpRouteLoaderType);
+    constructor(loader: HttpRouteLoaderType, serviceName?: string, serviceDependencies?: string[]);
     start(): Promise<void>;
     stop(forced?: boolean): Promise<void>;
 }

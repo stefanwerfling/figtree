@@ -8,8 +8,8 @@ import { StringHelper } from '../../Utils/StringHelper.js';
 export class MariaDBService extends ServiceAbstract {
     _importance = ServiceImportance.Critical;
     _loader;
-    constructor(loader) {
-        super();
+    constructor(loader, serviceName, serviceDependencies) {
+        super(serviceName, serviceDependencies);
         this._loader = loader;
     }
     async start() {

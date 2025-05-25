@@ -3,7 +3,7 @@ import { ServiceAbstract, ServiceImportance } from '../../Service/ServiceAbstrac
 export declare class RedisDBService extends ServiceAbstract {
     protected readonly _importance: ServiceImportance;
     protected _channels: RedisChannel<any>[];
-    constructor(channels: RedisChannel<any>[]);
+    constructor(channels: RedisChannel<any>[], serviceName?: string, serviceDependencies?: string[]);
     start(): Promise<void>;
     stop(forced?: boolean): Promise<void>;
 }

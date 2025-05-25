@@ -3,7 +3,7 @@ import { ServiceAbstract, ServiceImportance } from '../../Service/ServiceAbstrac
 export declare class MariaDBService extends ServiceAbstract {
     protected readonly _importance: ServiceImportance;
     protected _loader: DBLoaderType;
-    constructor(loader: DBLoaderType);
+    constructor(loader: DBLoaderType, serviceName?: string, serviceDependencies?: string[]);
     start(): Promise<void>;
     stop(forced?: boolean): Promise<void>;
 }

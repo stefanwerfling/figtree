@@ -9,8 +9,8 @@ import { StringHelper } from '../../Utils/StringHelper.js';
 export class RedisDBService extends ServiceAbstract {
     _importance = ServiceImportance.Important;
     _channels;
-    constructor(channels) {
-        super();
+    constructor(channels, serviceName, serviceDependencies) {
+        super(serviceName, serviceDependencies);
         this._channels = channels;
     }
     async start() {
