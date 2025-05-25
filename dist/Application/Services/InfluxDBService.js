@@ -6,7 +6,11 @@ import { ServiceAbstract, ServiceImportance, ServiceStatus } from '../../Service
 import { ServiceError } from '../../Service/ServiceError.js';
 import { StringHelper } from '../../Utils/StringHelper.js';
 export class InfluxDBService extends ServiceAbstract {
+    static NAME = 'influx';
     _importance = ServiceImportance.Important;
+    constructor(serviceName, serviceDependencies) {
+        super(serviceName ?? InfluxDBService.NAME, serviceDependencies);
+    }
     async start() {
         this._inProcess = true;
         this._status = ServiceStatus.Progress;

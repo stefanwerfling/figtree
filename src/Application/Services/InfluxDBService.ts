@@ -12,9 +12,24 @@ import {StringHelper} from '../../Utils/StringHelper.js';
 export class InfluxDBService extends ServiceAbstract {
 
     /**
+     * Name of influx service
+     */
+    public static NAME = 'influx';
+
+    /**
      * Importance
      */
     protected readonly _importance: ServiceImportance = ServiceImportance.Important;
+
+    /**
+     * Constructor
+     * @param {string} serviceName
+     * @param {[string]} serviceName
+     * @param {[string[]]} serviceDependencies
+     */
+    public constructor(serviceName?: string, serviceDependencies?: string[]) {
+        super(serviceName ?? InfluxDBService.NAME, serviceDependencies);
+    }
 
     /**
      * Start the service

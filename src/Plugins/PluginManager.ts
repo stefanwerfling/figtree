@@ -57,6 +57,14 @@ export class PluginManager {
     }
 
     /**
+     * Has an instance of plugin manager
+     * @return {boolean}
+     */
+    public static hasInstance(): boolean {
+        return PluginManager._instance === null;
+    }
+
+    /**
      * Constructor
      * @param {string} serviceName - Service name, name who starts the plugin manager.
      * @param {string} appPath - Path-to-modules directory.
@@ -95,6 +103,15 @@ export class PluginManager {
 
             await this.load(pluginInfo);
         }
+    }
+
+    public async stop(): Promise<void> {
+        for (const plugin of this._plugins) {
+            await plugin.onDisable();
+        }
+
+        this._events.clear();
+        this._plugins = [];
     }
 
     /**
@@ -188,7 +205,7 @@ export class PluginManager {
 
             if (object) {
                 this._plugins.push(object);
-                object.onEnable();
+                await object.onEnable();
 
                 Logger.getLogger().info('PluginManager::load: Plugin is loaded %s', plugin.definition.name);
             }
@@ -247,9 +264,9 @@ export class PluginManager {
     /**
      * Return all Events
      * @param {Function} aClass
+     * @template T
      * @returns {APluginEvent[]}
      */
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
     public getAllEvents<T extends APluginEvent>(aClass: Function): T[] {
         const eventList: T[] = [];
 

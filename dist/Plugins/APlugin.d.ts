@@ -6,6 +6,6 @@ export declare abstract class APlugin {
     constructor(info: PluginDefinition, pm: PluginManager);
     protected getPluginManager(): PluginManager;
     abstract getName(): string;
-    abstract onEnable(): boolean;
-    abstract onDisable(): boolean;
+    abstract onEnable(): Promise<boolean>;
+    abstract onDisable(): Promise<boolean>;
 }

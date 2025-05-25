@@ -7,10 +7,11 @@ import { ServiceAbstract, ServiceImportance, ServiceStatus } from '../../Service
 import { ServiceError } from '../../Service/ServiceError.js';
 import { StringHelper } from '../../Utils/StringHelper.js';
 export class RedisDBService extends ServiceAbstract {
+    static NAME = 'redis';
     _importance = ServiceImportance.Important;
     _channels;
     constructor(channels, serviceName, serviceDependencies) {
-        super(serviceName, serviceDependencies);
+        super(serviceName ?? RedisDBService.NAME, serviceDependencies);
         this._channels = channels;
     }
     async start() {

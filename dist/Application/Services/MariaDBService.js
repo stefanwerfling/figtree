@@ -6,10 +6,11 @@ import { ServiceAbstract, ServiceImportance, ServiceStatus } from '../../Service
 import { ServiceError } from '../../Service/ServiceError.js';
 import { StringHelper } from '../../Utils/StringHelper.js';
 export class MariaDBService extends ServiceAbstract {
+    static NAME = 'mariadb';
     _importance = ServiceImportance.Critical;
     _loader;
     constructor(loader, serviceName, serviceDependencies) {
-        super(serviceName, serviceDependencies);
+        super(serviceName ?? MariaDBService.NAME, serviceDependencies);
         this._loader = loader;
     }
     async start() {

@@ -7,11 +7,12 @@ import { ServiceAbstract, ServiceImportance, ServiceStatus } from '../../Service
 import { ServiceError } from '../../Service/ServiceError.js';
 import { StringHelper } from '../../Utils/StringHelper.js';
 export class HttpService extends ServiceAbstract {
+    static NAME = 'httpserver';
     _importance = ServiceImportance.Important;
     _loader;
     _server = null;
     constructor(loader, serviceName, serviceDependencies) {
-        super(serviceName, serviceDependencies);
+        super(serviceName ?? HttpService.NAME, serviceDependencies);
         this._loader = loader;
     }
     async start() {

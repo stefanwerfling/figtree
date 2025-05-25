@@ -13,6 +13,11 @@ import {StringHelper} from '../../Utils/StringHelper.js';
 export class MariaDBService extends ServiceAbstract {
 
     /**
+     * Name of mariadb service
+     */
+    public static NAME = 'mariadb';
+
+    /**
      * Importance
      */
     protected readonly _importance: ServiceImportance = ServiceImportance.Critical;
@@ -30,7 +35,7 @@ export class MariaDBService extends ServiceAbstract {
      * @param {[string[]]} serviceDependencies
      */
     public constructor(loader: DBLoaderType, serviceName?: string, serviceDependencies?: string[]) {
-        super(serviceName, serviceDependencies);
+        super(serviceName ?? MariaDBService.NAME, serviceDependencies);
         this._loader = loader;
     }
 

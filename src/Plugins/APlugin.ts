@@ -47,12 +47,12 @@ export abstract class APlugin {
      * onEnable
      * @returns {boolean}
      */
-    public abstract onEnable(): boolean;
+    public abstract onEnable(): Promise<boolean>;
 
     /**
      * onDisable
      * @returns {boolean}
      */
-    public abstract onDisable(): boolean;
+    public abstract onDisable(): Promise<boolean>;
 
 }

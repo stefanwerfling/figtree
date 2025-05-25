@@ -16,6 +16,9 @@ export class PluginManager {
         }
         return PluginManager._instance;
     }
+    static hasInstance() {
+        return PluginManager._instance === null;
+    }
     constructor(serviceName, appPath) {
         if (appPath) {
             this._appPath = appPath;
@@ -33,6 +36,13 @@ export class PluginManager {
             Logger.getLogger().silly('PluginManager::start: found plugin: %s (%s)', pluginInfo.definition.name, pluginInfo.definition.version);
             await this.load(pluginInfo);
         }
+    }
+    async stop() {
+        for (const plugin of this._plugins) {
+            await plugin.onDisable();
+        }
+        this._events.clear();
+        this._plugins = [];
     }
     async scan() {
         let nodeModulesPath = path.join(this._appPath, 'node_modules');
@@ -98,7 +108,7 @@ export class PluginManager {
             const object = new oPlugin.default(plugin, this);
             if (object) {
                 this._plugins.push(object);
-                object.onEnable();
+                await object.onEnable();
                 Logger.getLogger().info('PluginManager::load: Plugin is loaded %s', plugin.definition.name);
             }
         }

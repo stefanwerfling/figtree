@@ -69,3 +69,4 @@ export { MariaDBService } from './Application/Services/MariaDBService.js';
 export { InfluxDBService } from './Application/Services/InfluxDBService.js';
 export { RedisDBService } from './Application/Services/RedisDBService.js';
 export { HttpService } from './Application/Services/HttpService.js';
+export { PluginService } from './Application/Services/PluginService.js';

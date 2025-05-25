@@ -15,6 +15,11 @@ import {StringHelper} from '../../Utils/StringHelper.js';
 export class HttpService extends ServiceAbstract {
 
     /**
+     * Name of Http Server service
+     */
+    public static NAME = 'httpserver';
+
+    /**
      * Importance
      */
     protected readonly _importance: ServiceImportance = ServiceImportance.Important;
@@ -38,7 +43,7 @@ export class HttpService extends ServiceAbstract {
      * @param {[string[]]} serviceDependencies
      */
     public constructor(loader: HttpRouteLoaderType, serviceName?: string, serviceDependencies?: string[]) {
-        super(serviceName, serviceDependencies);
+        super(serviceName ?? HttpService.NAME, serviceDependencies);
         this._loader = loader;
     }
 

@@ -8,9 +8,11 @@ export declare class PluginManager {
     protected _plugins: APlugin[];
     protected _events: Map<string, APluginEvent[]>;
     static getInstance(): PluginManager;
+    static hasInstance(): boolean;
     constructor(serviceName: string, appPath?: string);
     getServiceName(): string;
     start(): Promise<void>;
+    stop(): Promise<void>;
     scan(): Promise<PluginInformation[]>;
     load(plugin: PluginInformation): Promise<boolean>;
     getPlugins(): APlugin[];

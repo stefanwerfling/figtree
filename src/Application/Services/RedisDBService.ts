@@ -14,6 +14,11 @@ import {StringHelper} from '../../Utils/StringHelper.js';
 export class RedisDBService extends ServiceAbstract {
 
     /**
+     * Name of the service
+     */
+    public static NAME = 'redis';
+
+    /**
      * Importance
      */
     protected readonly _importance: ServiceImportance = ServiceImportance.Important;
@@ -31,7 +36,7 @@ export class RedisDBService extends ServiceAbstract {
      * @param {[string[]]} serviceDependencies
      */
     public constructor(channels: RedisChannel<any>[], serviceName?: string, serviceDependencies?: string[]) {
-        super(serviceName, serviceDependencies);
+        super(serviceName ?? RedisDBService.NAME, serviceDependencies);
         this._channels = channels;
     }
 
