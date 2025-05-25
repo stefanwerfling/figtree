@@ -8,6 +8,9 @@ import {ServiceAbstract, ServiceImportance, ServiceStatus} from '../../Service/S
 import {ServiceError} from '../../Service/ServiceError.js';
 import {StringHelper} from '../../Utils/StringHelper.js';
 
+/**
+ * RedisDBService
+ */
 export class RedisDBService extends ServiceAbstract {
 
     /**
@@ -24,9 +27,11 @@ export class RedisDBService extends ServiceAbstract {
     /**
      * Constructor
      * @param {RedisChannel<any>[]} channels
+     * @param {[string]} serviceName
+     * @param {[string[]]} serviceDependencies
      */
-    public constructor(channels: RedisChannel<any>[]) {
-        super();
+    public constructor(channels: RedisChannel<any>[], serviceName?: string, serviceDependencies?: string[]) {
+        super(serviceName, serviceDependencies);
         this._channels = channels;
     }
 

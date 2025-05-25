@@ -26,9 +26,11 @@ export class MariaDBService extends ServiceAbstract {
     /**
      * Constructor
      * @param {DBLoaderType} loader
+     * @param {[string]} serviceName
+     * @param {[string[]]} serviceDependencies
      */
-    public constructor(loader: DBLoaderType) {
-        super();
+    public constructor(loader: DBLoaderType, serviceName?: string, serviceDependencies?: string[]) {
+        super(serviceName, serviceDependencies);
         this._loader = loader;
     }
 

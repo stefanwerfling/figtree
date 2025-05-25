@@ -33,10 +33,12 @@ export class HttpService extends ServiceAbstract {
 
     /**
      * Constructor
-     * @param loader
+     * @param {HttpRouteLoaderType} loader
+     * @param {[string]} serviceName
+     * @param {[string[]]} serviceDependencies
      */
-    public constructor(loader: HttpRouteLoaderType) {
-        super();
+    public constructor(loader: HttpRouteLoaderType, serviceName?: string, serviceDependencies?: string[]) {
+        super(serviceName, serviceDependencies);
         this._loader = loader;
     }
 
