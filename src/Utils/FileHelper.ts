@@ -1,5 +1,5 @@
 import {Ets} from 'ets';
-import {mkdir, stat, rename, unlink, lstat, readFile, chmod, writeFile, realpath} from 'fs/promises';
+import {stat, rename, unlink, readFile, chmod, writeFile, realpath} from 'fs/promises';
 import {Logger} from '../Logger/Logger.js';
 
 export class FileHelper {

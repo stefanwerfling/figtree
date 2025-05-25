@@ -12,6 +12,7 @@ import exitHook from 'async-exit-hook';
 
 /**
  * BackendApp
+ * @template A, C
  */
 export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions> {
 
