@@ -181,4 +181,15 @@ export class FileHelper {
     public static async realPath(apath: string): Promise<string> {
         return realpath(apath);
     }
+
+    /**
+     * Read a content from File and parse as a JSON object
+     * @param {string} jsonFile
+     */
+    public static async readJsonFile(jsonFile: string): Promise<any> {
+        const raw = await FileHelper.fileRead(jsonFile);
+
+        return JSON.parse(raw);
+    }
+
 }

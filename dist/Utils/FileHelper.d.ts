@@ -9,4 +9,5 @@ export declare class FileHelper {
     static chmod(apath: string, mode: string | number): Promise<void>;
     static create(file: string, content: string): Promise<void>;
     static realPath(apath: string): Promise<string>;
+    static readJsonFile(jsonFile: string): Promise<any>;
 }

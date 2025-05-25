@@ -27,6 +27,8 @@ export {
     SchemaRequestData,
     RequestData
 } from './Schemas/Server/RequestData.js';
+export {SchemaProviderEntry, ProviderEntry} from './Schemas/Provider/ProviderEntry.js';
+export {SchemaPluginDefinition, PluginDefinition} from './Schemas/Plugin/PluginDefinition.js';
 
 // Env -----------------------------------------------------------------------------------------------------------------
 export {Args} from './Env/Args.js';
@@ -106,6 +108,18 @@ export {ProcessAwait} from './Process/ProcessAwait.js';
 export {ServiceError} from './Service/ServiceError.js';
 export {ServiceStatus, ServiceType, ServiceAbstract, ServiceImportance} from './Service/ServiceAbstract.js';
 export {ServiceList} from './Service/ServiceList.js';
+
+// Plugin --------------------------------------------------------------------------------------------------------------
+export {PluginInformation} from './Plugins/PluginInformation.js';
+export {APlugin} from './Plugins/APlugin.js';
+export {APluginEvent} from './Plugins/APluginEvent.js';
+export {PluginManager} from './Plugins/PluginManager.js';
+
+// Provider ------------------------------------------------------------------------------------------------------------
+export {IProvider} from './Provider/IProvider.js';
+export {IProviders} from './Provider/IProviders.js';
+export {AProviderOnLoadEvent} from './Provider/AProviderOnLoadEvent.js';
+export {BaseProviders} from './Provider/BaseProviders.js';
 
 // Application ---------------------------------------------------------------------------------------------------------
 export {BackendApp} from './Application/BackendApp.js';

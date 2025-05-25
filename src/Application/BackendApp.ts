@@ -83,7 +83,7 @@ export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions>
      * @protected
      * @return {boolean}
      */
-    protected async _loadCofig(): Promise<boolean> {
+    protected async _loadConfig(): Promise<boolean> {
         const argSchema = this._getArgSchema();
         let configfile = null;
 
@@ -151,7 +151,7 @@ export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions>
      * Start backend app
      */
     public async start(): Promise<void> {
-        if (!await this._loadCofig()) {
+        if (!await this._loadConfig()) {
             return;
         }
 

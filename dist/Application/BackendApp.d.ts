@@ -12,7 +12,7 @@ export declare abstract class BackendApp<A extends DefaultArgs, C extends Config
     constructor(name?: string);
     protected _getArgSchema(): Schema<A> | null;
     protected _getConfigInstance(): Config<C>;
-    protected _loadCofig(): Promise<boolean>;
+    protected _loadConfig(): Promise<boolean>;
     protected _initLogger(): void;
     protected _initServices(): Promise<void>;
     start(): Promise<void>;

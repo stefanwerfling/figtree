@@ -27,7 +27,7 @@ export class BackendApp {
     _getConfigInstance() {
         return ConfigBackend.getInstance();
     }
-    async _loadCofig() {
+    async _loadConfig() {
         const argSchema = this._getArgSchema();
         let configfile = null;
         if (argSchema !== null) {
@@ -72,7 +72,7 @@ export class BackendApp {
     }
     async _initServices() { }
     async start() {
-        if (!await this._loadCofig()) {
+        if (!await this._loadConfig()) {
             return;
         }
         this._initLogger();

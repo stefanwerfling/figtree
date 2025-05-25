@@ -112,5 +112,9 @@ export class FileHelper {
     static async realPath(apath) {
         return realpath(apath);
     }
+    static async readJsonFile(jsonFile) {
+        const raw = await FileHelper.fileRead(jsonFile);
+        return JSON.parse(raw);
+    }
 }
 //# sourceMappingURL=FileHelper.js.map
