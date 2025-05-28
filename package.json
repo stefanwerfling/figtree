@@ -26,12 +26,20 @@
     }
   },
   "keywords": [
-    "backend", "http-server", "api", "core", "config", "logging", "db", "raw-server"
+    "backend",
+    "http-server",
+    "api",
+    "core",
+    "config",
+    "logging",
+    "db",
+    "raw-server"
   ],
   "name": "figtree",
   "peerDependencies": {
     "@influxdata/influxdb-client": "^1.35.0",
     "async-exit-hook": "^2.0.1",
+    "chromadb": "^2.4.6",
     "cookie-parser": "^1.4.6",
     "ets": "git+https://github.com/OpenSourcePKG/ets.git",
     "express": "^5.1.0",
@@ -82,5 +90,5 @@
   },
   "type": "module",
   "types": "dist/index.d.ts",
-  "version": "1.0.17"
+  "version": "1.0.18"
 }

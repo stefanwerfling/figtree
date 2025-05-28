@@ -4,6 +4,7 @@ import { SchemaRequestData } from '../../../Schemas/Server/RequestData.js';
 import { StatusCodes } from '../../../Schemas/Server/Routes/StatusCodes.js';
 import { Session } from '../Session.js';
 import path from 'path';
+import { RequestContext } from './RequestContext.js';
 import { RouteError } from './RouteError.js';
 import { SwaggerUIRoute } from './SwaggerUIRoute.js';
 export class DefaultRoute {
@@ -33,6 +34,15 @@ export class DefaultRoute {
             if (Session.isUserLogin(req.session)) {
                 return true;
             }
+            const store = new Map();
+            store.set(RequestContext.SESSIONID, req.session.id);
+            store.set(RequestContext.USERID, '');
+            store.set(RequestContext.ISLOGIN, false);
+            if (req.session.user) {
+                store.set(RequestContext.USERID, req.session.user.userid);
+                store.set(RequestContext.ISLOGIN, req.session.user.isLogin);
+            }
+            RequestContext.getInstance().enterWith(store);
         }
         if (sendAutoResoonse) {
             throw new RouteError(StatusCodes.UNAUTHORIZED, 'User is unauthorized!');

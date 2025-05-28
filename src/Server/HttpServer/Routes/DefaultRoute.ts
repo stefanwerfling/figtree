@@ -7,6 +7,7 @@ import {DefaultReturn} from './../../../Schemas/Server/Routes/DefaultReturn.js';
 import path from 'path';
 import {Schema, SchemaErrors} from 'vts';
 import {IDefaultRoute} from './IDefaultRoute.js';
+import {RequestContext} from './RequestContext.js';
 import {RouteError} from './RouteError.js';
 import {SwaggerUIRoute} from './SwaggerUIRoute.js';
 
@@ -137,6 +138,19 @@ export class DefaultRoute implements IDefaultRoute {
             if (Session.isUserLogin(req.session)) {
                 return true;
             }
+
+            const store = new Map<string, any>();
+
+            store.set(RequestContext.SESSIONID, req.session.id);
+            store.set(RequestContext.USERID, '');
+            store.set(RequestContext.ISLOGIN, false);
+
+            if (req.session.user) {
+                store.set(RequestContext.USERID, req.session.user.userid);
+                store.set(RequestContext.ISLOGIN, req.session.user.isLogin);
+            }
+
+            RequestContext.getInstance().enterWith(store);
         }
 
         if (sendAutoResoonse) {
