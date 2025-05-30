@@ -17,11 +17,11 @@ Is a package for the Config/DB/Logging and many other useful classes and utils f
   - [x] Swagger UI Route and auto generation description from the schemas
   - [x] Unix HTTP Server (for intern communication)
   - [x] File Upload helper
-  - [ ] AsyncLocalStorage for Context
+  - [x] AsyncLocalStorage for Context
 - [x] Service handler (for initialized services or schedule)
 - [x] Backend Main
-- [ ] Provider hanlder
-- [ ] Plugin Manager/Loader
+- [x] Provider hanlder
+- [x] Plugin Manager/Loader
 - [ ] Crypto Managment
   - [x] Pem Helper/Parser
   - [x] Certificate generator (node-forge)
