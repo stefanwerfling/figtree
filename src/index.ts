@@ -84,6 +84,7 @@ export {Client as RawClient} from './Server/RawServer/Client/Client.js';
 // HTTP Server ---------------------------------------------------------------------------------------------------------
 export {IDefaultRoute} from './Server/HttpServer/Routes/IDefaultRoute.js';
 export {RouteError} from './Server/HttpServer/Routes/RouteError.js';
+export {RequestContextData, RequestContext} from './Server/HttpServer/Routes/RequestContext.js';
 export {DefaultRouteHandlerGet, DefaultRouteHandlerPost, DefaultRoute} from './Server/HttpServer/Routes/DefaultRoute.js';
 export {ITlsClientError} from './Server/HttpServer/Tls/ITlsClientError.js';
 export {ITlsSocket} from './Server/HttpServer/Tls/ITlsSocket.js';
@@ -113,7 +114,7 @@ export {ServiceList} from './Service/ServiceList.js';
 export {PluginInformation} from './Plugins/PluginInformation.js';
 export {APlugin} from './Plugins/APlugin.js';
 export {APluginEvent} from './Plugins/APluginEvent.js';
-export {PluginManager} from './Plugins/PluginManager.js';
+export {PluginManagerOptions, PluginManager} from './Plugins/PluginManager.js';
 
 // Provider ------------------------------------------------------------------------------------------------------------
 export {IProvider} from './Provider/IProvider.js';

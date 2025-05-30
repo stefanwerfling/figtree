@@ -5,14 +5,12 @@ import express, {Application, NextFunction, Request, Response} from 'express';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import session, {Store} from 'express-session';
-import Path from 'path';
 import {PemHelper} from '../../Crypto/PemHelper.js';
 import {Logger} from '../../Logger/Logger.js';
 import {FileHelper} from '../../Utils/FileHelper.js';
 import {IDefaultRoute} from './Routes/IDefaultRoute.js';
 import {ITlsClientError} from './Tls/ITlsClientError.js';
 import {ITlsSocket} from './Tls/ITlsSocket.js';
-import {DefaultRoute} from './Routes/DefaultRoute.js';
 
 /**
  * BaseHttpServerOptionCrypt

@@ -32,7 +32,7 @@ export class Login extends DefaultRoute {
                 // Your code -------------------------------------------------------------------------------------------
                 // Handler todo start ----------------------------------------------------------------------------------
 
-                if (this.isUserLogin(req, res, false)) {
+                if (this.isUserLogin(req, false)) {
                     return {
                         statusCode: StatusCodes.OK,
                         status: true

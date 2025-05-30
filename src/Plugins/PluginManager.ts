@@ -1,5 +1,6 @@
 import {Ets} from 'ets';
 import {SchemaErrors} from 'vts';
+import {MerkleTreeRootHash} from '../Crypto/MerkleTreeRootHash.js';
 import {Logger} from '../Logger/Logger.js';
 import {SchemaPluginDefinition} from '../Schemas/Plugin/PluginDefinition.js';
 import {DirHelper} from '../Utils/DirHelper.js';
@@ -8,6 +9,15 @@ import {APlugin} from './APlugin.js';
 import {APluginEvent} from './APluginEvent.js';
 import path from 'path';
 import {PluginInformation} from './PluginInformation.js';
+
+/**
+ * Plugin manager options
+ */
+export type PluginManagerOptions = {
+    checkDistHash?: boolean;
+    // Path-to-modules directory
+    appPath?: string;
+};
 
 /**
  * Plugin manager controll the plugin loading and event registering.
@@ -25,6 +35,12 @@ export class PluginManager {
      * @protected
      */
     protected _appPath: string;
+
+    /**
+     * check the dist hash
+     * @protected
+     */
+    protected _checkDistHash: boolean = false;
 
     /**
      * Service name from service instance (name of the system in which the plugin works).
@@ -67,14 +83,19 @@ export class PluginManager {
     /**
      * Constructor
      * @param {string} serviceName - Service name, name who starts the plugin manager.
-     * @param {string} appPath - Path-to-modules directory.
+     * @param {string} options - options for plugin manager
      */
-    public constructor(serviceName: string, appPath?: string) {
-        if (appPath) {
-            this._appPath = appPath;
+    public constructor(serviceName: string, options: PluginManagerOptions = {}) {
+        this._appPath = path.join(path.resolve());
+
+        if (options.appPath) {
+            this._appPath = options.appPath;
         }
 
-        this._appPath = path.join(path.resolve());
+        if (options.checkDistHash) {
+            this._checkDistHash = true;
+        }
+
         this._serviceName = serviceName;
 
         PluginManager._instance = this;
@@ -193,6 +214,27 @@ export class PluginManager {
 
             if (importFile === null) {
                 throw new Error(`plugin main not found: ${plugin.path}`);
+            }
+
+            if (this._checkDistHash) {
+                if (plugin.definition.distHash === undefined) {
+                    throw new Error(`plugin dist hash is empty!`);
+                }
+
+                const distDir = path.dirname(importFile);
+
+                Logger.getLogger().silly(`PluginManager::load: check plugin hash by directory: ${distDir}`);
+
+                const mtrh = new MerkleTreeRootHash();
+                const pluginHash = await mtrh.fromFolder(distDir, true);
+
+                Logger.getLogger().silly(`PluginManager::load: dist-hash check Direcotry: ${pluginHash} Plugin: ${plugin.definition.distHash}`);
+
+                if (pluginHash === plugin.definition.distHash) {
+                    Logger.getLogger().silly('PluginManager::load: dist-hash check: OK');
+                } else {
+                    throw new Error(`plugin dist hash is not identical! code manipulated?`);
+                }
             }
 
             Logger.getLogger().silly('PluginManager::load: file plugin: %s (%s)', importFile, plugin.definition.name);

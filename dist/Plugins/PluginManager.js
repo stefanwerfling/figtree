@@ -1,4 +1,5 @@
 import { Ets } from 'ets';
+import { MerkleTreeRootHash } from '../Crypto/MerkleTreeRootHash.js';
 import { Logger } from '../Logger/Logger.js';
 import { SchemaPluginDefinition } from '../Schemas/Plugin/PluginDefinition.js';
 import { DirHelper } from '../Utils/DirHelper.js';
@@ -7,6 +8,7 @@ import path from 'path';
 export class PluginManager {
     static _instance = null;
     _appPath;
+    _checkDistHash = false;
     _serviceName;
     _plugins = [];
     _events = new Map();
@@ -19,11 +21,14 @@ export class PluginManager {
     static hasInstance() {
         return PluginManager._instance === null;
     }
-    constructor(serviceName, appPath) {
-        if (appPath) {
-            this._appPath = appPath;
-        }
+    constructor(serviceName, options = {}) {
         this._appPath = path.join(path.resolve());
+        if (options.appPath) {
+            this._appPath = options.appPath;
+        }
+        if (options.checkDistHash) {
+            this._checkDistHash = true;
+        }
         this._serviceName = serviceName;
         PluginManager._instance = this;
     }
@@ -101,6 +106,22 @@ export class PluginManager {
             }
             if (importFile === null) {
                 throw new Error(`plugin main not found: ${plugin.path}`);
+            }
+            if (this._checkDistHash) {
+                if (plugin.definition.distHash === undefined) {
+                    throw new Error(`plugin dist hash is empty!`);
+                }
+                const distDir = path.dirname(importFile);
+                Logger.getLogger().silly(`PluginManager::load: check plugin hash by directory: ${distDir}`);
+                const mtrh = new MerkleTreeRootHash();
+                const pluginHash = await mtrh.fromFolder(distDir, true);
+                Logger.getLogger().silly(`PluginManager::load: dist-hash check Direcotry: ${pluginHash} Plugin: ${plugin.definition.distHash}`);
+                if (pluginHash === plugin.definition.distHash) {
+                    Logger.getLogger().silly('PluginManager::load: dist-hash check: OK');
+                }
+                else {
+                    throw new Error(`plugin dist hash is not identical! code manipulated?`);
+                }
             }
             Logger.getLogger().silly('PluginManager::load: file plugin: %s (%s)', importFile, plugin.definition.name);
             const oPlugin = await import(importFile);

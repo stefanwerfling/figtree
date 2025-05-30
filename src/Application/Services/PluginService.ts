@@ -1,6 +1,6 @@
 import path from 'path';
 import {Logger} from '../../Logger/Logger.js';
-import {PluginManager} from '../../Plugins/PluginManager.js';
+import {PluginManager, PluginManagerOptions} from '../../Plugins/PluginManager.js';
 import {ServiceAbstract, ServiceImportance, ServiceStatus} from '../../Service/ServiceAbstract.js';
 import {StringHelper} from '../../Utils/StringHelper.js';
 
@@ -30,10 +30,16 @@ export class PluginService extends ServiceAbstract {
      * @param {string} appName
      * @param {[string]} serviceName
      * @param {[string[]]} serviceDependencies
+     * @param {PluginManagerOptions} options
      */
-    public constructor(appName: string, serviceName?: string, serviceDependencies?: string[]) {
+    public constructor(appName: string, serviceName?: string, serviceDependencies?: string[], options: PluginManagerOptions = {}) {
         super(serviceName ?? PluginService.NAME, serviceDependencies);
-        this._pluginManager = new PluginManager(appName, path.resolve());
+
+        if (options.appPath === undefined) {
+            options.appPath = path.resolve()
+        }
+
+        this._pluginManager = new PluginManager(appName, options);
     }
 
     /**

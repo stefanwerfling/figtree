@@ -5,7 +5,7 @@ export class Login extends DefaultRoute {
     static BASE = 'login';
     getExpressRouter() {
         this._get(this._getUrl('v1', Login.BASE, 'islogin/:userid'), false, async (req, res, data) => {
-            if (this.isUserLogin(req, res, false)) {
+            if (this.isUserLogin(req, false)) {
                 return {
                     statusCode: StatusCodes.OK,
                     status: true

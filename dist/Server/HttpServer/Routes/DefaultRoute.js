@@ -29,7 +29,7 @@ export class DefaultRoute {
         }
         return true;
     }
-    isUserLogin(req, res, sendAutoResoonse = true) {
+    isUserLogin(req, sendAutoResoonse = true) {
         if (SchemaRequestData.validate(req, [])) {
             if (Session.isUserLogin(req.session)) {
                 return true;
@@ -57,7 +57,7 @@ export class DefaultRoute {
             this._routes.get(uriPath, async (req, res) => {
                 try {
                     if (checkUserLogin) {
-                        if (!this.isUserLogin(req, res)) {
+                        if (!this.isUserLogin(req)) {
                             return;
                         }
                     }
@@ -149,7 +149,7 @@ export class DefaultRoute {
             this._routes.post(uriPath, async (req, res) => {
                 try {
                     if (checkUserLogin) {
-                        if (!this.isUserLogin(req, res)) {
+                        if (!this.isUserLogin(req)) {
                             return;
                         }
                     }

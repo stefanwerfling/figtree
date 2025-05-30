@@ -1,4 +1,5 @@
 import {readdir, stat, mkdir} from 'fs/promises';
+import * as path from 'path';
 
 /**
  * Dire helper class
@@ -7,11 +8,25 @@ export class DirHelper {
 
     /**
      * Read files by path
-     * @param {string} path
+     * @param {string} dir
+     * @param {boolean} recursive
+     * @param {string} base
      * @returns {string[]}
      */
-    public static async getFiles(path: string): Promise<string[]> {
-        return readdir(path);
+    public static async getFiles(dir: string, recursive: boolean = false, base = dir): Promise<string[]> {
+        const entries = await readdir(dir, { withFileTypes: true });
+
+        const files = await Promise.all(entries.map(async(entry) => {
+            const fullPath = path.join(dir, entry.name);
+
+            if (entry.isDirectory()) {
+                return this.getFiles(fullPath, recursive, base);
+            } else {
+                return [path.relative(base, fullPath)];
+            }
+        }));
+
+        return files.flat();
     }
 
     /**

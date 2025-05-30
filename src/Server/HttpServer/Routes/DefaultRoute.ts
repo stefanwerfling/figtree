@@ -14,7 +14,7 @@ import {SwaggerUIRoute} from './SwaggerUIRoute.js';
 /**
  * DefaultRouteHandlerGet
  */
-export type DefaultRouteHandlerGet<A, B, C, D, E, F, G, S> = (
+export type DefaultRouteHandlerGet<A, B, C, D, F, S> = (
     request: Request,
     response: Response,
     data: {
@@ -29,7 +29,7 @@ export type DefaultRouteHandlerGet<A, B, C, D, E, F, G, S> = (
 /**
  * DefaultRouteHandlerPost
  */
-export type DefaultRouteHandlerPost<A, B, C, D, E, F, G, S> = (
+export type DefaultRouteHandlerPost<A, B, C, D, E, F, S> = (
     request: Request,
     response: Response,
     data: {
@@ -126,12 +126,10 @@ export class DefaultRoute implements IDefaultRoute {
     /**
      * Is User Login
      * @param {unknown} req
-     * @param {Response} res
      * @param {boolean} sendAutoResoonse
      */
     public isUserLogin(
         req: unknown,
-        res: Response,
         sendAutoResoonse: boolean = true
     ): req is RequestData {
         if (SchemaRequestData.validate(req, [])) {
@@ -179,14 +177,14 @@ export class DefaultRoute implements IDefaultRoute {
     protected _get<A, B, C, D, E, F, G, S>(
         uriPath: string,
         checkUserLogin: boolean,
-        handler: DefaultRouteHandlerGet<A, B, C, D, E, F, G, S>,
+        handler: DefaultRouteHandlerGet<A, B, C, D, F, S>,
         description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G, S>
     ): void {
         try {
             this._routes.get(uriPath, async(req, res) => {
                 try {
                     if (checkUserLogin) {
-                        if (!this.isUserLogin(req, res)) {
+                        if (!this.isUserLogin(req)) {
                             return;
                         }
                     }
@@ -292,14 +290,14 @@ export class DefaultRoute implements IDefaultRoute {
     protected _post<A, B, C, D, E, F, G, S>(
         uriPath: string,
         checkUserLogin: boolean,
-        handler: DefaultRouteHandlerPost<A, B, C, D, E, F, G, S>,
+        handler: DefaultRouteHandlerPost<A, B, C, D, E, F, S>,
         description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G, S>
     ): void {
         try {
             this._routes.post(uriPath, async(req, res) => {
                 try {
                     if (checkUserLogin) {
-                        if (!this.isUserLogin(req, res)) {
+                        if (!this.isUserLogin(req)) {
                             return;
                         }
                     }

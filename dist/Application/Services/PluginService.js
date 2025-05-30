@@ -7,9 +7,12 @@ export class PluginService extends ServiceAbstract {
     static NAME = 'plugin';
     _importance = ServiceImportance.Critical;
     _pluginManager;
-    constructor(appName, serviceName, serviceDependencies) {
+    constructor(appName, serviceName, serviceDependencies, options = {}) {
         super(serviceName ?? PluginService.NAME, serviceDependencies);
-        this._pluginManager = new PluginManager(appName, path.resolve());
+        if (options.appPath === undefined) {
+            options.appPath = path.resolve();
+        }
+        this._pluginManager = new PluginManager(appName, options);
     }
     getPluginManager() {
         return this._pluginManager;
