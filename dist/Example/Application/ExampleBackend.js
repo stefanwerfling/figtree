@@ -13,7 +13,7 @@ export class ExampleBackend extends BackendApp {
         return SchemaDefaultArgs;
     }
     async _initServices() {
-        this._serviceList.add(new HttpService(ExampleRouteLoader));
+        this._serviceManager.add(new HttpService(ExampleRouteLoader));
     }
 }
 //# sourceMappingURL=ExampleBackend.js.map

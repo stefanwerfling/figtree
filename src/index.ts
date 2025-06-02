@@ -19,6 +19,8 @@ export {SchemaConfigBackendOptions, ConfigBackendOptions} from './Schemas/Config
 export {SchemaLoggerConfig, LoggerConfig} from './Schemas/Logger/LoggerConfig.js';
 export {StatusCodes} from './Schemas/Server/Routes/StatusCodes.js';
 export {SchemaDefaultReturn, DefaultReturn} from './Schemas/Server/Routes/DefaultReturn.js';
+export {SchemaServiceInfoEntry, ServiceInfoEntry} from './Schemas/Service/ServiceInfoEntry.js';
+export {SchemaServiceStatusResponse, ServiceStatusResponse} from './Schemas/Server/Routes/Service.js';
 export {
     SchemaSessionUserData,
     SessionUserData,
@@ -101,6 +103,7 @@ export {
 export {USHttpServerOptions, USHttpServer} from './Server/HttpServer/USHttpServer.js';
 export {HttpUploadChunkInfo, FnHttpUploadHandleSuccess, HttpUpload} from './Server/HttpServer/HttpUpload.js';
 export {SwaggerUIRoute} from './Server/HttpServer/Routes/SwaggerUIRoute.js';
+export {ServiceRoute} from './Server/HttpServer/Routes/ServiceRoute.js';
 
 // Process -------------------------------------------------------------------------------------------------------------
 export {ProcessAwait} from './Process/ProcessAwait.js';
@@ -108,7 +111,7 @@ export {ProcessAwait} from './Process/ProcessAwait.js';
 // Service -------------------------------------------------------------------------------------------------------------
 export {ServiceError} from './Service/ServiceError.js';
 export {ServiceStatus, ServiceType, ServiceAbstract, ServiceImportance} from './Service/ServiceAbstract.js';
-export {ServiceList} from './Service/ServiceList.js';
+export {ServiceManager} from './Service/ServiceManager.js';
 
 // Plugin --------------------------------------------------------------------------------------------------------------
 export {PluginInformation} from './Plugins/PluginInformation.js';

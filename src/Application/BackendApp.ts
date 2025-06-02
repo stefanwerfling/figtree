@@ -6,7 +6,7 @@ import {Args} from '../Env/Args.js';
 import {Logger} from '../Logger/Logger.js';
 import {DefaultArgs} from '../Schemas/Args/DefaultArgs.js';
 import {ConfigOptions} from '../Schemas/Config/ConfigOptions.js';
-import {ServiceList} from '../Service/ServiceList.js';
+import {ServiceManager} from '../Service/ServiceManager.js';
 import {FileHelper} from '../Utils/FileHelper.js';
 import exitHook from 'async-exit-hook';
 
@@ -48,10 +48,10 @@ export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions>
     protected _args: A|null = null;
 
     /**
-     * Service List
+     * Service Manager
      * @protected
      */
-    protected _serviceList: ServiceList = new ServiceList();
+    protected _serviceManager: ServiceManager = new ServiceManager();
 
     /**
      * constructor
@@ -172,7 +172,7 @@ export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions>
             try {
                 Logger.getLogger().info('Stop %s Service ...', Config.getInstance().getAppName());
 
-                await this._serviceList.stopAll();
+                await this._serviceManager.stopAll();
 
                 Logger.getLogger().info('... End.');
             } catch (e) {
@@ -187,15 +187,15 @@ export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions>
 
         Logger.getLogger().info('Start %s Service ...', Config.getInstance().getAppName());
         await this._initServices();
-        await this._serviceList.startAll();
+        await this._serviceManager.startAll();
     }
 
     /**
-     * Return the service list
-     * @return {ServiceList}
+     * Return the service manager
+     * @return {ServiceManager}
      */
-    public getServiceList(): ServiceList {
-        return this._serviceList;
+    public getServiceManager(): ServiceManager {
+        return this._serviceManager;
     }
 
 }

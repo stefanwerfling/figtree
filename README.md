@@ -20,7 +20,7 @@ Is a package for the Config/DB/Logging and many other useful classes and utils f
   - [x] AsyncLocalStorage for Context
 - [x] Service handler (for initialized services or schedule)
 - [x] Backend Main
-- [x] Provider hanlder
+- [x] Provider handler
 - [x] Plugin Manager/Loader
 - [ ] Crypto Managment
   - [x] Pem Helper/Parser

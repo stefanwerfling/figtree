@@ -24,7 +24,7 @@ export class ExampleBackend extends BackendApp<DefaultArgs, ConfigOptions> {
 
     protected async _initServices(): Promise<void> {
         //this._serviceList.add(new MariaDBService(DBLoader));
-        this._serviceList.add(new HttpService(ExampleRouteLoader));
+        this._serviceManager.add(new HttpService(ExampleRouteLoader));
     }
 
 }

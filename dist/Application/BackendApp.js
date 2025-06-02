@@ -3,7 +3,7 @@ import { Config } from '../Config/Config.js';
 import { ConfigBackend } from '../Config/ConfigBackend.js';
 import { Args } from '../Env/Args.js';
 import { Logger } from '../Logger/Logger.js';
-import { ServiceList } from '../Service/ServiceList.js';
+import { ServiceManager } from '../Service/ServiceManager.js';
 import { FileHelper } from '../Utils/FileHelper.js';
 import exitHook from 'async-exit-hook';
 export class BackendApp {
@@ -16,7 +16,7 @@ export class BackendApp {
     }
     _appName = 'figtree';
     _args = null;
-    _serviceList = new ServiceList();
+    _serviceManager = new ServiceManager();
     constructor(name = 'figtree') {
         this._appName = name;
         BackendApp._instances.set(name, this);
@@ -87,7 +87,7 @@ export class BackendApp {
         exitHook(async (callback) => {
             try {
                 Logger.getLogger().info('Stop %s Service ...', Config.getInstance().getAppName());
-                await this._serviceList.stopAll();
+                await this._serviceManager.stopAll();
                 Logger.getLogger().info('... End.');
             }
             catch (e) {
@@ -100,10 +100,10 @@ export class BackendApp {
         });
         Logger.getLogger().info('Start %s Service ...', Config.getInstance().getAppName());
         await this._initServices();
-        await this._serviceList.startAll();
+        await this._serviceManager.startAll();
     }
-    getServiceList() {
-        return this._serviceList;
+    getServiceManager() {
+        return this._serviceManager;
     }
 }
 //# sourceMappingURL=BackendApp.js.map
