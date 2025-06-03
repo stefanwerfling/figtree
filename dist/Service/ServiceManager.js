@@ -120,5 +120,38 @@ export class ServiceManager {
             }
         }
     }
+    async start(name) {
+        const service = this.getByName(name);
+        if (service === null) {
+            throw new Error(`Service not found by name: ${name}`);
+        }
+        if (service.getStatus() === ServiceStatus.Success) {
+            return;
+        }
+        if (service.isProcess()) {
+            throw new Error(`Service already in processing: ${name}`);
+        }
+        const deps = service.getServiceDependencies();
+        for (const dep of deps) {
+            const depService = this.getByName(dep);
+            if (depService === null) {
+                throw new Error(`Dependencie-Service not found by name: ${dep}`);
+            }
+            if (depService.getStatus() !== ServiceStatus.Success) {
+                throw new Error(`Dependencie-Service is not ready by name: ${dep}`);
+            }
+        }
+        await this._startService(service);
+    }
+    async stop(name) {
+        const service = this.getByName(name);
+        if (service === null) {
+            throw new Error(`Service not found by name: ${name}`);
+        }
+        if (service.getStatus() !== ServiceStatus.Success) {
+            throw new Error(`The service has not successfully started to stop: ${name}`);
+        }
+        await service.stop();
+    }
 }
 //# sourceMappingURL=ServiceManager.js.map

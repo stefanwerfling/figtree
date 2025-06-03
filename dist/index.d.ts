@@ -8,7 +8,7 @@ export { SchemaLoggerConfig, LoggerConfig } from './Schemas/Logger/LoggerConfig.
 export { StatusCodes } from './Schemas/Server/Routes/StatusCodes.js';
 export { SchemaDefaultReturn, DefaultReturn } from './Schemas/Server/Routes/DefaultReturn.js';
 export { SchemaServiceInfoEntry, ServiceInfoEntry } from './Schemas/Service/ServiceInfoEntry.js';
-export { SchemaServiceStatusResponse, ServiceStatusResponse } from './Schemas/Server/Routes/Service.js';
+export { SchemaServiceStatusResponse, ServiceStatusResponse, SchemaServiceByNameRequest, ServiceByNameRequest } from './Schemas/Server/Routes/Service.js';
 export { SchemaSessionUserData, SessionUserData, SchemaSessionData, SessionData, SchemaRequestData, RequestData } from './Schemas/Server/RequestData.js';
 export { SchemaProviderEntry, ProviderEntry } from './Schemas/Provider/ProviderEntry.js';
 export { SchemaPluginDefinition, PluginDefinition } from './Schemas/Plugin/PluginDefinition.js';

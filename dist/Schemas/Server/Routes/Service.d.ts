@@ -14,3 +14,7 @@ export declare const SchemaServiceStatusResponse: import("vts/dist/schemas/objec
     }>>;
 }>;
 export type ServiceStatusResponse = ExtractSchemaResultType<typeof SchemaServiceStatusResponse>;
+export declare const SchemaServiceByNameRequest: import("vts/dist/schemas/objectSchema.js").ObjectSchema<{
+    name: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
+}>;
+export type ServiceByNameRequest = ExtractSchemaResultType<typeof SchemaServiceByNameRequest>;

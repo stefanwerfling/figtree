@@ -1,9 +1,17 @@
 import {Router} from 'express';
 import {BackendApp} from '../../../Application/BackendApp.js';
-import {SchemaServiceStatusResponse, ServiceStatusResponse} from '../../../Schemas/Server/Routes/Service.js';
+import {DefaultReturn, SchemaDefaultReturn} from '../../../Schemas/Server/Routes/DefaultReturn.js';
+import {
+    SchemaServiceByNameRequest,
+    SchemaServiceStatusResponse,
+    ServiceStatusResponse
+} from '../../../Schemas/Server/Routes/Service.js';
 import {StatusCodes} from '../../../Schemas/Server/Routes/StatusCodes.js';
 import {DefaultRoute} from './DefaultRoute.js';
 
+/**
+ * Base Service Route
+ */
 export class ServiceRoute extends DefaultRoute {
 
     /**
@@ -18,6 +26,11 @@ export class ServiceRoute extends DefaultRoute {
      */
     protected _onlyUserAccess: boolean;
 
+    /**
+     * Constructor
+     * @param {string} backendInstanceName
+     * @param {boolean} onlyUserAccess
+     */
     public constructor(backendInstanceName: string, onlyUserAccess: boolean = true) {
         super();
         this._backendInstanceName = backendInstanceName;
@@ -25,7 +38,7 @@ export class ServiceRoute extends DefaultRoute {
     }
 
     /**
-     * Het Express Router
+     * Get Express Router
      * @return {Router}
      */
     public getExpressRouter(): Router {
@@ -54,7 +67,73 @@ export class ServiceRoute extends DefaultRoute {
                 description: 'Service status list',
                 responseBodySchema: SchemaServiceStatusResponse
             }
-        )
+        );
+
+        this._post(
+            this._getUrl('v1', 'service', 'start'),
+            this._onlyUserAccess,
+            async (request, response, data): Promise<DefaultReturn> => {
+                const backend = BackendApp.getInstance(this._backendInstanceName);
+
+                if (backend) {
+                    try {
+                        await backend.getServiceManager().start(data.body!.name);
+
+                        return {
+                            statusCode: StatusCodes.OK,
+                        };
+                    } catch (e) {
+                        return {
+                            statusCode: StatusCodes.INTERNAL_ERROR,
+                            msg: e instanceof Error ? e.message : String(e),
+                        };
+                    }
+                }
+
+                return {
+                    statusCode: StatusCodes.INTERNAL_ERROR,
+                    msg: 'Backend not found, no information for services',
+                };
+            },
+            {
+                description: 'Service start by service name',
+                bodySchema: SchemaServiceByNameRequest,
+                responseBodySchema: SchemaDefaultReturn
+            }
+        );
+
+        this._post(
+            this._getUrl('v1', 'service', 'stop'),
+            this._onlyUserAccess,
+            async (request, response, data): Promise<DefaultReturn> => {
+                const backend = BackendApp.getInstance(this._backendInstanceName);
+
+                if (backend) {
+                    try {
+                        await backend.getServiceManager().stop(data.body!.name);
+
+                        return {
+                            statusCode: StatusCodes.OK,
+                        };
+                    } catch (e) {
+                        return {
+                            statusCode: StatusCodes.INTERNAL_ERROR,
+                            msg: e instanceof Error ? e.message : String(e),
+                        };
+                    }
+                }
+
+                return {
+                    statusCode: StatusCodes.INTERNAL_ERROR,
+                    msg: 'Backend not found, no information for services',
+                };
+            },
+            {
+                description: 'Service stop by service name',
+                bodySchema: SchemaServiceByNameRequest,
+                responseBodySchema: SchemaDefaultReturn
+            }
+        );
 
         return super.getExpressRouter();
     }

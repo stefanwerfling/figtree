@@ -13,3 +13,15 @@ export const SchemaServiceStatusResponse = SchemaDefaultReturn.extend({
  * Type of schema service status response
  */
 export type ServiceStatusResponse = ExtractSchemaResultType<typeof SchemaServiceStatusResponse>;
+
+/**
+ * Schema service by name request
+ */
+export const SchemaServiceByNameRequest = Vts.object({
+    name: Vts.string({description: 'Name of the service to be addressed'})
+}, {description: 'Service by name request'});
+
+/**
+ * Type of schema service by name request
+ */
+export type ServiceByNameRequest = ExtractSchemaResultType<typeof SchemaServiceByNameRequest>;

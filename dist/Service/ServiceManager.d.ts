@@ -8,4 +8,6 @@ export declare class ServiceManager {
     protected _startService(service: ServiceAbstract): Promise<void>;
     startAll(): Promise<void>;
     stopAll(): Promise<void>;
+    start(name: string): Promise<void>;
+    stop(name: string): Promise<void>;
 }
