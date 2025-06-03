@@ -5,6 +5,7 @@ export declare class RequestContext {
     static ISLOGIN: string;
     private static _instance;
     static getInstance(): RequestContext;
+    static hasInstance(): boolean;
     private _asyncLocalStorage;
     private constructor();
     runWithContext(data: RequestContextData, callback: () => void): void;

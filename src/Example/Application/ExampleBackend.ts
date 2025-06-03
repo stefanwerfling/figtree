@@ -11,6 +11,15 @@ import {ExampleRouteLoader} from '../Routes/ExampleRouteLoader.js';
 
 export class ExampleBackend extends BackendApp<DefaultArgs, ConfigOptions> {
 
+    public static NAME = 'example_backend';
+
+    /**
+     * Constructor
+     */
+    public constructor() {
+        super(ExampleBackend.NAME);
+    }
+
     protected _getConfigInstance(): Config<ConfigOptions> {
         const config = ExampleConfig.getInstance();
         config.setAppName('example');

@@ -4,6 +4,10 @@ import { SchemaDefaultArgs } from '../../Schemas/Args/DefaultArgs.js';
 import { ExampleConfig } from '../Config/ExampleConfig.js';
 import { ExampleRouteLoader } from '../Routes/ExampleRouteLoader.js';
 export class ExampleBackend extends BackendApp {
+    static NAME = 'example_backend';
+    constructor() {
+        super(ExampleBackend.NAME);
+    }
     _getConfigInstance() {
         const config = ExampleConfig.getInstance();
         config.setAppName('example');

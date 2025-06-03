@@ -65,6 +65,7 @@ export class ServiceRoute extends DefaultRoute {
             },
             {
                 description: 'Service status list',
+                tags: ['service'],
                 responseBodySchema: SchemaServiceStatusResponse
             }
         );
@@ -97,6 +98,7 @@ export class ServiceRoute extends DefaultRoute {
             },
             {
                 description: 'Service start by service name',
+                tags: ['service'],
                 bodySchema: SchemaServiceByNameRequest,
                 responseBodySchema: SchemaDefaultReturn
             }
@@ -130,6 +132,7 @@ export class ServiceRoute extends DefaultRoute {
             },
             {
                 description: 'Service stop by service name',
+                tags: ['service'],
                 bodySchema: SchemaServiceByNameRequest,
                 responseBodySchema: SchemaDefaultReturn
             }

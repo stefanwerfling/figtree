@@ -28,6 +28,7 @@ export class SwaggerUIRoute {
         let swagUrl = url;
         const spec = {
             summary: description.description,
+            tags: description.tags !== undefined ? description.tags : undefined,
             requestBody: undefined,
             responses: undefined,
             parameters: undefined

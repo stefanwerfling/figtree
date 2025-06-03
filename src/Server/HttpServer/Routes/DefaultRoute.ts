@@ -1,4 +1,4 @@
-import {Request, Response, Router} from 'express';
+import {Request, RequestHandler, Response, Router} from 'express';
 import {Logger} from '../../../Logger/Logger.js';
 import {RequestData, SchemaRequestData} from '../../../Schemas/Server/RequestData.js';
 import {StatusCodes} from '../../../Schemas/Server/Routes/StatusCodes.js';
@@ -12,24 +12,9 @@ import {RouteError} from './RouteError.js';
 import {SwaggerUIRoute} from './SwaggerUIRoute.js';
 
 /**
- * DefaultRouteHandlerGet
+ * DefaultRouteHandler
  */
-export type DefaultRouteHandlerGet<A, B, C, D, F, S> = (
-    request: Request,
-    response: Response,
-    data: {
-        headers: A|undefined
-        params: C|undefined,
-        query: B|undefined,
-        cookies: D|undefined,
-        session: S|undefined
-    }
-) => Promise<F>;
-
-/**
- * DefaultRouteHandlerPost
- */
-export type DefaultRouteHandlerPost<A, B, C, D, E, F, S> = (
+export type DefaultRouteHandler<A, B, C, D, E, F, S> = (
     request: Request,
     response: Response,
     data: {
@@ -47,6 +32,7 @@ export type DefaultRouteHandlerPost<A, B, C, D, E, F, S> = (
  */
 export type DefaultRouteMethodeDescription<A, B, C, D, E, F, G, S> = {
     description?: string;
+    tags?: string[];
     headerSchema?: Schema<A>;
     querySchema?: Schema<B>;
     pathSchema?: Schema<C>;
@@ -55,7 +41,14 @@ export type DefaultRouteMethodeDescription<A, B, C, D, E, F, G, S> = {
     responseBodySchema?: Schema<F>;
     responseHeaderSchema?: Schema<G>;
     sessionSchema?: Schema<S>;
+    parser?: RequestHandler,
+    useLocalStorage?: boolean;
 };
+
+export type DefaultRouteCheckUserLogin<
+    REQ extends Request = Request,
+    RESP extends Response = Response
+> = (request: REQ, response: RESP) => Promise<boolean>;
 
 /**
  * DefaultRoute
@@ -137,18 +130,16 @@ export class DefaultRoute implements IDefaultRoute {
                 return true;
             }
 
-            const store = new Map<string, any>();
+            if (RequestContext.hasInstance()) {
+                RequestContext.getInstance().set(RequestContext.SESSIONID, req.session.id);
+                RequestContext.getInstance().set(RequestContext.USERID, '');
+                RequestContext.getInstance().set(RequestContext.ISLOGIN, false);
 
-            store.set(RequestContext.SESSIONID, req.session.id);
-            store.set(RequestContext.USERID, '');
-            store.set(RequestContext.ISLOGIN, false);
-
-            if (req.session.user) {
-                store.set(RequestContext.USERID, req.session.user.userid);
-                store.set(RequestContext.ISLOGIN, req.session.user.isLogin);
+                if (req.session.user) {
+                    RequestContext.getInstance().set(RequestContext.USERID, req.session.user.userid);
+                    RequestContext.getInstance().set(RequestContext.ISLOGIN, req.session.user.isLogin);
+                }
             }
-
-            RequestContext.getInstance().enterWith(store);
         }
 
         if (sendAutoResoonse) {
@@ -167,239 +158,199 @@ export class DefaultRoute implements IDefaultRoute {
     }
 
     /**
-     * _get
-     * @param {string} uriPath
-     * @param {boolean} checkUserLogin
-     * @param {DefaultRouteHandlerGet} handler
+     * Alias for get registration
+     * @param {string|string[]} uriPath
+     * @param {boolean|DefaultRouteCheckUserLogin} checkUserLogin
+     * @param {DefaultRouteHandlerPost} handler
      * @param {DefaultRouteMethodeDescription} description
      * @protected
      */
     protected _get<A, B, C, D, E, F, G, S>(
-        uriPath: string,
-        checkUserLogin: boolean,
-        handler: DefaultRouteHandlerGet<A, B, C, D, F, S>,
+        uriPath: string|string[],
+        checkUserLogin: boolean|DefaultRouteCheckUserLogin,
+        handler: DefaultRouteHandler<A, B, C, D, E, F, S>,
         description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G, S>
     ): void {
-        try {
-            this._routes.get(uriPath, async(req, res) => {
-                try {
-                    if (checkUserLogin) {
-                        if (!this.isUserLogin(req)) {
-                            return;
-                        }
-                    }
-
-                    let headers: undefined|A = undefined;
-                    let params: undefined|C = undefined;
-                    let query: undefined|B = undefined;
-                    let cookies: undefined|D = undefined;
-                    let session: undefined|S = undefined;
-
-                    if (description.headerSchema) {
-                        if (this.isSchemaValidate(description.headerSchema, req.headers, res)) {
-                            headers = req.headers;
-                        } else {
-                            return;
-                        }
-                    }
-
-                    if (description.pathSchema) {
-                        if (this.isSchemaValidate(description.pathSchema, req.params, res)) {
-                            params = req.params;
-                        } else {
-                            return;
-                        }
-                    }
-
-                    if (description.querySchema) {
-                        if (this.isSchemaValidate(description.querySchema, req.query, res)) {
-                            query = req.query;
-                        } else {
-                            return;
-                        }
-                    }
-
-                    if (description.cookieSchema) {
-                        if (this.isSchemaValidate(description.cookieSchema, req.cookies, res)) {
-                            cookies = req.cookies;
-                        } else {
-                            return;
-                        }
-                    }
-
-                    if (description.sessionSchema) {
-                        if (this.isSchemaValidate(description.sessionSchema, req.session, res)) {
-                            session = req.session;
-                        } else {
-                            return;
-                        }
-                    }
-
-                    const result = await handler(
-                        req,
-                        res,
-                        {
-                            headers: headers,
-                            params: params,
-                            query: query,
-                            cookies: cookies,
-                            session: session
-                        }
-                    );
-
-                    if (description.responseBodySchema) {
-                        const error: SchemaErrors = [];
-
-                        if (description.responseBodySchema.validate(result, error)) {
-                            res.status(200).json(result);
-                        } else {
-                            throw new Error(`The result have a error in: ${description.responseBodySchema.describe().description}`);
-                        }
-                    }
-                } catch (ie) {
-                    if (ie instanceof RouteError) {
-                        if (ie.asJson()) {
-                            res.status(200).json(ie.defaultReturn());
-                        } else {
-                            res.status(parseInt(ie.getStatus(), 10) ?? 500).send(ie.getRawMsg());
-                        }
-
-                        return;
-                    }
-
-                    Logger.getLogger().error('DefaultRoute::_get: Exception intern, path can not call: %0', uriPath);
-                }
-            });
-
-            if (SwaggerUIRoute.hasInstance()) {
-                SwaggerUIRoute.getInstance().registerGet(uriPath, description);
-            }
-        } catch (e) {
-            Logger.getLogger().error(`DefaultRoute::_get: Exception extern, path can not call: %0$`, uriPath);
-        }
+        this._all('get', uriPath, checkUserLogin, handler, description);
     }
 
     /**
-     * _post
-     * @param {string} uriPath
-     * @param {boolean} checkUserLogin
+     * Alias for post registration
+     * @param {string|string[]} uriPath
+     * @param {boolean|DefaultRouteCheckUserLogin} checkUserLogin
      * @param {DefaultRouteHandlerPost} handler
      * @param {DefaultRouteMethodeDescription} description
      * @protected
      */
     protected _post<A, B, C, D, E, F, G, S>(
-        uriPath: string,
-        checkUserLogin: boolean,
-        handler: DefaultRouteHandlerPost<A, B, C, D, E, F, S>,
+        uriPath: string|string[],
+        checkUserLogin: boolean|DefaultRouteCheckUserLogin,
+        handler: DefaultRouteHandler<A, B, C, D, E, F, S>,
         description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G, S>
     ): void {
-        try {
-            this._routes.post(uriPath, async(req, res) => {
-                try {
-                    if (checkUserLogin) {
-                        if (!this.isUserLogin(req)) {
-                            return;
-                        }
-                    }
-
-                    let headers: undefined|A = undefined;
-                    let params: undefined|C = undefined;
-                    let query: undefined|B = undefined;
-                    let cookies: undefined|D = undefined;
-                    let session: undefined|S = undefined;
-                    let body: undefined|E = undefined;
-
-                    if (description.headerSchema) {
-                        if (this.isSchemaValidate(description.headerSchema, req.headers, res)) {
-                            headers = req.headers;
-                        } else {
-                            return;
-                        }
-                    }
-
-                    if (description.pathSchema) {
-                        if (this.isSchemaValidate(description.pathSchema, req.params, res)) {
-                            params = req.params;
-                        } else {
-                            return;
-                        }
-                    }
-
-                    if (description.querySchema) {
-                        if (this.isSchemaValidate(description.querySchema, req.query, res)) {
-                            query = req.query;
-                        } else {
-                            return;
-                        }
-                    }
-
-                    if (description.cookieSchema) {
-                        if (this.isSchemaValidate(description.cookieSchema, req.cookies, res)) {
-                            cookies = req.cookies;
-                        } else {
-                            return;
-                        }
-                    }
-
-                    if (description.sessionSchema) {
-                        if (this.isSchemaValidate(description.sessionSchema, req.session, res)) {
-                            session = req.session;
-                        } else {
-                            return;
-                        }
-                    }
-
-                    if (description.bodySchema) {
-                        if (this.isSchemaValidate(description.bodySchema, req.body, res)) {
-                            body = req.body;
-                        } else {
-                            return;
-                        }
-                    }
-
-                    const result = await handler(
-                        req,
-                        res,
-                        {
-                            headers: headers,
-                            params: params,
-                            query: query,
-                            cookies: cookies,
-                            session: session,
-                            body: body
-                        }
-                    );
-
-                    if (description.responseBodySchema) {
-                        const error: SchemaErrors = [];
-
-                        if (description.responseBodySchema.validate(result, error)) {
-                            res.status(200).json(result);
-                        } else {
-                            throw new Error(`The result have a error in: ${description.responseBodySchema.describe().description}`);
-                        }
-                    }
-                } catch (ie) {
-                    if (ie instanceof RouteError) {
-                        if (ie.asJson()) {
-                            res.status(200).json(ie.defaultReturn());
-                        } else {
-                            res.status(parseInt(ie.getStatus(), 10) ?? 500).send(ie.getRawMsg());
-                        }
-
-                        return;
-                    }
-
-                    Logger.getLogger().error('DefaultRoute::_post: Exception intern, path can not call: %0', uriPath);
-                }
-            });
-
-            if (SwaggerUIRoute.hasInstance()) {
-                SwaggerUIRoute.getInstance().registerPost(uriPath, description);
-            }
-        } catch (e) {
-            Logger.getLogger().error('DefaultRoute::_post: Exception extern, path can not call: %0', uriPath);
-        }
+        this._all('post', uriPath, checkUserLogin, handler, description);
     }
 
+    /**
+     *
+     * @param method
+     * @param uriPath
+     * @param checkUserLogin
+     * @param handler
+     * @param description
+     * @protected
+     */
+    protected _all<A, B, C, D, E, F, G, S>(
+        method: string,
+        uriPath: string|string[],
+        checkUserLogin: boolean|DefaultRouteCheckUserLogin,
+        handler: DefaultRouteHandler<A, B, C, D, E, F, S>,
+        description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G, S>
+    ): void {
+        const cMethod = method.toLowerCase();
+        const urls = Array.isArray(uriPath) ? uriPath : [uriPath];
+        const routeHandle = async(req: Request, res: Response) => {
+            try {
+                // check login -----------------------------------------------------------------------------------------
+
+                if (description.useLocalStorage) {
+                    RequestContext.getInstance().enterWith(new Map<string, any>());
+                }
+
+                if (typeof checkUserLogin === 'function') {
+                    if (!await checkUserLogin(req, res)) {
+                        return;
+                    }
+                } else if (checkUserLogin) {
+                    if (!this.isUserLogin(req)) {
+                        return;
+                    }
+                }
+
+                // check schemas ---------------------------------------------------------------------------------------
+
+                let headers: undefined|A = undefined;
+                let params: undefined|C = undefined;
+                let query: undefined|B = undefined;
+                let cookies: undefined|D = undefined;
+                let session: undefined|S = undefined;
+                let body: undefined|E = undefined;
+
+                if (description.headerSchema) {
+                    if (this.isSchemaValidate(description.headerSchema, req.headers, res)) {
+                        headers = req.headers;
+                    } else {
+                        return;
+                    }
+                }
+
+                if (description.pathSchema) {
+                    if (this.isSchemaValidate(description.pathSchema, req.params, res)) {
+                        params = req.params;
+                    } else {
+                        return;
+                    }
+                }
+
+                if (description.querySchema) {
+                    if (this.isSchemaValidate(description.querySchema, req.query, res)) {
+                        query = req.query;
+                    } else {
+                        return;
+                    }
+                }
+
+                if (description.cookieSchema) {
+                    if (this.isSchemaValidate(description.cookieSchema, req.cookies, res)) {
+                        cookies = req.cookies;
+                    } else {
+                        return;
+                    }
+                }
+
+                if (description.sessionSchema) {
+                    if (this.isSchemaValidate(description.sessionSchema, req.session, res)) {
+                        session = req.session;
+                    } else {
+                        return;
+                    }
+                }
+
+                if (description.bodySchema) {
+                    if (this.isSchemaValidate(description.bodySchema, req.body, res)) {
+                        body = req.body;
+                    } else {
+                        return;
+                    }
+                }
+
+                // call handler ----------------------------------------------------------------------------------------
+
+                const result = await handler(
+                    req,
+                    res,
+                    {
+                        headers: headers,
+                        params: params,
+                        query: query,
+                        cookies: cookies,
+                        session: session,
+                        body: body
+                    }
+                );
+
+                // check response --------------------------------------------------------------------------------------
+
+                if (description.responseBodySchema) {
+                    if (description.responseBodySchema.validate(result, [])) {
+                        res.status(200).json(result);
+                    } else {
+                        throw new Error(`The result have a error in: ${description.responseBodySchema.describe().description}`);
+                    }
+                }
+            } catch (ie) {
+                if (ie instanceof RouteError) {
+                    if (ie.asJson()) {
+                        res.status(200).json(ie.defaultReturn());
+                    } else {
+                        res.status(parseInt(ie.getStatus(), 10) ?? 500).send(ie.getRawMsg());
+                    }
+
+                    return;
+                }
+
+                Logger.getLogger().error('DefaultRoute::_all<%0>::routeHandle: Exception intern, path can not call: %0', cMethod, uriPath);
+            }
+        };
+
+        for (const url of urls) {
+            const params = [];
+
+            params.push(url);
+
+            if (description.parser) {
+                params.push(description.parser);
+            }
+
+            params.push(routeHandle);
+
+            try {
+                (this._routes as any)[cMethod](...params);
+
+                if (SwaggerUIRoute.hasInstance()) {
+                    switch (cMethod) {
+                        case 'get':
+                            SwaggerUIRoute.getInstance().registerGet(url, description);
+                            break;
+
+                        case 'post':
+                            SwaggerUIRoute.getInstance().registerPost(url, description);
+                            break;
+                    }
+                }
+            } catch (e) {
+                Logger.getLogger().error('DefaultRoute::_all<%0>: Exception extern, path can not call: %0', cMethod, uriPath);
+            }
+        }
+    }
 }

@@ -69,6 +69,7 @@ export class SwaggerUIRoute implements IDefaultRoute {
         let swagUrl = url;
         const spec = {
             summary: description.description,
+            tags: description.tags !== undefined ? description.tags : undefined,
             requestBody: undefined as undefined | object,
             responses: undefined as undefined | object,
             parameters: undefined as undefined | object[]

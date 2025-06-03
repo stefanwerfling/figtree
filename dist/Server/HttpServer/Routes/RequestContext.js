@@ -3,12 +3,15 @@ export class RequestContext {
     static SESSIONID = 'sessionid';
     static USERID = 'userid';
     static ISLOGIN = 'islogin';
-    static _instance;
+    static _instance = null;
     static getInstance() {
         if (!RequestContext._instance) {
             RequestContext._instance = new RequestContext();
         }
         return RequestContext._instance;
+    }
+    static hasInstance() {
+        return RequestContext._instance !== null;
     }
     _asyncLocalStorage;
     constructor() {

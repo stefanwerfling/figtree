@@ -1,8 +1,13 @@
 import {HttpRouteLoader} from '../../Server/HttpServer/HttpRouteLoader.js';
 import {IDefaultRoute} from '../../Server/HttpServer/Routes/IDefaultRoute.js';
+import {ServiceRoute} from '../../Server/HttpServer/Routes/ServiceRoute.js';
 import {SwaggerUIRoute} from '../../Server/HttpServer/Routes/SwaggerUIRoute.js';
+import {ExampleBackend} from '../Application/ExampleBackend.js';
 import {Login} from './API/Login.js';
 
+/**
+ * Example route loader
+ */
 export class ExampleRouteLoader extends HttpRouteLoader {
 
     /**
@@ -14,6 +19,7 @@ export class ExampleRouteLoader extends HttpRouteLoader {
 
         return [
             new Login(),
+            new ServiceRoute(ExampleBackend.NAME, false),
             SwaggerUIRoute.getInstance()
         ];
     }
