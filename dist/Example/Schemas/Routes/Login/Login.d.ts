@@ -6,7 +6,7 @@ export declare const SchemaTest: import("vts/dist/schemas/objectSchema.js").Obje
     }>>;
 }>;
 export declare const SchemaIsLogin: import("vts/dist/schemas/objectSchema.js").ObjectSchema<{
-    statusCode: import("vts/dist/schemas/orSchema.js").OrSchema<import("vts/dist/schemas/enumSchema.js").EnumSchema<import("../../../../index.js").StatusCodes> | import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>>;
+    statusCode: import("vts/dist/schemas/orSchema.js").OrSchema<import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions> | import("vts/dist/schemas/enumSchema.js").EnumSchema<import("../../../../index.js").StatusCodes>>;
     msg: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>>;
 } & {
     status: import("vts/dist/schemas/booleanSchema.js").BooleanSchema;

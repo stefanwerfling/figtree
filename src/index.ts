@@ -92,7 +92,12 @@ export {Client as RawClient} from './Server/RawServer/Client/Client.js';
 export {IDefaultRoute} from './Server/HttpServer/Routes/IDefaultRoute.js';
 export {RouteError} from './Server/HttpServer/Routes/RouteError.js';
 export {RequestContextData, RequestContext} from './Server/HttpServer/Routes/RequestContext.js';
-export {DefaultRouteHandler, DefaultRouteMethodeDescription, DefaultRouteCheckUserLogin, DefaultRoute} from './Server/HttpServer/Routes/DefaultRoute.js';
+export {
+    DefaultRouteHandler,
+    DefaultRouteMethodeDescription,
+    DefaultRouteCheckUserLogin,
+    DefaultRoute
+} from './Server/HttpServer/Routes/DefaultRoute.js';
 export {ITlsClientError} from './Server/HttpServer/Tls/ITlsClientError.js';
 export {ITlsSocket} from './Server/HttpServer/Tls/ITlsSocket.js';
 export {Session} from './Server/HttpServer/Session.js';
@@ -130,10 +135,15 @@ export {IProviders} from './Provider/IProviders.js';
 export {AProviderOnLoadEvent} from './Provider/AProviderOnLoadEvent.js';
 export {BaseProviders} from './Provider/BaseProviders.js';
 
+// Provider HttpServer -------------------------------------------------------------------------------------------------
+export {HttpRouteProviderType} from './Server/HttpServer/HttpRouteProviderType.js';
+export {IHttpRouteProvider} from './Server/HttpServer/IHttpRouteProvider.js';
+export {HttpRouteProviders} from './Server/HttpServer/HttpRouteProviders.js';
+
 // Application ---------------------------------------------------------------------------------------------------------
 export {BackendApp} from './Application/BackendApp.js';
+export {PluginService} from './Application/Services/PluginService.js';
 export {MariaDBService} from './Application/Services/MariaDBService.js';
 export {InfluxDBService} from './Application/Services/InfluxDBService.js';
 export {RedisDBService} from './Application/Services/RedisDBService.js';
 export {HttpService} from './Application/Services/HttpService.js';
-export {PluginService} from './Application/Services/PluginService.js';

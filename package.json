@@ -88,6 +88,9 @@
     "clean": "rm -rf dist",
     "compile": "tsc --project tsconfig.json"
   },
+  "bin": {
+    "figtree": "./dist/Cli/index.js"
+  },
   "type": "module",
   "types": "dist/index.d.ts",
   "version": "1.0.18"

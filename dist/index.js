@@ -61,10 +61,12 @@ export { APluginEvent } from './Plugins/APluginEvent.js';
 export { PluginManager } from './Plugins/PluginManager.js';
 export { AProviderOnLoadEvent } from './Provider/AProviderOnLoadEvent.js';
 export { BaseProviders } from './Provider/BaseProviders.js';
+export { HttpRouteProviderType } from './Server/HttpServer/HttpRouteProviderType.js';
+export { HttpRouteProviders } from './Server/HttpServer/HttpRouteProviders.js';
 export { BackendApp } from './Application/BackendApp.js';
+export { PluginService } from './Application/Services/PluginService.js';
 export { MariaDBService } from './Application/Services/MariaDBService.js';
 export { InfluxDBService } from './Application/Services/InfluxDBService.js';
 export { RedisDBService } from './Application/Services/RedisDBService.js';
 export { HttpService } from './Application/Services/HttpService.js';
-export { PluginService } from './Application/Services/PluginService.js';
 //# sourceMappingURL=index.js.map

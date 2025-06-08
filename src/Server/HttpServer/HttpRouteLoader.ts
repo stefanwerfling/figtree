@@ -13,7 +13,7 @@ export class HttpRouteLoader {
 }
 
 /**
- * DB Loader Type
+ * Http Route Loader Type
  */
 export type HttpRouteLoaderType = { new(): HttpRouteLoader;
 
@@ -22,4 +22,5 @@ export type HttpRouteLoaderType = { new(): HttpRouteLoader;
      * @return {IDefaultRoute[]}
      */
     loadRoutes(): Promise<IDefaultRoute[]>;
+
 };

@@ -3,6 +3,7 @@ import {IProvider} from './IProvider.js';
 
 /**
  * Interface for Providers object
+ * @template E extends ProviderEntry, T extends IProvider<E>
  */
 export interface IProviders<E extends ProviderEntry, T extends IProvider<E>> {
 
@@ -14,9 +15,9 @@ export interface IProviders<E extends ProviderEntry, T extends IProvider<E>> {
     getProvider(name: string): Promise<T|null>;
 
     /**
-     * Return all providers by name and title
-     * @returns {E extends ProviderEntry[]}
+     * Return all providers
+     * @returns {T}
      */
-    getProviders(): Promise<E[]>;
+    getProviders(): Promise<T[]>;
 
 }

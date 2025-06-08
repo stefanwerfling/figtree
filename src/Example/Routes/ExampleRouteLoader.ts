@@ -1,4 +1,5 @@
 import {HttpRouteLoader} from '../../Server/HttpServer/HttpRouteLoader.js';
+import {HttpRouteProviders} from '../../Server/HttpServer/HttpRouteProviders.js';
 import {IDefaultRoute} from '../../Server/HttpServer/Routes/IDefaultRoute.js';
 import {ServiceRoute} from '../../Server/HttpServer/Routes/ServiceRoute.js';
 import {SwaggerUIRoute} from '../../Server/HttpServer/Routes/SwaggerUIRoute.js';
@@ -17,10 +18,13 @@ export class ExampleRouteLoader extends HttpRouteLoader {
     public static async loadRoutes(): Promise<IDefaultRoute[]> {
         SwaggerUIRoute.getInstance().setInfo('Example', '1.0.1');
 
+        const routeProviders = new HttpRouteProviders();
+
         return [
             new Login(),
             new ServiceRoute(ExampleBackend.NAME, false),
-            SwaggerUIRoute.getInstance()
+            SwaggerUIRoute.getInstance(),
+            ...await routeProviders.getProvidersRoutes()
         ];
     }
 }
