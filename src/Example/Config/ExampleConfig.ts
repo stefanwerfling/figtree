@@ -46,6 +46,9 @@ export class ExampleConfig extends ConfigBackend {
                 httpserver: {
                     port: 3000,
                     publicdir: './public',
+                    csrf: {
+                        cookie: true
+                    }
                 }
             };
         }

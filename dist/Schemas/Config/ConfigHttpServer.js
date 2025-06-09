@@ -11,11 +11,15 @@ export const SchemaConfigHttpServerProxy = Vts.object({
         Vts.array(Vts.string())
     ])
 });
+export const SchemaConfigHttpServerCsrf = Vts.object({
+    cookie: Vts.boolean()
+});
 export const SchemaConfigHttpServer = Vts.object({
     port: Vts.optional(Vts.number()),
     publicdir: Vts.string(),
     session: Vts.optional(SchemaConfigHttpServerSession),
     sslpath: Vts.optional(Vts.string()),
-    proxy: Vts.optional(SchemaConfigHttpServerProxy)
+    proxy: Vts.optional(SchemaConfigHttpServerProxy),
+    csrf: Vts.optional(SchemaConfigHttpServerCsrf)
 });
 //# sourceMappingURL=ConfigHttpServer.js.map

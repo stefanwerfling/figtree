@@ -14,7 +14,12 @@ export {
     SchemaConfigDbOptions,
     ConfigDbOptions
 } from './Schemas/Config/ConfigDb.js';
-export {SchemaConfigHttpServerSession, SchemaConfigHttpServerProxy, SchemaConfigHttpServer} from './Schemas/Config/ConfigHttpServer.js';
+export {
+    SchemaConfigHttpServerSession,
+    SchemaConfigHttpServerProxy,
+    SchemaConfigHttpServerCsrf,
+    SchemaConfigHttpServer
+} from './Schemas/Config/ConfigHttpServer.js';
 export {SchemaConfigBackendOptions, ConfigBackendOptions} from './Schemas/Config/ConfigBackendOptions.js';
 export {SchemaLoggerConfig, LoggerConfig} from './Schemas/Logger/LoggerConfig.js';
 export {StatusCodes} from './Schemas/Server/Routes/StatusCodes.js';
@@ -107,6 +112,7 @@ export {
     BaseHttpServerOptionCrypt,
     BaseHttpServerOptionSession,
     BaseHttpServerOptionProxy,
+    BaseHttpServerOptionCsrf,
     BaseHttpServerOptions,
     BaseHttpServer
 } from './Server/HttpServer/BaseHttpServer.js';

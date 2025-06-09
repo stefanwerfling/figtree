@@ -1,3 +1,4 @@
+import csurf from 'csurf';
 import fs from 'fs';
 import https from 'https';
 import * as http from 'node:http';
@@ -39,6 +40,13 @@ export type BaseHttpServerOptionProxy = {
 };
 
 /**
+ * Base http server option csrf
+ */
+export type BaseHttpServerOptionCsrf = {
+    cookie: boolean;
+};
+
+/**
  * Base http server options
  */
 export type BaseHttpServerOptions = {
@@ -49,6 +57,7 @@ export type BaseHttpServerOptions = {
     publicDir?: string;
     crypt?: BaseHttpServerOptionCrypt;
     proxy?: BaseHttpServerOptionProxy;
+    csrf?: BaseHttpServerOptionCsrf;
 };
 
 /**
@@ -119,6 +128,12 @@ export class BaseHttpServer {
     protected readonly _proxy?: BaseHttpServerOptionProxy;
 
     /**
+     * use csrf
+     * @protected
+     */
+    protected readonly _csrf?: BaseHttpServerOptionCsrf;
+
+    /**
      * constructor
      * @param {BaseHttpServerOptions} serverInit
      */
@@ -135,6 +150,10 @@ export class BaseHttpServer {
 
         if (serverInit.proxy) {
             this._proxy = serverInit.proxy;
+        }
+
+        if (serverInit.csrf) {
+            this._csrf = serverInit.csrf;
         }
 
         this._express = express();
@@ -184,6 +203,12 @@ export class BaseHttpServer {
         this._express.use(bodyParser.urlencoded({extended: true}));
         this._express.use(bodyParser.json());
         this._express.use(cookieParser());
+
+        // -------------------------------------------------------------------------------------------------------------
+
+        if (this._csrf) {
+            this._express.use(csurf({ cookie: this._csrf.cookie }));
+        }
 
         // -------------------------------------------------------------------------------------------------------------
 

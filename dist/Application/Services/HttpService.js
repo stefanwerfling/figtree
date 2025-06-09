@@ -60,6 +60,12 @@ export class HttpService extends ServiceAbstract {
                     trust: tConfig.httpserver.proxy.trust
                 };
             }
+            let csrf = undefined;
+            if (tConfig.httpserver.csrf) {
+                csrf = {
+                    cookie: tConfig.httpserver.csrf.cookie
+                };
+            }
             this._server = new HttpServer({
                 realm: Config.getInstance().getAppTitle(),
                 port: aport,
@@ -76,7 +82,8 @@ export class HttpService extends ServiceAbstract {
                     key: 'server.pem',
                     crt: 'server.crt'
                 },
-                proxy: proxy
+                proxy: proxy,
+                csrf: csrf
             });
             await this._server.listen();
         }

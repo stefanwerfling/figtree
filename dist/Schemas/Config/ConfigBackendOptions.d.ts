@@ -43,6 +43,9 @@ export declare const SchemaConfigBackendOptions: import("vts/dist/schemas/object
         proxy: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/objectSchema.js").ObjectSchema<{
             trust: import("vts/dist/schemas/orSchema.js").OrSchema<import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions> | import("vts/dist/schemas/booleanSchema.js").BooleanSchema | import("vts/dist/schemas/arraySchema.js").ArraySchema<import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>>>;
         }>>;
+        csrf: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/objectSchema.js").ObjectSchema<{
+            cookie: import("vts/dist/schemas/booleanSchema.js").BooleanSchema;
+        }>>;
     }>;
 }>;
 export type ConfigBackendOptions = ExtractSchemaResultType<typeof SchemaConfigBackendOptions>;

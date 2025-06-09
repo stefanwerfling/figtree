@@ -21,6 +21,13 @@ export const SchemaConfigHttpServerProxy = Vts.object({
 });
 
 /**
+ * Schema config http server csrf
+ */
+export const SchemaConfigHttpServerCsrf = Vts.object({
+    cookie: Vts.boolean()
+});
+
+/**
  * Schema config http server
  */
 export const SchemaConfigHttpServer = Vts.object({
@@ -28,5 +35,6 @@ export const SchemaConfigHttpServer = Vts.object({
     publicdir: Vts.string(),
     session: Vts.optional(SchemaConfigHttpServerSession),
     sslpath: Vts.optional(Vts.string()),
-    proxy: Vts.optional(SchemaConfigHttpServerProxy)
+    proxy: Vts.optional(SchemaConfigHttpServerProxy),
+    csrf: Vts.optional(SchemaConfigHttpServerCsrf)
 });

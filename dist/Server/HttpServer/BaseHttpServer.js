@@ -1,3 +1,4 @@
+import csurf from 'csurf';
 import fs from 'fs';
 import https from 'https';
 import express from 'express';
@@ -17,6 +18,7 @@ export class BaseHttpServer {
     _session;
     _crypt;
     _proxy;
+    _csrf;
     constructor(serverInit) {
         if (serverInit.port) {
             this._port = serverInit.port;
@@ -27,6 +29,9 @@ export class BaseHttpServer {
         }
         if (serverInit.proxy) {
             this._proxy = serverInit.proxy;
+        }
+        if (serverInit.csrf) {
+            this._csrf = serverInit.csrf;
         }
         this._express = express();
         this._express.use((req, _, next) => {
@@ -55,6 +60,9 @@ export class BaseHttpServer {
         this._express.use(bodyParser.urlencoded({ extended: true }));
         this._express.use(bodyParser.json());
         this._express.use(cookieParser());
+        if (this._csrf) {
+            this._express.use(csurf({ cookie: this._csrf.cookie }));
+        }
         if (this._session) {
             this._sessionParser = session({
                 secret: this._session.secret,
