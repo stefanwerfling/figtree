@@ -53,4 +53,5 @@ export declare class BaseHttpServer {
     protected _getCertAndKey(options: BaseHttpServerOptionCrypt): Promise<BaseHttpCertKey | null>;
     listen(): Promise<void>;
     close(): void;
+    getServer(): http.Server | null;
 }

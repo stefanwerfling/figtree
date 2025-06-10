@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import { PemHelper } from '../../Crypto/PemHelper.js';
 import { Logger } from '../../Logger/Logger.js';
+import { StatusCodes } from '../../Schemas/Server/Routes/StatusCodes.js';
 import { FileHelper } from '../../Utils/FileHelper.js';
 export class BaseHttpServer {
     static _listenHost = 'localhost';
@@ -49,8 +50,17 @@ export class BaseHttpServer {
             this._crypt = serverInit.crypt;
         }
         this._express.use((error, _request, response, _next) => {
-            response.status(500);
-            Logger.getLogger().error(error.stack);
+            if (error instanceof SyntaxError && 'body' in error) {
+                Logger.getLogger().warn('Invalid JSON received:', error.message);
+                const resulte = {
+                    statusCode: StatusCodes.INTERNAL_ERROR,
+                    msg: 'Invalid JSON payload'
+                };
+                response.status(400).json(resulte);
+                return;
+            }
+            Logger.getLogger().error(error.stack || error.message);
+            response.status(500).send('Internal Server Error');
         });
     }
     _getSessionStore() {
@@ -166,6 +176,9 @@ export class BaseHttpServer {
             this._server.close();
             this._server = null;
         }
+    }
+    getServer() {
+        return this._server;
     }
 }
 //# sourceMappingURL=BaseHttpServer.js.map

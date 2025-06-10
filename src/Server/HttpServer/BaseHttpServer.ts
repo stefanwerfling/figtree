@@ -8,6 +8,8 @@ import cookieParser from 'cookie-parser';
 import session, {Store} from 'express-session';
 import {PemHelper} from '../../Crypto/PemHelper.js';
 import {Logger} from '../../Logger/Logger.js';
+import {DefaultReturn} from '../../Schemas/Server/Routes/DefaultReturn.js';
+import {StatusCodes} from '../../Schemas/Server/Routes/StatusCodes.js';
 import {FileHelper} from '../../Utils/FileHelper.js';
 import {IDefaultRoute} from './Routes/IDefaultRoute.js';
 import {ITlsClientError} from './Tls/ITlsClientError.js';
@@ -180,9 +182,21 @@ export class BaseHttpServer {
 
         // add error handling
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        this._express.use((error: Error, _request: Request, response: Response, _next: NextFunction): void => {
-            response.status(500);
-            Logger.getLogger().error(error.stack);
+        this._express.use((error: any, _request: Request, response: Response, _next: NextFunction): void => {
+            if (error instanceof SyntaxError && 'body' in error) {
+                Logger.getLogger().warn('Invalid JSON received:', error.message);
+
+                const resulte: DefaultReturn = {
+                    statusCode: StatusCodes.INTERNAL_ERROR,
+                    msg: 'Invalid JSON payload'
+                };
+
+                response.status(400).json(resulte);
+                return;
+            }
+
+            Logger.getLogger().error(error.stack || error.message);
+            response.status(500).send('Internal Server Error');
         });
     }
 
@@ -372,6 +386,14 @@ export class BaseHttpServer {
             this._server.close();
             this._server = null;
         }
+    }
+
+    /**
+     * Return the http server
+     * @return {http.Server|null}
+     */
+    public getServer(): http.Server|null {
+        return this._server;
     }
 
 }
