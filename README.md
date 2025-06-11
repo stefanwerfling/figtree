@@ -1,11 +1,11 @@
 [![Discord](https://img.shields.io/discord/1347133593578766369.svg?label=Discord&logo=discord&color=5865F2&logoColor=white)](https://discord.gg/52PQ2mbWQD) [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/stefanwerfling/figtree)
 
-# FigTree - Server Core
+# FigTree - Server Core/Backend Framework
 
 <p align="center">
 <img src="/doc/images/logo.png" width="300px" style="border-radius: 15px;transition: transform .2s;object-fit: cover;">
 <br><br>
-Figtree is a comprehensive Node.js backend framework designed for rapid development of server applications. It provides a complete foundation with integrated database support, HTTP server capabilities, plugin architecture, schema validation, and service management. This framework abstracts common backend development patterns into reusable, well-structured components.
+FigTree is a comprehensive Node.js backend framework designed for rapid development of server applications. It provides a complete foundation with integrated database support, HTTP server capabilities, plugin architecture, schema validation, and service management. This framework abstracts common backend development patterns into reusable, well-structured components.
 </p>
 
 ## Implementation
@@ -37,7 +37,7 @@ Figtree is a comprehensive Node.js backend framework designed for rapid developm
 
 ## Installation
 
-You can install Figtree via npm:
+You can install FigTree via npm:
 
 ```bash
 npm install git+https://github.com/stefanwerfling/figtree.git
@@ -96,7 +96,17 @@ The framework is designed to be used in production behind a reverse proxy. For l
 
 It's best to use [FlyingFish](https://github.com/stefanwerfling/flyingfish), NPM, or Nginx directly.
 
-### Where is the framework already used
+### Plugin Hash
+For creating the plugin hash, FigTree now has a CLI tool that can be called in your own project (plugin project) with:
+
+```bash
+npm run figtree -create-plugin-hash
+```
+
+The CLI tool goes into the "dist" directory based on the current directory and creates a merkle hash of all files.
+
+
+## Where is the framework already used
 
 * [PuppeteerCast](https://github.com/stefanwerfling/puppeteercast)
   * PuppeteerCast is a system that converts web browser content into live video streams accessible via HTTP endpoints. The system uses headless browser automation to navigate and interact with web pages, captures the visual and audio output, encodes it into streaming formats, and serves it through multiple API interfaces compatible with various client applications.
