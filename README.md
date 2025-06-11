@@ -1,6 +1,6 @@
 [![Discord](https://img.shields.io/discord/1347133593578766369.svg?label=Discord&logo=discord&color=5865F2&logoColor=white)](https://discord.gg/52PQ2mbWQD) [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/stefanwerfling/figtree)
 
-# Figtree - Server Core
+# FigTree - Server Core
 
 <p align="center">
 <img src="/doc/images/logo.png" width="300px" style="border-radius: 15px;transition: transform .2s;object-fit: cover;">
@@ -16,6 +16,7 @@ Figtree is a comprehensive Node.js backend framework designed for rapid developm
 - [x] Logging (Winston)
 - [x] DB loading and handling (MariaDB, InfluxDB, Redis)
   - [ ] History (For data change)
+  - [ ] Add ChromaDB
 - [x] Process handling
 - [x] Server TCP Raw
 - [x] HTTP/s Server and handling (Express.js, rateLimit, helmet, cookieParser, session parser, self-temporary cert generation)
@@ -23,10 +24,13 @@ Figtree is a comprehensive Node.js backend framework designed for rapid developm
   - [x] Unix HTTP Server (for intern communication)
   - [x] File Upload helper
   - [x] AsyncLocalStorage for Context
+  - [ ] Websocket Server
 - [x] Service Manager (for initialized services or schedule)
 - [x] Backend Main
 - [x] Provider handler
 - [x] Plugin Manager/Loader
+  - [x] Plugin Merkle-Hash Validation (Protection)
+  - [ ] Plugin Signing the hash (CA)
 - [ ] Crypto Managment
   - [x] Pem Helper/Parser
   - [x] Certificate generator (node-forge)
@@ -94,7 +98,7 @@ It's best to use [FlyingFish](https://github.com/stefanwerfling/flyingfish), NPM
 
 ### Where is the framework already used
 
-* [Project PuppeteerCast](https://github.com/stefanwerfling/puppeteercast)
+* [PuppeteerCast](https://github.com/stefanwerfling/puppeteercast)
   * PuppeteerCast is a system that converts web browser content into live video streams accessible via HTTP endpoints. The system uses headless browser automation to navigate and interact with web pages, captures the visual and audio output, encodes it into streaming formats, and serves it through multiple API interfaces compatible with various client applications.
   * The core transformation process involves running a web browser in a virtual display environment, capturing both screen content and audio output, and encoding this media into transport streams that can be consumed by streaming clients, TV applications, and media players.
 
