@@ -6,6 +6,7 @@ import {Session} from '../Session.js';
 import {DefaultReturn} from './../../../Schemas/Server/Routes/DefaultReturn.js';
 import path from 'path';
 import {Schema, SchemaErrors} from 'vts';
+import {DefaultRouteCheckUserIsLogin, DefaultRouteCheckUserLogin} from './DefaultRouteCheckUser.js';
 import {IDefaultRoute} from './IDefaultRoute.js';
 import {RequestContext} from './RequestContext.js';
 import {RouteError} from './RouteError.js';
@@ -45,10 +46,7 @@ export type DefaultRouteMethodeDescription<A, B, C, D, E, F, G, S> = {
     useLocalStorage?: boolean;
 };
 
-export type DefaultRouteCheckUserLogin<
-    REQ extends Request = Request,
-    RESP extends Response = Response
-> = (request: REQ, response: RESP) => Promise<boolean>;
+
 
 /**
  * DefaultRoute
@@ -114,39 +112,6 @@ export class DefaultRoute implements IDefaultRoute {
         }
 
         return true;
-    }
-
-    /**
-     * Is User Login
-     * @param {unknown} req
-     * @param {boolean} sendAutoResoonse
-     */
-    public isUserLogin(
-        req: unknown,
-        sendAutoResoonse: boolean = true
-    ): req is RequestData {
-        if (SchemaRequestData.validate(req, [])) {
-            if (Session.isUserLogin(req.session)) {
-                return true;
-            }
-
-            if (RequestContext.hasInstance()) {
-                RequestContext.getInstance().set(RequestContext.SESSIONID, req.session.id);
-                RequestContext.getInstance().set(RequestContext.USERID, '');
-                RequestContext.getInstance().set(RequestContext.ISLOGIN, false);
-
-                if (req.session.user) {
-                    RequestContext.getInstance().set(RequestContext.USERID, req.session.user.userid);
-                    RequestContext.getInstance().set(RequestContext.ISLOGIN, req.session.user.isLogin);
-                }
-            }
-        }
-
-        if (sendAutoResoonse) {
-            throw new RouteError(StatusCodes.UNAUTHORIZED, 'User is unauthorized!');
-        }
-
-        return false;
     }
 
     /**
@@ -222,7 +187,7 @@ export class DefaultRoute implements IDefaultRoute {
                         return;
                     }
                 } else if (checkUserLogin) {
-                    if (!this.isUserLogin(req)) {
+                    if (!DefaultRouteCheckUserIsLogin(req)) {
                         return;
                     }
                 }

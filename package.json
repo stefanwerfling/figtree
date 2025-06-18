@@ -50,6 +50,7 @@
     "helmet": "^8.1.0",
     "mysql": "^2.18.1",
     "node-forge": "^1.3.1",
+    "rbac-simple": "git+https://github.com/OpenSourcePKG/rbac-simple.git",
     "redis": "^4.7.0",
     "swagger-ui-express": "^5.0.1",
     "typeorm": "0.3.20",

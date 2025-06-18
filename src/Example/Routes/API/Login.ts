@@ -1,6 +1,7 @@
 import {Router} from 'express';
 import {StatusCodes} from '../../../Schemas/Server/Routes/StatusCodes.js';
 import {DefaultRoute} from '../../../Server/HttpServer/Routes/DefaultRoute.js';
+import {DefaultRouteCheckUserIsLogin} from '../../../Server/HttpServer/Routes/DefaultRouteCheckUser.js';
 import {
     IsLogin,
     SchemaIsLogin,
@@ -32,7 +33,7 @@ export class Login extends DefaultRoute {
                 // Your code -------------------------------------------------------------------------------------------
                 // Handler todo start ----------------------------------------------------------------------------------
 
-                if (this.isUserLogin(req, false)) {
+                if (DefaultRouteCheckUserIsLogin(req, false)) {
                     return {
                         statusCode: StatusCodes.OK,
                         status: true

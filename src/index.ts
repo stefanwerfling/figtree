@@ -98,9 +98,12 @@ export {IDefaultRoute} from './Server/HttpServer/Routes/IDefaultRoute.js';
 export {RouteError} from './Server/HttpServer/Routes/RouteError.js';
 export {RequestContextData, RequestContext} from './Server/HttpServer/Routes/RequestContext.js';
 export {
+    DefaultRouteCheckUserLogin,
+    DefaultRouteCheckUserIsLogin
+} from './Server/HttpServer/Routes/DefaultRouteCheckUser.js';
+export {
     DefaultRouteHandler,
     DefaultRouteMethodeDescription,
-    DefaultRouteCheckUserLogin,
     DefaultRoute
 } from './Server/HttpServer/Routes/DefaultRoute.js';
 export {ITlsClientError} from './Server/HttpServer/Tls/ITlsClientError.js';
