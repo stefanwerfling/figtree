@@ -40,7 +40,7 @@
   "peerDependencies": {
     "@influxdata/influxdb-client": "^1.35.0",
     "async-exit-hook": "^2.0.1",
-    "chromadb": "^2.4.6",
+    "chromadb": "^3.0.3",
     "cookie-parser": "^1.4.6",
     "csurf": "^1.11.0",
     "ets": "git+https://github.com/OpenSourcePKG/ets.git",
