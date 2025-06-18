@@ -1,7 +1,7 @@
 import { ExtractSchemaResultType } from 'vts';
-export declare const SchemaDefaultArgs: import("vts/dist/schemas/objectSchema.js").ObjectSchema<{
-    config: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>>;
+export declare const SchemaDefaultArgs: import("vts").ObjectSchema<{
+    config: import("vts").OptionalSchema<import("vts").StringSchema<import("vts").StringSchemaOptions>>;
 } & {
-    envargs: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>>;
+    envargs: import("vts").OptionalSchema<import("vts").StringSchema<import("vts").StringSchemaOptions>>;
 }>;
 export type DefaultArgs = ExtractSchemaResultType<typeof SchemaDefaultArgs>;

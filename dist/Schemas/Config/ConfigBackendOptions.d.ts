@@ -1,50 +1,50 @@
 import { ExtractSchemaResultType } from 'vts';
-export declare const SchemaConfigBackendOptions: import("vts/dist/schemas/objectSchema.js").ObjectSchema<{
-    logging: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/objectSchema.js").ObjectSchema<{
-        dirname: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>>;
-        filename: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>>;
-        zippedArchive: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/booleanSchema.js").BooleanSchema>;
-        maxSize: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>>;
-        maxFiles: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>>;
-        enableConsole: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/booleanSchema.js").BooleanSchema>;
-        level: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>>;
+export declare const SchemaConfigBackendOptions: import("vts").ObjectSchema<{
+    logging: import("vts").OptionalSchema<import("vts").ObjectSchema<{
+        dirname: import("vts").OptionalSchema<import("vts").StringSchema<import("vts").StringSchemaOptions>>;
+        filename: import("vts").OptionalSchema<import("vts").StringSchema<import("vts").StringSchemaOptions>>;
+        zippedArchive: import("vts").OptionalSchema<import("vts").BooleanSchema>;
+        maxSize: import("vts").OptionalSchema<import("vts").StringSchema<import("vts").StringSchemaOptions>>;
+        maxFiles: import("vts").OptionalSchema<import("vts").StringSchema<import("vts").StringSchemaOptions>>;
+        enableConsole: import("vts").OptionalSchema<import("vts").BooleanSchema>;
+        level: import("vts").OptionalSchema<import("vts").StringSchema<import("vts").StringSchemaOptions>>;
     }>>;
 } & {
-    db: import("vts/dist/schemas/objectSchema.js").ObjectSchema<{
-        mysql: import("vts/dist/schemas/objectSchema.js").ObjectSchema<{
-            host: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
-            port: import("vts/dist/schemas/numberSchema.js").NumberSchema;
-            username: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
-            password: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
-            database: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
+    db: import("vts").ObjectSchema<{
+        mysql: import("vts").ObjectSchema<{
+            host: import("vts").StringSchema<import("vts").StringSchemaOptions>;
+            port: import("vts").NumberSchema;
+            username: import("vts").StringSchema<import("vts").StringSchemaOptions>;
+            password: import("vts").StringSchema<import("vts").StringSchemaOptions>;
+            database: import("vts").StringSchema<import("vts").StringSchemaOptions>;
         }>;
-        influx: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/objectSchema.js").ObjectSchema<{
-            url: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
-            token: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
-            org: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
-            bucket: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
-            username: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
-            password: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
+        influx: import("vts").OptionalSchema<import("vts").ObjectSchema<{
+            url: import("vts").StringSchema<import("vts").StringSchemaOptions>;
+            token: import("vts").StringSchema<import("vts").StringSchemaOptions>;
+            org: import("vts").StringSchema<import("vts").StringSchemaOptions>;
+            bucket: import("vts").StringSchema<import("vts").StringSchemaOptions>;
+            username: import("vts").StringSchema<import("vts").StringSchemaOptions>;
+            password: import("vts").StringSchema<import("vts").StringSchemaOptions>;
         }>>;
-        redis: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/objectSchema.js").ObjectSchema<{
-            url: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
-            password: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>>;
+        redis: import("vts").OptionalSchema<import("vts").ObjectSchema<{
+            url: import("vts").StringSchema<import("vts").StringSchemaOptions>;
+            password: import("vts").OptionalSchema<import("vts").StringSchema<import("vts").StringSchemaOptions>>;
         }>>;
     }>;
-    httpserver: import("vts/dist/schemas/objectSchema.js").ObjectSchema<{
-        port: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/numberSchema.js").NumberSchema>;
-        publicdir: import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>;
-        session: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/objectSchema.js").ObjectSchema<{
-            secret: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>>;
-            cookie_path: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>>;
-            cookie_max_age: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/numberSchema.js").NumberSchema>;
+    httpserver: import("vts").ObjectSchema<{
+        port: import("vts").OptionalSchema<import("vts").NumberSchema>;
+        publicdir: import("vts").StringSchema<import("vts").StringSchemaOptions>;
+        session: import("vts").OptionalSchema<import("vts").ObjectSchema<{
+            secret: import("vts").OptionalSchema<import("vts").StringSchema<import("vts").StringSchemaOptions>>;
+            cookie_path: import("vts").OptionalSchema<import("vts").StringSchema<import("vts").StringSchemaOptions>>;
+            cookie_max_age: import("vts").OptionalSchema<import("vts").NumberSchema>;
         }>>;
-        sslpath: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>>;
-        proxy: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/objectSchema.js").ObjectSchema<{
-            trust: import("vts/dist/schemas/orSchema.js").OrSchema<import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions> | import("vts/dist/schemas/booleanSchema.js").BooleanSchema | import("vts/dist/schemas/arraySchema.js").ArraySchema<import("vts/dist/schemas/stringSchema.js").StringSchema<import("vts/dist/schemas/stringSchema.js").StringSchemaOptions>>>;
+        sslpath: import("vts").OptionalSchema<import("vts").StringSchema<import("vts").StringSchemaOptions>>;
+        proxy: import("vts").OptionalSchema<import("vts").ObjectSchema<{
+            trust: import("vts").OrSchema<import("vts").StringSchema<import("vts").StringSchemaOptions> | import("vts").BooleanSchema | import("vts").ArraySchema<import("vts").StringSchema<import("vts").StringSchemaOptions>>>;
         }>>;
-        csrf: import("vts/dist/schemas/objectSchema/optionalSchema.js").OptionalSchema<import("vts/dist/schemas/objectSchema.js").ObjectSchema<{
-            cookie: import("vts/dist/schemas/booleanSchema.js").BooleanSchema;
+        csrf: import("vts").OptionalSchema<import("vts").ObjectSchema<{
+            cookie: import("vts").BooleanSchema;
         }>>;
     }>;
 }>;

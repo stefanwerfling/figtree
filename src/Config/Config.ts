@@ -1,6 +1,5 @@
 import path from 'path';
-import {SchemaErrors} from 'vts';
-import {ObjectSchema} from 'vts/dist/schemas/objectSchema.js';
+import {ObjectSchema, SchemaErrors} from 'vts';
 import {ConfigOptions, SchemaConfigOptions} from '../Schemas/Config/ConfigOptions.js';
 import {FileHelper} from '../Utils/FileHelper.js';
 
