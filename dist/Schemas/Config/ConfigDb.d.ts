@@ -33,6 +33,9 @@ export declare const SchemaConfigDbOptionsRedis: import("vts").ObjectSchema<{
     url: import("vts").StringSchema<import("vts").StringSchemaOptions>;
     password: import("vts").OptionalSchema<import("vts").StringSchema<import("vts").StringSchemaOptions>>;
 }>;
+export declare const SchemaConfigDbOptionsChroma: import("vts").ObjectSchema<{
+    url: import("vts").StringSchema<import("vts").StringSchemaOptions>;
+}>;
 export declare const SchemaConfigDbOptions: import("vts").ObjectSchema<{
     mysql: import("vts").ObjectSchema<{
         host: import("vts").StringSchema<import("vts").StringSchemaOptions>;
@@ -52,6 +55,9 @@ export declare const SchemaConfigDbOptions: import("vts").ObjectSchema<{
     redis: import("vts").OptionalSchema<import("vts").ObjectSchema<{
         url: import("vts").StringSchema<import("vts").StringSchemaOptions>;
         password: import("vts").OptionalSchema<import("vts").StringSchema<import("vts").StringSchemaOptions>>;
+    }>>;
+    chroma: import("vts").OptionalSchema<import("vts").ObjectSchema<{
+        url: import("vts").StringSchema<import("vts").StringSchemaOptions>;
     }>>;
 }>;
 export type ConfigDbOptions = ExtractSchemaResultType<typeof SchemaConfigDbOptions>;

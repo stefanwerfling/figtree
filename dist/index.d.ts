@@ -1,7 +1,7 @@
 export { SchemaArgsBase } from './Schemas/Args/ArgsBase.js';
 export { SchemaDefaultArgs, DefaultArgs } from './Schemas/Args/DefaultArgs.js';
 export { SchemaConfigOptions, ConfigOptions } from './Schemas/Config/ConfigOptions.js';
-export { ENV_OPTIONAL_DB, ENV_DUTY_DB, SchemaConfigDbOptionsInflux, SchemaConfigDbOptionsMySql, SchemaConfigDbOptionsRedis, SchemaConfigDbOptions, ConfigDbOptions } from './Schemas/Config/ConfigDb.js';
+export { ENV_OPTIONAL_DB, ENV_DUTY_DB, SchemaConfigDbOptionsInflux, SchemaConfigDbOptionsMySql, SchemaConfigDbOptionsRedis, SchemaConfigDbOptionsChroma, SchemaConfigDbOptions, ConfigDbOptions } from './Schemas/Config/ConfigDb.js';
 export { SchemaConfigHttpServerSession, SchemaConfigHttpServerProxy, SchemaConfigHttpServerCsrf, SchemaConfigHttpServer } from './Schemas/Config/ConfigHttpServer.js';
 export { SchemaConfigBackendOptions, ConfigBackendOptions } from './Schemas/Config/ConfigBackendOptions.js';
 export { SchemaLoggerConfig, LoggerConfig } from './Schemas/Logger/LoggerConfig.js';
@@ -40,6 +40,8 @@ export { InfluxDbHelperOptions, InfluxDbHelper } from './Db/InfluxDb/InfluxDbHel
 export { RedisChannel } from './Db/RedisDb/RedisChannel.js';
 export { RedisSubscribe } from './Db/RedisDb/RedisSubscribe.js';
 export { RedisClientOptions, FunChannelCallback, RedisClient } from './Db/RedisDb/RedisClient.js';
+export { ChromaDbClientOptions, ChromaDbClient } from './Db/ChromaDb/ChromaDbClient.js';
+export { ChromaCollection } from './Db/ChromaDb/ChromaCollection.js';
 export { Message as RawMessage } from './Server/RawServer/Base/Message.js';
 export { Server as RawServer } from './Server/RawServer/Server.js';
 export { Client as RawClient } from './Server/RawServer/Client/Client.js';
@@ -77,4 +79,5 @@ export { PluginService } from './Application/Services/PluginService.js';
 export { MariaDBService } from './Application/Services/MariaDBService.js';
 export { InfluxDBService } from './Application/Services/InfluxDBService.js';
 export { RedisDBService } from './Application/Services/RedisDBService.js';
+export { ChromaDBService } from './Application/Services/ChromaDBService.js';
 export { HttpService } from './Application/Services/HttpService.js';

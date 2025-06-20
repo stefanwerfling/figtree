@@ -11,6 +11,7 @@ export {
     SchemaConfigDbOptionsInflux,
     SchemaConfigDbOptionsMySql,
     SchemaConfigDbOptionsRedis,
+    SchemaConfigDbOptionsChroma,
     SchemaConfigDbOptions,
     ConfigDbOptions
 } from './Schemas/Config/ConfigDb.js';
@@ -87,6 +88,8 @@ export {InfluxDbHelperOptions, InfluxDbHelper} from './Db/InfluxDb/InfluxDbHelpe
 export {RedisChannel} from './Db/RedisDb/RedisChannel.js';
 export {RedisSubscribe} from './Db/RedisDb/RedisSubscribe.js';
 export {RedisClientOptions, FunChannelCallback, RedisClient} from './Db/RedisDb/RedisClient.js';
+export {ChromaDbClientOptions, ChromaDbClient} from './Db/ChromaDb/ChromaDbClient.js';
+export {ChromaCollection} from './Db/ChromaDb/ChromaCollection.js';
 
 // Raw Server ----------------------------------------------------------------------------------------------------------
 export {Message as RawMessage} from './Server/RawServer/Base/Message.js';
@@ -155,4 +158,5 @@ export {PluginService} from './Application/Services/PluginService.js';
 export {MariaDBService} from './Application/Services/MariaDBService.js';
 export {InfluxDBService} from './Application/Services/InfluxDBService.js';
 export {RedisDBService} from './Application/Services/RedisDBService.js';
+export {ChromaDBService} from './Application/Services/ChromaDBService.js';
 export {HttpService} from './Application/Services/HttpService.js';

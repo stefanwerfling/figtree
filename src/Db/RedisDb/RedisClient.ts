@@ -36,7 +36,7 @@ export class RedisClient {
             if (options) {
                 RedisClient._instance = new RedisClient(options);
             } else {
-                throw new Error('RedisClient::getInstance: Option not set for Regis client init!');
+                throw new Error('RedisClient::getInstance: Option not set for Redis client init!');
             }
         }
 

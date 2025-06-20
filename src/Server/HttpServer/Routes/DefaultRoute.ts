@@ -1,8 +1,6 @@
 import {Request, RequestHandler, Response, Router} from 'express';
 import {Logger} from '../../../Logger/Logger.js';
-import {RequestData, SchemaRequestData} from '../../../Schemas/Server/RequestData.js';
 import {StatusCodes} from '../../../Schemas/Server/Routes/StatusCodes.js';
-import {Session} from '../Session.js';
 import {DefaultReturn} from './../../../Schemas/Server/Routes/DefaultReturn.js';
 import path from 'path';
 import {Schema, SchemaErrors} from 'vts';

@@ -35,9 +35,13 @@ export const SchemaConfigDbOptionsRedis = Vts.object({
     url: Vts.string(),
     password: Vts.optional(Vts.string())
 });
+export const SchemaConfigDbOptionsChroma = Vts.object({
+    url: Vts.string()
+});
 export const SchemaConfigDbOptions = Vts.object({
     mysql: SchemaConfigDbOptionsMySql,
     influx: Vts.optional(SchemaConfigDbOptionsInflux),
-    redis: Vts.optional(SchemaConfigDbOptionsRedis)
+    redis: Vts.optional(SchemaConfigDbOptionsRedis),
+    chroma: Vts.optional(SchemaConfigDbOptionsChroma)
 });
 //# sourceMappingURL=ConfigDb.js.map

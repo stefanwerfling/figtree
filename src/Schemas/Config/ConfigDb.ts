@@ -55,12 +55,20 @@ export const SchemaConfigDbOptionsRedis = Vts.object({
 });
 
 /**
+ * Schema for chroma DB options config
+ */
+export const SchemaConfigDbOptionsChroma = Vts.object({
+    url: Vts.string()
+});
+
+/**
  * Schema DB options config
  */
 export const SchemaConfigDbOptions = Vts.object({
     mysql: SchemaConfigDbOptionsMySql,
     influx: Vts.optional(SchemaConfigDbOptionsInflux),
-    redis: Vts.optional(SchemaConfigDbOptionsRedis)
+    redis: Vts.optional(SchemaConfigDbOptionsRedis),
+    chroma: Vts.optional(SchemaConfigDbOptionsChroma)
 });
 
 /**
