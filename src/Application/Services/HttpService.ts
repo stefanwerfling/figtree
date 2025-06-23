@@ -1,7 +1,8 @@
 import {v4 as uuid} from 'uuid';
 import {Config} from '../../Config/Config.js';
 import {Logger} from '../../Logger/Logger.js';
-import {SchemaConfigBackendOptions} from '../../Schemas/Config/ConfigBackendOptions.js';
+import {ConfigBackendOptions, SchemaConfigBackendOptions} from '../../Schemas/Config/ConfigBackendOptions.js';
+import {SchemaConfigHttpServer} from '../../Schemas/Config/ConfigHttpServer.js';
 import {BaseHttpServerOptionCsrf, BaseHttpServerOptionProxy} from '../../Server/HttpServer/BaseHttpServer.js';
 import {HttpRouteLoaderType} from '../../Server/HttpServer/HttpRouteLoader.js';
 import {HttpServer} from '../../Server/HttpServer/HttpServer.js';
@@ -55,7 +56,7 @@ export class HttpService extends ServiceAbstract {
         this._status = ServiceStatus.Progress;
 
         try {
-            const tConfig = Config.getInstance().get();
+            const tConfig = Config.getInstance().get() as ConfigBackendOptions;
 
             if (tConfig === null) {
                 throw new ServiceError(
@@ -64,7 +65,7 @@ export class HttpService extends ServiceAbstract {
                 );
             }
 
-            if (!SchemaConfigBackendOptions.validate(tConfig, [])) {
+            if (tConfig.httpserver && !SchemaConfigHttpServer.validate(tConfig.httpserver, [])) {
                 throw new ServiceError(
                     this.constructor.name,
                     'Configuration is invalid. Check your config file format and values.'

@@ -1,7 +1,8 @@
 import {Config} from '../../Config/Config.js';
 import {ChromaDbClient} from '../../Db/ChromaDb/ChromaDbClient.js';
 import {Logger} from '../../Logger/Logger.js';
-import {SchemaConfigBackendOptions} from '../../Schemas/Config/ConfigBackendOptions.js';
+import {ConfigBackendOptions, SchemaConfigBackendOptions} from '../../Schemas/Config/ConfigBackendOptions.js';
+import {SchemaConfigDbOptionsChroma} from '../../Schemas/Config/ConfigDb.js';
 import {ServiceAbstract, ServiceImportance, ServiceStatus} from '../../Service/ServiceAbstract.js';
 import {ServiceError} from '../../Service/ServiceError.js';
 import {StringHelper} from '../../Utils/StringHelper.js';
@@ -44,7 +45,7 @@ export class ChromaDBService extends ServiceAbstract {
         this._status = ServiceStatus.Progress;
 
         try {
-            const tConfig = Config.getInstance().get();
+            const tConfig = Config.getInstance().get() as ConfigBackendOptions;
 
             if (tConfig === null) {
                 throw new ServiceError(
@@ -53,7 +54,7 @@ export class ChromaDBService extends ServiceAbstract {
                 );
             }
 
-            if (!SchemaConfigBackendOptions.validate(tConfig, [])) {
+            if (tConfig.db && tConfig.db.chroma && !SchemaConfigDbOptionsChroma.validate(tConfig.db.chroma, [])) {
                 throw new ServiceError(
                     this.constructor.name,
                     'Configuration is invalid. Check your config file format and values.'

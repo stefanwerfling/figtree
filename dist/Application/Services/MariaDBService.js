@@ -1,7 +1,7 @@
 import { Config } from '../../Config/Config.js';
 import { DBHelper } from '../../Db/MariaDb/DBHelper.js';
 import { Logger } from '../../Logger/Logger.js';
-import { SchemaConfigBackendOptions } from '../../Schemas/Config/ConfigBackendOptions.js';
+import { SchemaConfigDbOptionsMySql } from '../../Schemas/Config/ConfigDb.js';
 import { ServiceAbstract, ServiceImportance, ServiceStatus } from '../../Service/ServiceAbstract.js';
 import { ServiceError } from '../../Service/ServiceError.js';
 import { StringHelper } from '../../Utils/StringHelper.js';
@@ -21,7 +21,7 @@ export class MariaDBService extends ServiceAbstract {
             if (tConfig === null) {
                 throw new ServiceError(this.constructor.name, 'Config is null. Check your config file exists!');
             }
-            if (!SchemaConfigBackendOptions.validate(tConfig, [])) {
+            if (tConfig.db && tConfig.db.mysql && !SchemaConfigDbOptionsMySql.validate(tConfig.db.mysql, [])) {
                 throw new ServiceError(this.constructor.name, 'Configuration is invalid. Check your config file format and values.');
             }
             if (tConfig.db.mysql === undefined) {

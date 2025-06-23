@@ -2,7 +2,7 @@ import { Config } from '../../Config/Config.js';
 import { RedisClient } from '../../Db/RedisDb/RedisClient.js';
 import { RedisSubscribe } from '../../Db/RedisDb/RedisSubscribe.js';
 import { Logger } from '../../Logger/Logger.js';
-import { SchemaConfigBackendOptions } from '../../Schemas/Config/ConfigBackendOptions.js';
+import { SchemaConfigDbOptionsRedis } from '../../Schemas/Config/ConfigDb.js';
 import { ServiceAbstract, ServiceImportance, ServiceStatus } from '../../Service/ServiceAbstract.js';
 import { ServiceError } from '../../Service/ServiceError.js';
 import { StringHelper } from '../../Utils/StringHelper.js';
@@ -22,7 +22,7 @@ export class RedisDBService extends ServiceAbstract {
             if (tConfig === null) {
                 throw new ServiceError(this.constructor.name, 'Config is null. Check your config file exists!');
             }
-            if (!SchemaConfigBackendOptions.validate(tConfig, [])) {
+            if (tConfig.db && tConfig.db.redis && !SchemaConfigDbOptionsRedis.validate(tConfig.db.redis, [])) {
                 throw new ServiceError(this.constructor.name, 'Configuration is invalid. Check your config file format and values.');
             }
             if (tConfig.db.redis && tConfig.db.redis.url) {
