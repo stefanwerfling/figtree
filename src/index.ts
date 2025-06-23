@@ -88,8 +88,9 @@ export {InfluxDbHelperOptions, InfluxDbHelper} from './Db/InfluxDb/InfluxDbHelpe
 export {RedisChannel} from './Db/RedisDb/RedisChannel.js';
 export {RedisSubscribe} from './Db/RedisDb/RedisSubscribe.js';
 export {RedisClientOptions, FunChannelCallback, RedisClient} from './Db/RedisDb/RedisClient.js';
+export {ChromaDbCollection} from './Db/ChromaDb/ChromaDbCollection.js';
+export {ChromaDbCollectionLoader} from './Db/ChromaDb/ChromaDbCollectionLoader.js';
 export {ChromaDbClientOptions, ChromaDbClient} from './Db/ChromaDb/ChromaDbClient.js';
-export {ChromaCollection} from './Db/ChromaDb/ChromaCollection.js';
 
 // Raw Server ----------------------------------------------------------------------------------------------------------
 export {Message as RawMessage} from './Server/RawServer/Base/Message.js';

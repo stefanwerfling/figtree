@@ -24,5 +24,8 @@ export class ChromaDbClient {
     getClient() {
         return this._client;
     }
+    loadCollections(loader) {
+        return loader.load(this);
+    }
 }
 //# sourceMappingURL=ChromaDbClient.js.map

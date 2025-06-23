@@ -4,7 +4,13 @@ import {ChromaDbClient} from './ChromaDbClient.js';
 /**
  * Chroma Collection
  */
-export abstract class ChromaCollection {
+export abstract class ChromaDbCollection {
+
+    /**
+     * Name of collection
+     * @protected
+     */
+    protected _name: string;
 
     /**
      * Collection
@@ -12,6 +18,13 @@ export abstract class ChromaCollection {
      */
     protected _collection?: Collection;
 
+    /**
+     * Constructor
+     * @param {string} name
+     * @param {Record<string, any>} metadata
+     * @param {ChromaDbClient} client
+     * @protected
+     */
     protected constructor(name: string, metadata: Record<string, any>, client?: ChromaDbClient) {
         const tclient = client ? client : (ChromaDbClient.hasInstance() ? ChromaDbClient.getInstance() : null);
 
@@ -19,6 +32,7 @@ export abstract class ChromaCollection {
             throw new Error('Please get a client instance from ChromaDbClient');
         }
 
+        this._name = name;
         this._init(name, metadata, tclient).then();
     }
 

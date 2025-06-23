@@ -12,7 +12,11 @@ export enum ENV_OPTIONAL {
     LOGGING_LEVEL = 'LOGGING_LEVEL',
 }
 
-export class ConfigBackend extends Config<ConfigBackendOptions> {
+/**
+ * Config for Backend
+ * @template T
+ */
+export class ConfigBackend<T extends ConfigBackendOptions> extends Config<T> {
 
     /**
      * DEFAULTS
@@ -37,11 +41,11 @@ export class ConfigBackend extends Config<ConfigBackendOptions> {
 
     /**
      * _loadEnv
-     * @param {ConfigBackendOptions|null} aConfig
-     * @returns {ConfigBackendOptions|null}
+     * @param {T|null} aConfig
+     * @returns {T|null}
      * @protected
      */
-    protected _loadEnv(aConfig: ConfigBackendOptions | null): ConfigBackendOptions | null {
+    protected _loadEnv(aConfig: T | null): T | null {
         let config = aConfig;
 
         // defaults ------------------------------------------------------------------------------------------------
@@ -87,7 +91,7 @@ export class ConfigBackend extends Config<ConfigBackendOptions> {
                     port: ConfigBackend.DEFAULT_HTTPSERVER_PORT,
                     publicdir: ConfigBackend.DEFAULT_HTTPSERVER_PUBLICDIR
                 }
-            };
+            } as T;
         }
 
         // optional ----------------------------------------------------------------------------------------------------
@@ -103,11 +107,11 @@ export class ConfigBackend extends Config<ConfigBackendOptions> {
 
     /**
      * Load MariaDB Env
-     * @param {ConfigBackendOptions} config
-     * @returns {ConfigBackendOptions}
+     * @param {T} config
+     * @returns {T}
      * @protected
      */
-    protected _loadEnvMariaDb(config: ConfigBackendOptions): ConfigBackendOptions {
+    protected _loadEnvMariaDb(config: T): T {
         if (process.env[ENV_OPTIONAL_DB.DB_MYSQL_HOST]) {
             config.db.mysql.host = process.env[ENV_OPTIONAL_DB.DB_MYSQL_HOST];
         }
@@ -122,11 +126,11 @@ export class ConfigBackend extends Config<ConfigBackendOptions> {
 
     /**
      * Load InfluxDB Env
-     * @param {ConfigBackendOptions} config
-     * @returns {ConfigBackendOptions}
+     * @param {T} config
+     * @returns {T}
      * @protected
      */
-    protected _loadEnvInfluxDb(config: ConfigBackendOptions): ConfigBackendOptions {
+    protected _loadEnvInfluxDb(config: T): T {
         const influxEnvList = [
             ENV_OPTIONAL_DB.DB_INFLUX_URL,
             ENV_OPTIONAL_DB.DB_INFLUX_TOKEN,
@@ -171,11 +175,11 @@ export class ConfigBackend extends Config<ConfigBackendOptions> {
 
     /**
      * Load Redis Env
-     * @param {ConfigBackendOptions} config
-     * @returns {ConfigBackendOptions}
+     * @param {T} config
+     * @returns {T}
      * @protected
      */
-    protected _loadEnvRedisDb(config: ConfigBackendOptions): ConfigBackendOptions {
+    protected _loadEnvRedisDb(config: T): T {
         if (config.db.redis) {
             if (process.env[ENV_OPTIONAL_DB.DB_REDIS_URL]) {
                 config.db.redis.url = process.env[ENV_OPTIONAL_DB.DB_REDIS_URL];
@@ -191,11 +195,11 @@ export class ConfigBackend extends Config<ConfigBackendOptions> {
 
     /**
      * Load HttpServer Env
-     * @param {ConfigBackendOptions} config
-     * @returns {ConfigBackendOptions}
+     * @param {T} config
+     * @returns {T}
      * @protected
      */
-    protected _loadEnvHttpserver(config: ConfigBackendOptions): ConfigBackendOptions {
+    protected _loadEnvHttpserver(config: T): T {
         if (process.env[ENV_OPTIONAL.HTTPSERVER_PORT]) {
             config.httpserver.port = parseInt(process.env[ENV_OPTIONAL.HTTPSERVER_PORT]!, 10) ||
                 ConfigBackend.DEFAULT_HTTPSERVER_PORT;
@@ -210,11 +214,11 @@ export class ConfigBackend extends Config<ConfigBackendOptions> {
 
     /**
      * Load Logging Env
-     * @param {ConfigBackendOptions} config
-     * @returns {ConfigBackendOptions}
+     * @param {T} config
+     * @returns {T}
      * @protected
      */
-    protected _loadEnvLogging(config: ConfigBackendOptions): ConfigBackendOptions {
+    protected _loadEnvLogging(config: T): T {
         if (process.env[ENV_OPTIONAL.LOGGING_LEVEL]) {
             config.logging = {
                 level: process.env[ENV_OPTIONAL.LOGGING_LEVEL]

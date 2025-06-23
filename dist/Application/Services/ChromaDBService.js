@@ -29,6 +29,7 @@ export class ChromaDBService extends ServiceAbstract {
             this._chromaDbClient = ChromaDbClient.getInstance({
                 path: tConfig.db.chroma.url
             });
+            await this._chromaDbClient.getClient().init();
         }
         catch (error) {
             this._status = ServiceStatus.Error;
@@ -43,6 +44,20 @@ export class ChromaDBService extends ServiceAbstract {
     }
     getClient() {
         return this._chromaDbClient;
+    }
+    async stop(forced = false) {
+        try {
+            this._chromaDbClient = null;
+        }
+        catch (error) {
+            this._status = ServiceStatus.Error;
+            this._statusMsg = StringHelper.sprintf('ChromaDBService::stop: Error stopping the ChromaDB: %e', error);
+            Logger.getLogger().error(this._statusMsg);
+        }
+        finally {
+            this._status = ServiceStatus.None;
+            this._inProcess = false;
+        }
     }
 }
 //# sourceMappingURL=ChromaDBService.js.map

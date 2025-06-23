@@ -1,4 +1,6 @@
 import { ChromaClient } from "chromadb";
+import {ChromaDbCollection} from './ChromaDbCollection.js';
+import {ChromaDbCollectionLoader} from './ChromaDbCollectionLoader.js';
 
 /**
  * ChromaDB Client options
@@ -64,4 +66,15 @@ export class ChromaDbClient {
     public getClient(): ChromaClient {
         return this._client;
     }
+
+    /**
+     * load collections
+     * @template T
+     * @param {ChromaDbCollectionLoader} loader
+     * @return {T[]}
+     */
+    public loadCollections<T extends ChromaDbCollection>(loader: ChromaDbCollectionLoader<T>): Promise<T[]> {
+        return loader.load(this);
+    }
+
 }

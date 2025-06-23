@@ -6,6 +6,9 @@ import {ServiceAbstract, ServiceImportance, ServiceStatus} from '../../Service/S
 import {ServiceError} from '../../Service/ServiceError.js';
 import {StringHelper} from '../../Utils/StringHelper.js';
 
+/**
+ * ChromaDB Service
+ */
 export class ChromaDBService extends ServiceAbstract {
 
     /**
@@ -24,6 +27,11 @@ export class ChromaDBService extends ServiceAbstract {
      */
     protected _chromaDbClient: ChromaDbClient|null = null;
 
+    /**
+     * Constructor
+     * @param {string} serviceName
+     * @param {string[]} serviceDependencies
+     */
     public constructor(serviceName?: string, serviceDependencies?: string[]) {
         super(serviceName ?? ChromaDBService.NAME, serviceDependencies);
     }
@@ -62,6 +70,8 @@ export class ChromaDBService extends ServiceAbstract {
             this._chromaDbClient = ChromaDbClient.getInstance({
                 path: tConfig.db.chroma.url
             });
+
+            await this._chromaDbClient.getClient().init();
         } catch (error) {
             this._status = ServiceStatus.Error;
             this._inProcess = false;
@@ -89,4 +99,21 @@ export class ChromaDBService extends ServiceAbstract {
         return this._chromaDbClient;
     }
 
+    /**
+     * Stop the service
+     * @param {boolean} forced
+     */
+    public override async stop(forced: boolean = false): Promise<void> {
+        try {
+            this._chromaDbClient = null;
+        } catch (error) {
+            this._status = ServiceStatus.Error;
+            this._statusMsg = StringHelper.sprintf('ChromaDBService::stop: Error stopping the ChromaDB: %e', error);
+
+            Logger.getLogger().error(this._statusMsg);
+        } finally {
+            this._status = ServiceStatus.None;
+            this._inProcess = false;
+        }
+    }
 }

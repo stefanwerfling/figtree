@@ -6,7 +6,7 @@ import {ConfigOptions} from '../../Schemas/Config/ConfigOptions.js';
 /**
  * Example Config
  */
-export class ExampleConfig extends ConfigBackend {
+export class ExampleConfig extends ConfigBackend<ConfigBackendOptions> {
 
     /**
      * Return the Config instance
