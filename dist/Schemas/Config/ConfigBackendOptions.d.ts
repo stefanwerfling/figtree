@@ -11,13 +11,13 @@ export declare const SchemaConfigBackendOptions: import("vts").ObjectSchema<{
     }>>;
 } & {
     db: import("vts").ObjectSchema<{
-        mysql: import("vts").ObjectSchema<{
+        mysql: import("vts").OptionalSchema<import("vts").ObjectSchema<{
             host: import("vts").StringSchema<import("vts").StringSchemaOptions>;
             port: import("vts").NumberSchema;
             username: import("vts").StringSchema<import("vts").StringSchemaOptions>;
             password: import("vts").StringSchema<import("vts").StringSchemaOptions>;
             database: import("vts").StringSchema<import("vts").StringSchemaOptions>;
-        }>;
+        }>>;
         influx: import("vts").OptionalSchema<import("vts").ObjectSchema<{
             url: import("vts").StringSchema<import("vts").StringSchemaOptions>;
             token: import("vts").StringSchema<import("vts").StringSchemaOptions>;

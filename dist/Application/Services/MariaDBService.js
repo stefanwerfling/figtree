@@ -7,7 +7,7 @@ import { ServiceError } from '../../Service/ServiceError.js';
 import { StringHelper } from '../../Utils/StringHelper.js';
 export class MariaDBService extends ServiceAbstract {
     static NAME = 'mariadb';
-    _importance = ServiceImportance.Critical;
+    _importance = ServiceImportance.Important;
     _loader;
     constructor(loader, serviceName, serviceDependencies) {
         super(serviceName ?? MariaDBService.NAME, serviceDependencies);
@@ -23,6 +23,9 @@ export class MariaDBService extends ServiceAbstract {
             }
             if (!SchemaConfigBackendOptions.validate(tConfig, [])) {
                 throw new ServiceError(this.constructor.name, 'Configuration is invalid. Check your config file format and values.');
+            }
+            if (tConfig.db.mysql === undefined) {
+                throw new ServiceError(this.constructor.name, 'Configuration for mysql/mariadb is not set. Check your config file format and values.');
             }
             await DBHelper.init({
                 type: 'mysql',

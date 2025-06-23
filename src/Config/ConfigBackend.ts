@@ -1,5 +1,5 @@
 import {ConfigBackendOptions, SchemaConfigBackendOptions} from '../Schemas/Config/ConfigBackendOptions.js';
-import {ENV_DUTY_DB, ENV_OPTIONAL_DB} from '../Schemas/Config/ConfigDb.js';
+import {ENV_DB} from '../Schemas/Config/ConfigDb.js';
 import {ConfigOptions} from '../Schemas/Config/ConfigOptions.js';
 import {Config} from './Config.js';
 
@@ -25,7 +25,8 @@ export class ConfigBackend<T extends ConfigBackendOptions> extends Config<T> {
     public static readonly DEFAULT_HTTPSERVER_PUBLICDIR = 'frontend';
     public static readonly DEFAULT_DB_MYSQL_HOST = '127.0.0.1';
     public static readonly DEFAULT_DB_MYSQL_PORT = 3306;
-    public static readonly DEFAULT_REDIS_URL = 'redis://127.0.0.1:6379';
+    public static readonly DEFAULT_DB_REDIS_URL = 'redis://127.0.0.1:6379';
+    public static readonly DEFAULT_DB_CHROMA_URL = 'http://localhost:8000/';
 
     /**
      * Return the Config instance
@@ -50,46 +51,15 @@ export class ConfigBackend<T extends ConfigBackendOptions> extends Config<T> {
 
         // defaults ------------------------------------------------------------------------------------------------
 
-        if (config) {
-            if (process.env[ENV_DUTY_DB.DB_MYSQL_USERNAME]) {
-                config.db.mysql.username = process.env[ENV_DUTY_DB.DB_MYSQL_USERNAME];
-            }
-
-            if (process.env[ENV_DUTY_DB.DB_MYSQL_PASSWORD]) {
-                config.db.mysql.password = process.env[ENV_DUTY_DB.DB_MYSQL_PASSWORD];
-            }
-
-            if (process.env[ENV_DUTY_DB.DB_MYSQL_DATABASE]) {
-                config.db.mysql.database = process.env[ENV_DUTY_DB.DB_MYSQL_DATABASE];
-            }
-        } else {
-            for (const env of Object.values(ENV_DUTY_DB)) {
-                if (!process.env[env]) {
-                    console.log(`Config::load: Env Variable "${env}" not found!`);
-                    return null;
-                }
-            }
-
-            const dbMysqlUsername = process.env[ENV_DUTY_DB.DB_MYSQL_USERNAME]!;
-            const dbMysqlPassword = process.env[ENV_DUTY_DB.DB_MYSQL_PASSWORD]!;
-            const dbMysqlDatabase = process.env[ENV_DUTY_DB.DB_MYSQL_DATABASE]!;
-
+        if (config === null) {
             config = {
-                db: {
-                    mysql: {
-                        host: ConfigBackend.DEFAULT_DB_MYSQL_HOST,
-                        port: ConfigBackend.DEFAULT_DB_MYSQL_PORT,
-                        username: dbMysqlUsername,
-                        password: dbMysqlPassword,
-                        database: dbMysqlDatabase
-                    },
-                    redis: {
-                        url: ConfigBackend.DEFAULT_REDIS_URL
-                    }
-                },
+                db: {},
                 httpserver: {
                     port: ConfigBackend.DEFAULT_HTTPSERVER_PORT,
                     publicdir: ConfigBackend.DEFAULT_HTTPSERVER_PUBLICDIR
+                },
+                logging: {
+                    level: 'error'
                 }
             } as T;
         }
@@ -99,6 +69,7 @@ export class ConfigBackend<T extends ConfigBackendOptions> extends Config<T> {
         config = this._loadEnvMariaDb(config);
         config = this._loadEnvRedisDb(config);
         config = this._loadEnvInfluxDb(config);
+        config = this._loadEnvChromaDb(config);
         config = this._loadEnvHttpserver(config);
         config = this._loadEnvLogging(config);
 
@@ -112,13 +83,33 @@ export class ConfigBackend<T extends ConfigBackendOptions> extends Config<T> {
      * @protected
      */
     protected _loadEnvMariaDb(config: T): T {
-        if (process.env[ENV_OPTIONAL_DB.DB_MYSQL_HOST]) {
-            config.db.mysql.host = process.env[ENV_OPTIONAL_DB.DB_MYSQL_HOST];
+        const mariadbEnvList = [
+            ENV_DB.DB_MYSQL_HOST,
+            ENV_DB.DB_MYSQL_PORT,
+            ENV_DB.DB_MYSQL_DATABASE,
+            ENV_DB.DB_MYSQL_USERNAME,
+            ENV_DB.DB_MYSQL_PASSWORD
+        ];
+
+        if (mariadbEnvList.some(entry => process.env[entry])) {
+            config.db.mysql = {
+                host: ConfigBackend.DEFAULT_DB_MYSQL_HOST,
+                port: ConfigBackend.DEFAULT_DB_MYSQL_PORT,
+                database: '',
+                username: '',
+                password: ''
+            };
         }
 
-        if (process.env[ENV_OPTIONAL_DB.DB_MYSQL_PORT]) {
-            config.db.mysql.port = parseInt(process.env[ENV_OPTIONAL_DB.DB_MYSQL_PORT]!, 10) ||
-                ConfigBackend.DEFAULT_DB_MYSQL_PORT;
+        if (config.db.mysql) {
+            if (process.env[ENV_DB.DB_MYSQL_HOST]) {
+                config.db.mysql.host = process.env[ENV_DB.DB_MYSQL_HOST];
+            }
+
+            if (process.env[ENV_DB.DB_MYSQL_PORT]) {
+                config.db.mysql.port = parseInt(process.env[ENV_DB.DB_MYSQL_PORT]!, 10) ||
+                    ConfigBackend.DEFAULT_DB_MYSQL_PORT;
+            }
         }
 
         return config;
@@ -132,41 +123,38 @@ export class ConfigBackend<T extends ConfigBackendOptions> extends Config<T> {
      */
     protected _loadEnvInfluxDb(config: T): T {
         const influxEnvList = [
-            ENV_OPTIONAL_DB.DB_INFLUX_URL,
-            ENV_OPTIONAL_DB.DB_INFLUX_TOKEN,
-            ENV_OPTIONAL_DB.DB_INFLUX_ORG,
-            ENV_OPTIONAL_DB.DB_INFLUX_BUCKET
+            ENV_DB.DB_INFLUX_URL,
+            ENV_DB.DB_INFLUX_TOKEN,
+            ENV_DB.DB_INFLUX_ORG,
+            ENV_DB.DB_INFLUX_BUCKET
         ];
 
-        for (const entry of influxEnvList) {
-            if (process.env[entry]) {
-                config.db.influx = {
-                    url: '',
-                    password: '',
-                    username: '',
-                    org: '',
-                    bucket: '',
-                    token: ''
-                };
-                break;
-            }
+        if (influxEnvList.some(entry => process.env[entry])) {
+            config.db.influx = {
+                url: '',
+                password: '',
+                username: '',
+                org: '',
+                bucket: '',
+                token: ''
+            };
         }
 
         if (config.db.influx) {
-            if (process.env[ENV_OPTIONAL_DB.DB_INFLUX_URL]) {
-                config.db.influx.url = process.env[ENV_OPTIONAL_DB.DB_INFLUX_URL];
+            if (process.env[ENV_DB.DB_INFLUX_URL]) {
+                config.db.influx.url = process.env[ENV_DB.DB_INFLUX_URL];
             }
 
-            if (process.env[ENV_OPTIONAL_DB.DB_INFLUX_TOKEN]) {
-                config.db.influx.token = process.env[ENV_OPTIONAL_DB.DB_INFLUX_TOKEN];
+            if (process.env[ENV_DB.DB_INFLUX_TOKEN]) {
+                config.db.influx.token = process.env[ENV_DB.DB_INFLUX_TOKEN];
             }
 
-            if (process.env[ENV_OPTIONAL_DB.DB_INFLUX_ORG]) {
-                config.db.influx.org = process.env[ENV_OPTIONAL_DB.DB_INFLUX_ORG];
+            if (process.env[ENV_DB.DB_INFLUX_ORG]) {
+                config.db.influx.org = process.env[ENV_DB.DB_INFLUX_ORG];
             }
 
-            if (process.env[ENV_OPTIONAL_DB.DB_INFLUX_BUCKET]) {
-                config.db.influx.bucket = process.env[ENV_OPTIONAL_DB.DB_INFLUX_BUCKET];
+            if (process.env[ENV_DB.DB_INFLUX_BUCKET]) {
+                config.db.influx.bucket = process.env[ENV_DB.DB_INFLUX_BUCKET];
             }
         }
 
@@ -180,13 +168,47 @@ export class ConfigBackend<T extends ConfigBackendOptions> extends Config<T> {
      * @protected
      */
     protected _loadEnvRedisDb(config: T): T {
+        const redisEnvList = [
+            ENV_DB.DB_REDIS_URL,
+            ENV_DB.DB_REDIS_PASSWORD
+        ];
+
+        if (redisEnvList.some(entry => process.env[entry])) {
+            config.db.redis = {
+                url: ConfigBackend.DEFAULT_DB_REDIS_URL,
+                password: ''
+            };
+        }
+
         if (config.db.redis) {
-            if (process.env[ENV_OPTIONAL_DB.DB_REDIS_URL]) {
-                config.db.redis.url = process.env[ENV_OPTIONAL_DB.DB_REDIS_URL];
+            if (process.env[ENV_DB.DB_REDIS_URL]) {
+                config.db.redis.url = process.env[ENV_DB.DB_REDIS_URL];
             }
 
-            if (process.env[ENV_OPTIONAL_DB.DB_REDIS_PASSWORD]) {
-                config.db.redis.password = process.env[ENV_OPTIONAL_DB.DB_REDIS_PASSWORD];
+            if (process.env[ENV_DB.DB_REDIS_PASSWORD]) {
+                config.db.redis.password = process.env[ENV_DB.DB_REDIS_PASSWORD];
+            }
+        }
+
+        return config;
+    }
+
+    /**
+     * Load env for chroma db
+     * @param {T} config
+     * @return {T}
+     * @protected
+     */
+    protected _loadEnvChromaDb(config: T): T {
+        if (process.env[ENV_DB.DB_CHROMA_URL]) {
+            config.db.chroma = {
+                url: ConfigBackend.DEFAULT_DB_CHROMA_URL
+            };
+        }
+
+        if (config.db.chroma) {
+            if (process.env[ENV_DB.DB_CHROMA_URL]) {
+                config.db.chroma.url = process.env[ENV_DB.DB_CHROMA_URL];
             }
         }
 

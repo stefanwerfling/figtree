@@ -20,7 +20,7 @@ export class MariaDBService extends ServiceAbstract {
     /**
      * Importance
      */
-    protected readonly _importance: ServiceImportance = ServiceImportance.Critical;
+    protected readonly _importance: ServiceImportance = ServiceImportance.Important;
 
     /**
      * Loader
@@ -60,6 +60,13 @@ export class MariaDBService extends ServiceAbstract {
                 throw new ServiceError(
                     this.constructor.name,
                     'Configuration is invalid. Check your config file format and values.'
+                );
+            }
+
+            if (tConfig.db.mysql === undefined) {
+                throw new ServiceError(
+                    this.constructor.name,
+                    'Configuration for mysql/mariadb is not set. Check your config file format and values.'
                 );
             }
 

@@ -1,26 +1,24 @@
 import {ExtractSchemaResultType, Vts} from 'vts';
 
 /**
- * ENV_DUTY_DB
+ * ENV_DB
  */
-export enum ENV_DUTY_DB {
-    DB_MYSQL_USERNAME = 'DB_MYSQL_USERNAME',
-    DB_MYSQL_PASSWORD = 'DB_MYSQL_PASSWORD',
-    DB_MYSQL_DATABASE = 'DB_MYSQL_DATABASE'
-}
-
-/**
- * ENV_OPTIONAL_DB
- */
-export enum ENV_OPTIONAL_DB {
+export enum ENV_DB {
     DB_MYSQL_HOST = 'DB_MYSQL_HOST',
     DB_MYSQL_PORT = 'DB_MYSQL_PORT',
+    DB_MYSQL_USERNAME = 'DB_MYSQL_USERNAME',
+    DB_MYSQL_PASSWORD = 'DB_MYSQL_PASSWORD',
+    DB_MYSQL_DATABASE = 'DB_MYSQL_DATABASE',
+
     DB_INFLUX_URL = 'DB_INFLUX_URL',
     DB_INFLUX_TOKEN = 'DB_INFLUX_TOKEN',
     DB_INFLUX_ORG = 'DB_INFLUX_ORG',
     DB_INFLUX_BUCKET = 'DB_INFLUX_BUCKET',
+
     DB_REDIS_URL = 'DB_REDIS_URL',
-    DB_REDIS_PASSWORD = 'DB_REDIS_PASSWORD'
+    DB_REDIS_PASSWORD = 'DB_REDIS_PASSWORD',
+
+    DB_CHROMA_URL = 'DB_CHROMA_URL'
 }
 
 /**
@@ -65,7 +63,7 @@ export const SchemaConfigDbOptionsChroma = Vts.object({
  * Schema DB options config
  */
 export const SchemaConfigDbOptions = Vts.object({
-    mysql: SchemaConfigDbOptionsMySql,
+    mysql: Vts.optional(SchemaConfigDbOptionsMySql),
     influx: Vts.optional(SchemaConfigDbOptionsInflux),
     redis: Vts.optional(SchemaConfigDbOptionsRedis),
     chroma: Vts.optional(SchemaConfigDbOptionsChroma)

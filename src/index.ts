@@ -6,8 +6,7 @@ export {SchemaArgsBase} from './Schemas/Args/ArgsBase.js';
 export {SchemaDefaultArgs, DefaultArgs} from './Schemas/Args/DefaultArgs.js';
 export {SchemaConfigOptions, ConfigOptions} from './Schemas/Config/ConfigOptions.js';
 export {
-    ENV_OPTIONAL_DB,
-    ENV_DUTY_DB,
+    ENV_DB,
     SchemaConfigDbOptionsInflux,
     SchemaConfigDbOptionsMySql,
     SchemaConfigDbOptionsRedis,
