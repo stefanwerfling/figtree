@@ -9,7 +9,7 @@ export declare abstract class BackendApp<A extends DefaultArgs, C extends Config
     protected _appName: string;
     protected _args: A | null;
     protected _serviceManager: ServiceManager;
-    constructor(name?: string);
+    protected constructor(name?: string);
     protected _getArgSchema(): Schema<A> | null;
     protected _getConfigInstance(): Config<C>;
     protected _loadConfig(): Promise<boolean>;

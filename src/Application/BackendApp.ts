@@ -57,7 +57,7 @@ export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions>
      * constructor
      * @param {string} name
      */
-    public constructor(name: string = 'figtree') {
+    protected constructor(name: string = 'figtree') {
         this._appName = name;
         BackendApp._instances.set(name, this);
     }

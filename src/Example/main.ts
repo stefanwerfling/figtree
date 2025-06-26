@@ -1,3 +1,4 @@
+import {BackendCluster} from '../Application/BackendCluster.js';
 import {ExampleBackend} from './Application/ExampleBackend.js';
 
 /**
@@ -6,6 +7,14 @@ import {ExampleBackend} from './Application/ExampleBackend.js';
 (async(): Promise<void> => {
     console.log("Figtree Example");
 
-    const backend = new ExampleBackend();
+    const useCluster = false;
+    let backend: ExampleBackend|BackendCluster = new ExampleBackend();
+
+    if (useCluster) {
+        backend = new BackendCluster({
+            appFactory: () => new ExampleBackend()
+        });
+    }
+
     await backend.start();
 })();
