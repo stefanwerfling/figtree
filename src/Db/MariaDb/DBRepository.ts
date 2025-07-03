@@ -1,14 +1,18 @@
 import {DeleteResult, EntityTarget, Repository} from 'typeorm';
-import {DBBaseEntityUnid} from './DBBaseEntityUnid.js';
+import {DBBaseEntityId} from './DBBaseEntityId.js';
 import {DBHelper} from './DBHelper.js';
 
-export abstract class DBServiceUn<T extends DBBaseEntityUnid> {
+/**
+ * DB Repository for id`s with type number
+ * @template T
+ */
+export abstract class DBRepository<T extends DBBaseEntityId> {
 
     /**
      * instance
      * @protected
      */
-    protected static _instance = new Map<string, DBServiceUn<any>>();
+    protected static _instance = new Map<string, DBRepository<any>>();
 
     /**
      * repository for T
@@ -17,17 +21,23 @@ export abstract class DBServiceUn<T extends DBBaseEntityUnid> {
     protected readonly _repository: Repository<T>;
 
     /**
-     * getSingleInstance
+     * Get Single Instance
+     * @template I extends DBBaseEntityId
+     * @template S extends DBRepository<I>
+     * @param {new (tentrie: EntityTarget<I>) => S} tclass
+     * @param {EntityTarget} tentrie
+     * @param {string} registerName
+     * @return {S}
      */
-    protected static getSingleInstance<I extends DBBaseEntityUnid, S extends DBServiceUn<I>>(
+    protected static getSingleInstance<I extends DBBaseEntityId, S extends DBRepository<I>>(
         tclass: new (tentrie: EntityTarget<I>) => S,
         tentrie: EntityTarget<I>,
         registerName: string
     ): S {
         let cls;
 
-        if (DBServiceUn._instance.has(registerName)) {
-            cls = DBServiceUn._instance.get(registerName);
+        if (DBRepository._instance.has(registerName)) {
+            cls = DBRepository._instance.get(registerName);
 
             if (!(cls instanceof tclass)) {
                 throw new Error('Class not found in register!');
@@ -35,7 +45,7 @@ export abstract class DBServiceUn<T extends DBBaseEntityUnid> {
         } else {
             cls = new tclass(tentrie);
 
-            DBServiceUn._instance.set(registerName, cls);
+            DBRepository._instance.set(registerName, cls);
         }
 
         return cls;
@@ -43,38 +53,39 @@ export abstract class DBServiceUn<T extends DBBaseEntityUnid> {
 
     /**
      * constructor
-     * @param {DBBaseEntityUnid} target
+     * @param {EntityTarget<T>} target
      */
-    public constructor(target: EntityTarget<T>) {
+    protected constructor(target: EntityTarget<T>) {
         this._repository = DBHelper.getRepository(target);
     }
 
     /**
-     * countAll
+     * count all entries
+     * @return number
      */
     public async countAll(): Promise<number> {
         return this._repository.count();
     }
 
     /**
-     * findAll
-     * @returns {DBBaseEntityUnid[]}
+     * find all entries
+     * @return {T[]}
      */
     public async findAll(): Promise<T[]> {
         return this._repository.find();
     }
 
     /**
-     * findOne
-     * @param unid
-     * @returns {DBBaseEntityUnid}
+     * find one entry by id
+     * @param {number} id
+     * @return {T|null}
      */
-    public async findOne(unid: string): Promise<T | null> {
-        const repository = this._repository as Repository<DBBaseEntityUnid>;
+    public async findOne(id: number): Promise<T | null> {
+        const repository = this._repository as Repository<DBBaseEntityId>;
 
         const result = await repository.findOne({
             where: {
-                unid: unid
+                id: id
             }
         });
 
@@ -87,25 +98,26 @@ export abstract class DBServiceUn<T extends DBBaseEntityUnid> {
 
     /**
      * Remove a row (entry) by ID.
-     * @param {string} unid - ID from entry.
+     * @param {number} id - ID from entry.
      * @returns {DeleteResult}
      */
-    public async remove(unid: string): Promise<DeleteResult> {
-        return this._repository.delete(unid);
+    public async remove(id: number): Promise<DeleteResult> {
+        return this._repository.delete(id);
     }
 
     /**
      * Save an entry object extend from DBBaseEntityId.
-     * @param {T extend DBBaseEntityUnid} entity
-     * @returns {T extend DBBaseEntityUnid}
+     * @param {T extends DBBaseEntityId} entity
+     * @returns {T}
      */
     public async save(entity: T): Promise<T> {
         return this._repository.save(entity);
+        //return this._repository.insert(entity);
     }
 
     /**
      * Get access to repository for cross-query building and more.
-     * @returns {Repository<DBBaseEntityUnid>}
+     * @returns {Repository<T>}
      */
     public getRepository(): Repository<T> {
         return this._repository;

@@ -1,11 +1,11 @@
 import {DBBaseEntityId} from './DBBaseEntityId.js';
-import {DBService} from './DBService.js';
+import {DBRepository} from './DBRepository.js';
 
 /**
  * On find all
  */
 export type DBSaveListIdOnFindAllInDb<
-    S extends DBService<E>,
+    S extends DBRepository<E>,
     E extends DBBaseEntityId,
     MT extends string | number
 > = (
@@ -40,7 +40,7 @@ export class DBSaveListId {
 
     public static async save<
         D extends any,
-        S extends DBService<E>,
+        S extends DBRepository<E>,
         E extends DBBaseEntityId,
         MT extends string | number
     >(

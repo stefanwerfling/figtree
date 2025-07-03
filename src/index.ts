@@ -76,12 +76,12 @@ export {
 // DB ------------------------------------------------------------------------------------------------------------------
 export {DBBaseEntityId} from './Db/MariaDb/DBBaseEntityId.js';
 export {DBBaseEntityUnid} from './Db/MariaDb/DBBaseEntityUnid.js';
-export {DBService} from './Db/MariaDb/DBService.js';
-export {DBServiceUn} from './Db/MariaDb/DBServiceUn.js';
+export {DBRepository} from './Db/MariaDb/DBRepository.js';
+export {DBRepositoryUnid} from './Db/MariaDb/DBRepositoryUnid.js';
 export {DBSaveListIdOnGetId, DBSaveListIdOnFindAllInDb, DBSaveListIdOnFillData, DBSaveListId} from './Db/MariaDb/DBSaveListId.js';
 export {DBSaveListUnidOnGetId, DBSaveListUnidOnFindAllInDb, DBSaveListUnidOnFillData, DBSaveListUnid} from './Db/MariaDb/DBSaveListUnid.js';
 export {DBLoaderType, DBLoader} from './Db/MariaDb/DBLoader.js';
-export {DBServiceType} from './Db/MariaDb/DBServiceType.js';
+export {DBRepositoryType} from './Db/MariaDb/DBRepositoryType.js';
 export {DBHelper} from './Db/MariaDb/DBHelper.js';
 export {InfluxDbHelperOptions, InfluxDbHelper} from './Db/InfluxDb/InfluxDbHelper.js';
 export {RedisChannel} from './Db/RedisDb/RedisChannel.js';
