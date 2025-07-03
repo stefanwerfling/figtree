@@ -75,8 +75,8 @@ export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions>
      * Return the config instance
      * @protected
      */
-    protected _getConfigInstance(): Config<C> {
-        return ConfigBackend.getInstance<C>();
+    protected _getConfigInstance(): ConfigBackend {
+        return ConfigBackend.getInstance();
     }
 
     /**

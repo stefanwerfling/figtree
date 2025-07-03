@@ -21,7 +21,7 @@ export class ExampleBackend extends BackendApp<DefaultArgs, ConfigOptions> {
         super(ExampleBackend.NAME);
     }
 
-    protected _getConfigInstance(): Config<ConfigOptions> {
+    protected _getConfigInstance(): ExampleConfig {
         const config = ExampleConfig.getInstance();
         config.setAppName('example');
 

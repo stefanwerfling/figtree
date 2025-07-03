@@ -1,23 +1,22 @@
 import {Config} from '../../Config/Config.js';
 import {ConfigBackend} from '../../Config/ConfigBackend.js';
 import {ConfigBackendOptions, SchemaConfigBackendOptions} from '../../Schemas/Config/ConfigBackendOptions.js';
-import {ConfigOptions} from '../../Schemas/Config/ConfigOptions.js';
 
 /**
  * Example Config
  */
-export class ExampleConfig extends ConfigBackend<ConfigBackendOptions> {
+export class ExampleConfig extends ConfigBackend {
 
     /**
      * Return the Config instance
      * @return {Config}
      */
-    public static getInstance<I extends ConfigOptions>(): Config<I> {
+    public static getInstance(): ExampleConfig {
         if (!Config._instance) {
             Config._instance = new ExampleConfig(SchemaConfigBackendOptions);
         }
 
-        return Config._instance;
+        return Config._instance as ExampleConfig;
     }
 
     /**

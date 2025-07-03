@@ -3,8 +3,8 @@ import { ConfigOptions } from '../Schemas/Config/ConfigOptions.js';
 export declare class Config<T extends ConfigOptions = ConfigOptions> {
     static readonly DEFAULT_CONFIG_FILE = "config.json";
     static readonly DEFAULT_DIR: string;
-    protected static _instance: Config<any>;
-    static getInstance<I extends ConfigOptions>(): Config<I>;
+    protected static _instance: Config;
+    static getInstance(): Config;
     protected _schema: ObjectSchema<any> | null;
     private _appName;
     private _appTitle;

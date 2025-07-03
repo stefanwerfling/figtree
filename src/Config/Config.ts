@@ -19,15 +19,15 @@ export class Config<T extends ConfigOptions = ConfigOptions> {
      * instance
      * @protected
      */
-    protected static _instance: Config<any>;
+    protected static _instance: Config;
 
     /**
      * Return the Config instance
      * @return {Config}
      */
-    public static getInstance<I extends ConfigOptions>(): Config<I> {
+    public static getInstance(): Config {
         if (!Config._instance) {
-            Config._instance = new Config<I>(SchemaConfigOptions);
+            Config._instance = new Config<ConfigOptions>(SchemaConfigOptions);
         }
 
         return Config._instance;

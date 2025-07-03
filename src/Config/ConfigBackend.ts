@@ -1,6 +1,5 @@
 import {ConfigBackendOptions, SchemaConfigBackendOptions} from '../Schemas/Config/ConfigBackendOptions.js';
 import {ENV_DB} from '../Schemas/Config/ConfigDb.js';
-import {ConfigOptions} from '../Schemas/Config/ConfigOptions.js';
 import {Config} from './Config.js';
 
 /**
@@ -16,7 +15,7 @@ export enum ENV_OPTIONAL {
  * Config for Backend
  * @template T
  */
-export class ConfigBackend<T extends ConfigBackendOptions> extends Config<T> {
+export class ConfigBackend<T extends ConfigBackendOptions = ConfigBackendOptions> extends Config<T> {
 
     /**
      * DEFAULTS
@@ -32,12 +31,12 @@ export class ConfigBackend<T extends ConfigBackendOptions> extends Config<T> {
      * Return the Config instance
      * @return {Config}
      */
-    public static getInstance<I extends ConfigOptions>(): Config<I> {
+    public static getInstance(): ConfigBackend {
         if (!Config._instance) {
             Config._instance = new ConfigBackend(SchemaConfigBackendOptions);
         }
 
-        return Config._instance;
+        return Config._instance as ConfigBackend;
     }
 
     /**
