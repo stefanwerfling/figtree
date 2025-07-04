@@ -20,4 +20,8 @@ export const SchemaIsLoginParameter = Vts.object({
 export const SchemaIsLoginParameterPath = Vts.object({
     userid: Vts.string({ description: 'Userid for request' })
 });
+export const SchemaLoginRequest = Vts.object({
+    username: Vts.string(),
+    password: Vts.string()
+});
 //# sourceMappingURL=Login.js.map

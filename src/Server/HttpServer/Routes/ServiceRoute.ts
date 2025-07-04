@@ -1,4 +1,5 @@
 import {Router} from 'express';
+import {ACLRight} from '../../../ACL/ACLRight.js';
 import {BackendApp} from '../../../Application/BackendApp.js';
 import {DefaultReturn, SchemaDefaultReturn} from '../../../Schemas/Server/Routes/DefaultReturn.js';
 import {
@@ -8,6 +9,13 @@ import {
 } from '../../../Schemas/Server/Routes/Service.js';
 import {StatusCodes} from '../../../Schemas/Server/Routes/StatusCodes.js';
 import {DefaultRoute} from './DefaultRoute.js';
+import {DefaultRouteCheckUserLogin} from './DefaultRouteCheckUser.js';
+
+export type ServiceRouteACLRights = {
+    status: ACLRight
+    start: ACLRight,
+    stop: ACLRight
+};
 
 /**
  * Base Service Route
@@ -24,17 +32,29 @@ export class ServiceRoute extends DefaultRoute {
      * Default true
      * @protected
      */
-    protected _onlyUserAccess: boolean;
+    protected _onlyUserAccess: boolean|DefaultRouteCheckUserLogin;
+
+    /**
+     * access rights for default routes service
+     * @protected
+     */
+    protected _accessRights?: ServiceRouteACLRights;
 
     /**
      * Constructor
      * @param {string} backendInstanceName
-     * @param {boolean} onlyUserAccess
+     * @param {boolean|DefaultRouteCheckUserLogin} onlyUserAccess
+     * @param accessRights
      */
-    public constructor(backendInstanceName: string, onlyUserAccess: boolean = true) {
+    public constructor(
+        backendInstanceName: string,
+        onlyUserAccess: boolean|DefaultRouteCheckUserLogin = true,
+        accessRights?: ServiceRouteACLRights
+    ) {
         super();
         this._backendInstanceName = backendInstanceName;
         this._onlyUserAccess = onlyUserAccess;
+        this._accessRights = accessRights;
     }
 
     /**
@@ -66,7 +86,8 @@ export class ServiceRoute extends DefaultRoute {
             {
                 description: 'Service status list',
                 tags: ['service'],
-                responseBodySchema: SchemaServiceStatusResponse
+                responseBodySchema: SchemaServiceStatusResponse,
+                aclRight: this._accessRights?.status
             }
         );
 
@@ -100,7 +121,8 @@ export class ServiceRoute extends DefaultRoute {
                 description: 'Service start by service name',
                 tags: ['service'],
                 bodySchema: SchemaServiceByNameRequest,
-                responseBodySchema: SchemaDefaultReturn
+                responseBodySchema: SchemaDefaultReturn,
+                aclRight: this._accessRights?.start
             }
         );
 
@@ -134,7 +156,8 @@ export class ServiceRoute extends DefaultRoute {
                 description: 'Service stop by service name',
                 tags: ['service'],
                 bodySchema: SchemaServiceByNameRequest,
-                responseBodySchema: SchemaDefaultReturn
+                responseBodySchema: SchemaDefaultReturn,
+                aclRight: this._accessRights?.stop
             }
         );
 

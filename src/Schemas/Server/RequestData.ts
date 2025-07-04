@@ -5,7 +5,8 @@ import {ExtractSchemaResultType, Vts} from 'vts';
  */
 export const SchemaSessionUserData = Vts.object({
     isLogin: Vts.boolean(),
-    userid: Vts.string()
+    userid: Vts.string(),
+    role: Vts.optional(Vts.string())
 });
 
 /**

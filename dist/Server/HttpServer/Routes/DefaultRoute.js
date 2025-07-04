@@ -46,7 +46,7 @@ export class DefaultRoute {
                     RequestContext.getInstance().enterWith(new Map());
                 }
                 if (typeof checkUserLogin === 'function') {
-                    if (!await checkUserLogin(req, res)) {
+                    if (!await checkUserLogin(req, res, description.aclRight)) {
                         return;
                     }
                 }

@@ -35,3 +35,10 @@ export type IsLoginParameter = ExtractSchemaResultType<typeof SchemaIsLoginParam
 export const SchemaIsLoginParameterPath = Vts.object({
     userid: Vts.string({description: 'Userid for request'})
 });
+
+export const SchemaLoginRequest = Vts.object({
+    username: Vts.string(),
+    password: Vts.string()
+});
+
+export type LoginRequest = ExtractSchemaResultType<typeof SchemaLoginRequest>;

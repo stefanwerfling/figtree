@@ -6,7 +6,7 @@ export declare const SchemaTest: import("vts").ObjectSchema<{
     }>>;
 }>;
 export declare const SchemaIsLogin: import("vts").ObjectSchema<{
-    statusCode: import("vts").OrSchema<import("vts").StringSchema<import("vts").StringSchemaOptions> | import("vts").EnumSchema<import("../../../../index.js").StatusCodes>>;
+    statusCode: import("vts").OrSchema<import("vts").EnumSchema<import("../../../../index.js").StatusCodes> | import("vts").StringSchema<import("vts").StringSchemaOptions>>;
     msg: import("vts").OptionalSchema<import("vts").StringSchema<import("vts").StringSchemaOptions>>;
 } & {
     status: import("vts").BooleanSchema;
@@ -26,3 +26,8 @@ export type IsLoginParameter = ExtractSchemaResultType<typeof SchemaIsLoginParam
 export declare const SchemaIsLoginParameterPath: import("vts").ObjectSchema<{
     userid: import("vts").StringSchema<import("vts").StringSchemaOptions>;
 }>;
+export declare const SchemaLoginRequest: import("vts").ObjectSchema<{
+    username: import("vts").StringSchema<import("vts").StringSchemaOptions>;
+    password: import("vts").StringSchema<import("vts").StringSchemaOptions>;
+}>;
+export type LoginRequest = ExtractSchemaResultType<typeof SchemaLoginRequest>;

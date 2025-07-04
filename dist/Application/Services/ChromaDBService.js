@@ -29,7 +29,6 @@ export class ChromaDBService extends ServiceAbstract {
             this._chromaDbClient = ChromaDbClient.getInstance({
                 path: tConfig.db.chroma.url
             });
-            await this._chromaDbClient.getClient().init();
         }
         catch (error) {
             this._status = ServiceStatus.Error;

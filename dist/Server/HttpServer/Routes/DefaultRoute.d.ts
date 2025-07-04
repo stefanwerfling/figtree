@@ -1,4 +1,5 @@
 import { Request, RequestHandler, Response, Router } from 'express';
+import { ACLRight } from '../../../ACL/ACLRight.js';
 import { Schema } from 'vts';
 import { DefaultRouteCheckUserLogin } from './DefaultRouteCheckUser.js';
 import { IDefaultRoute } from './IDefaultRoute.js';
@@ -23,6 +24,7 @@ export type DefaultRouteMethodeDescription<A, B, C, D, E, F, G, S> = {
     sessionSchema?: Schema<S>;
     parser?: RequestHandler;
     useLocalStorage?: boolean;
+    aclRight?: ACLRight;
 };
 export declare class DefaultRoute implements IDefaultRoute {
     protected _routes: Router;

@@ -1,4 +1,5 @@
 import {Request, Response} from 'express';
+import {ACL} from '../../../ACL/ACL.js';
 import {RequestData, SchemaRequestData} from '../../../Schemas/Server/RequestData.js';
 import {StatusCodes} from '../../../Schemas/Server/Routes/StatusCodes.js';
 import {Session} from '../Session.js';
@@ -11,7 +12,31 @@ import {RouteError} from './RouteError.js';
 export type DefaultRouteCheckUserLogin<
     REQ extends Request = Request,
     RESP extends Response = Response
-> = (request: REQ, response: RESP) => Promise<boolean>;
+> = (
+    request: REQ,
+    response: RESP,
+    aclRight?: string
+) => Promise<boolean>;
+
+export const DefaultRouteCheckUserIsLoginACL = async (
+    req: unknown,
+    res: Response,
+    aclRight?: string
+): Promise<boolean> => {
+    if (!DefaultRouteCheckUserIsLogin(req, true)) {
+        return false;
+    }
+
+    if (aclRight && req.session.user && req.session.user.role) {
+        const role = req.session.user.role;
+
+        if (await ACL.getInstance().checkAccess(role, aclRight)) {
+            return true;
+        }
+    }
+
+    throw new RouteError(StatusCodes.FORBIDDEN, 'User has no access!');
+};
 
 /**
  * Default function for check is a user logged in
@@ -37,7 +62,6 @@ export const DefaultRouteCheckUserIsLogin = (
             if (req.session.user) {
                 RequestContext.getInstance().set(RequestContext.USERID, req.session.user.userid);
                 RequestContext.getInstance().set(RequestContext.ISLOGIN, req.session.user.isLogin);
-                RequestContext.getInstance().set(RequestContext.ISLOGIN, true);
             }
         }
     }

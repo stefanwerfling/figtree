@@ -6,10 +6,12 @@ import { DefaultRoute } from './DefaultRoute.js';
 export class ServiceRoute extends DefaultRoute {
     _backendInstanceName;
     _onlyUserAccess;
-    constructor(backendInstanceName, onlyUserAccess = true) {
+    _accessRights;
+    constructor(backendInstanceName, onlyUserAccess = true, accessRights) {
         super();
         this._backendInstanceName = backendInstanceName;
         this._onlyUserAccess = onlyUserAccess;
+        this._accessRights = accessRights;
     }
     getExpressRouter() {
         this._get(this._getUrl('v1', 'service', 'status'), this._onlyUserAccess, async (request, response, data) => {
@@ -29,7 +31,8 @@ export class ServiceRoute extends DefaultRoute {
         }, {
             description: 'Service status list',
             tags: ['service'],
-            responseBodySchema: SchemaServiceStatusResponse
+            responseBodySchema: SchemaServiceStatusResponse,
+            aclRight: this._accessRights?.status
         });
         this._post(this._getUrl('v1', 'service', 'start'), this._onlyUserAccess, async (request, response, data) => {
             const backend = BackendApp.getInstance(this._backendInstanceName);
@@ -55,7 +58,8 @@ export class ServiceRoute extends DefaultRoute {
             description: 'Service start by service name',
             tags: ['service'],
             bodySchema: SchemaServiceByNameRequest,
-            responseBodySchema: SchemaDefaultReturn
+            responseBodySchema: SchemaDefaultReturn,
+            aclRight: this._accessRights?.start
         });
         this._post(this._getUrl('v1', 'service', 'stop'), this._onlyUserAccess, async (request, response, data) => {
             const backend = BackendApp.getInstance(this._backendInstanceName);
@@ -81,7 +85,8 @@ export class ServiceRoute extends DefaultRoute {
             description: 'Service stop by service name',
             tags: ['service'],
             bodySchema: SchemaServiceByNameRequest,
-            responseBodySchema: SchemaDefaultReturn
+            responseBodySchema: SchemaDefaultReturn,
+            aclRight: this._accessRights?.stop
         });
         return super.getExpressRouter();
     }

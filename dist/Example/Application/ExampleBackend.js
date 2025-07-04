@@ -1,7 +1,9 @@
+import { ACL } from '../../ACL/ACL.js';
 import { BackendApp } from '../../Application/BackendApp.js';
 import { HttpService } from '../../Application/Services/HttpService.js';
 import { PluginService } from '../../Application/Services/PluginService.js';
 import { SchemaDefaultArgs } from '../../Schemas/Args/DefaultArgs.js';
+import { MyACLRbac } from '../ACL/MyACLRbac.js';
 import { ExampleConfig } from '../Config/ExampleConfig.js';
 import { ExampleRouteLoader } from '../Routes/ExampleRouteLoader.js';
 export class ExampleBackend extends BackendApp {
@@ -18,6 +20,7 @@ export class ExampleBackend extends BackendApp {
         return SchemaDefaultArgs;
     }
     async _initServices() {
+        ACL.getInstance().addController(new MyACLRbac());
         this._serviceManager.add(new PluginService(ExampleBackend.NAME));
         this._serviceManager.add(new HttpService(ExampleRouteLoader));
     }

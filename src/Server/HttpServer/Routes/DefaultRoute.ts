@@ -1,4 +1,5 @@
 import {Request, RequestHandler, Response, Router} from 'express';
+import {ACLRight} from '../../../ACL/ACLRight.js';
 import {Logger} from '../../../Logger/Logger.js';
 import {StatusCodes} from '../../../Schemas/Server/Routes/StatusCodes.js';
 import {DefaultReturn} from './../../../Schemas/Server/Routes/DefaultReturn.js';
@@ -42,6 +43,7 @@ export type DefaultRouteMethodeDescription<A, B, C, D, E, F, G, S> = {
     sessionSchema?: Schema<S>;
     parser?: RequestHandler,
     useLocalStorage?: boolean;
+    aclRight?: ACLRight;
 };
 
 
@@ -181,7 +183,7 @@ export class DefaultRoute implements IDefaultRoute {
                 }
 
                 if (typeof checkUserLogin === 'function') {
-                    if (!await checkUserLogin(req, res)) {
+                    if (!await checkUserLogin(req, res, description.aclRight)) {
                         return;
                     }
                 } else if (checkUserLogin) {

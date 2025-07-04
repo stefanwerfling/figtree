@@ -1,8 +1,21 @@
+import { ACL } from '../../../ACL/ACL.js';
 import { SchemaRequestData } from '../../../Schemas/Server/RequestData.js';
 import { StatusCodes } from '../../../Schemas/Server/Routes/StatusCodes.js';
 import { Session } from '../Session.js';
 import { RequestContext } from './RequestContext.js';
 import { RouteError } from './RouteError.js';
+export const DefaultRouteCheckUserIsLoginACL = async (req, res, aclRight) => {
+    if (!DefaultRouteCheckUserIsLogin(req, true)) {
+        return false;
+    }
+    if (aclRight && req.session.user && req.session.user.role) {
+        const role = req.session.user.role;
+        if (await ACL.getInstance().checkAccess(role, aclRight)) {
+            return true;
+        }
+    }
+    throw new RouteError(StatusCodes.FORBIDDEN, 'User has no access!');
+};
 export const DefaultRouteCheckUserIsLogin = (req, sendAutoResoonse = true) => {
     if (SchemaRequestData.validate(req, [])) {
         if (Session.isUserLogin(req.session)) {
@@ -15,7 +28,6 @@ export const DefaultRouteCheckUserIsLogin = (req, sendAutoResoonse = true) => {
             if (req.session.user) {
                 RequestContext.getInstance().set(RequestContext.USERID, req.session.user.userid);
                 RequestContext.getInstance().set(RequestContext.ISLOGIN, req.session.user.isLogin);
-                RequestContext.getInstance().set(RequestContext.ISLOGIN, true);
             }
         }
     }

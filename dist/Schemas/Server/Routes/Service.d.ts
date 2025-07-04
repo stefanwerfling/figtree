@@ -1,6 +1,6 @@
 import { ExtractSchemaResultType } from 'vts';
 export declare const SchemaServiceStatusResponse: import("vts").ObjectSchema<{
-    statusCode: import("vts").OrSchema<import("vts").StringSchema<import("vts").StringSchemaOptions> | import("vts").EnumSchema<import("./StatusCodes.js").StatusCodes>>;
+    statusCode: import("vts").OrSchema<import("vts").EnumSchema<import("./StatusCodes.js").StatusCodes> | import("vts").StringSchema<import("vts").StringSchemaOptions>>;
     msg: import("vts").OptionalSchema<import("vts").StringSchema<import("vts").StringSchemaOptions>>;
 } & {
     services: import("vts").ArraySchema<import("vts").ObjectSchema<{

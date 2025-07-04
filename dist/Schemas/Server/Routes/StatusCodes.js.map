@@ -1,1 +1,1 @@
-{"version":3,"file":"StatusCodes.js","sourceRoot":"","sources":["../../../../src/Schemas/Server/Routes/StatusCodes.ts"],"names":[],"mappings":"AAGA,MAAM,CAAN,IAAY,WAIX;AAJD,WAAY,WAAW;IACnB,yBAAU,CAAA;IACV,mCAAoB,CAAA;IACpB,qCAAsB,CAAA;AAC1B,CAAC,EAJW,WAAW,KAAX,WAAW,QAItB"}
+{"version":3,"file":"StatusCodes.js","sourceRoot":"","sources":["../../../../src/Schemas/Server/Routes/StatusCodes.ts"],"names":[],"mappings":"AAGA,MAAM,CAAN,IAAY,WAKX;AALD,WAAY,WAAW;IACnB,yBAAU,CAAA;IACV,mCAAoB,CAAA;IACpB,gCAAiB,CAAA;IACjB,qCAAsB,CAAA;AAC1B,CAAC,EALW,WAAW,KAAX,WAAW,QAKtB"}
