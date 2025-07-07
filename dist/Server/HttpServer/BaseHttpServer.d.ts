@@ -54,4 +54,5 @@ export declare class BaseHttpServer {
     listen(): Promise<void>;
     close(): void;
     getServer(): http.Server | null;
+    getSessionParser(): express.RequestHandler | null;
 }

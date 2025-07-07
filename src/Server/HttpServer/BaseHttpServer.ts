@@ -396,4 +396,11 @@ export class BaseHttpServer {
         return this._server;
     }
 
+    /**
+     * Return the session parser
+     */
+    public getSessionParser(): express.RequestHandler|null {
+        return this._sessionParser;
+    }
+
 }

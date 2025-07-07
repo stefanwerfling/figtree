@@ -1,5 +1,6 @@
 import { Ets } from 'ets';
 import { stat, rename, unlink, readFile, chmod, writeFile, realpath } from 'fs/promises';
+import { createReadStream } from 'fs';
 import { Logger } from '../Logger/Logger.js';
 export class FileHelper {
     static logDebugging = false;
@@ -115,6 +116,12 @@ export class FileHelper {
     static async readJsonFile(jsonFile) {
         const raw = await FileHelper.fileRead(jsonFile);
         return JSON.parse(raw);
+    }
+    static async readBufferFile(file, options) {
+        return readFile(file, options);
+    }
+    static streamFile(filePath) {
+        return createReadStream(filePath);
     }
 }
 //# sourceMappingURL=FileHelper.js.map

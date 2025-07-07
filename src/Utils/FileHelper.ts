@@ -1,5 +1,6 @@
 import {Ets} from 'ets';
 import {stat, rename, unlink, readFile, chmod, writeFile, realpath} from 'fs/promises';
+import {createReadStream, ReadStream} from 'fs';
 import {Logger} from '../Logger/Logger.js';
 
 export class FileHelper {
@@ -190,6 +191,31 @@ export class FileHelper {
         const raw = await FileHelper.fileRead(jsonFile);
 
         return JSON.parse(raw);
+    }
+
+    /**
+     * Read a file to a buffer
+     * @param {string} file
+     * @param {options} options
+     * @return {NonSharedBuffer}
+     */
+    public static async readBufferFile(
+        file: string,
+        options?: {
+            encoding?: null | undefined;
+            flag?: string | undefined;
+        } | null
+    ): Promise<NonSharedBuffer> {
+        return readFile(file, options);
+    }
+
+    /**
+     * Create a stream to a file
+     * @param {string} filePath
+     * @return {ReadStream}
+     */
+    public static streamFile(filePath: string): ReadStream {
+        return createReadStream(filePath);
     }
 
 }

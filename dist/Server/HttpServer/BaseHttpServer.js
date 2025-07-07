@@ -180,5 +180,8 @@ export class BaseHttpServer {
     getServer() {
         return this._server;
     }
+    getSessionParser() {
+        return this._sessionParser;
+    }
 }
 //# sourceMappingURL=BaseHttpServer.js.map

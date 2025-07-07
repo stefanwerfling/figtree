@@ -1,3 +1,4 @@
+import { ReadStream } from 'fs';
 export declare class FileHelper {
     static logDebugging: boolean;
     static isOlderHours(filename: string, durationHours: number): Promise<boolean>;
@@ -10,4 +11,9 @@ export declare class FileHelper {
     static create(file: string, content: string): Promise<void>;
     static realPath(apath: string): Promise<string>;
     static readJsonFile(jsonFile: string): Promise<any>;
+    static readBufferFile(file: string, options?: {
+        encoding?: null | undefined;
+        flag?: string | undefined;
+    } | null): Promise<NonSharedBuffer>;
+    static streamFile(filePath: string): ReadStream;
 }

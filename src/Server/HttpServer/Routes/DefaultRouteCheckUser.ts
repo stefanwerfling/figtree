@@ -18,6 +18,13 @@ export type DefaultRouteCheckUserLogin<
     aclRight?: string
 ) => Promise<boolean>;
 
+/**
+ * Default function for check is a user logged in and acl
+ * @param {unknown} req
+ * @param {Response} res
+ * @param {[aclRight]} aclRight
+ * @constructor
+ */
 export const DefaultRouteCheckUserIsLoginACL = async (
     req: unknown,
     res: Response,
@@ -40,8 +47,8 @@ export const DefaultRouteCheckUserIsLoginACL = async (
 
 /**
  * Default function for check is a user logged in
- * @param  req
- * @param sendAutoResoonse
+ * @param {unknown} req
+ * @param {boolean} sendAutoResoonse
  * @constructor
  * @throws RouteError
  */

@@ -1,1 +1,0 @@
-{"version":3,"file":"APlugin.js","sourceRoot":"","sources":["../../src/Plugins/APlugin.ts"],"names":[],"mappings":"AAMA,MAAM,OAAgB,OAAO;IAMf,KAAK,CAAmB;IAMjB,cAAc,CAAgB;IAO/C,YAAmB,IAAsB,EAAE,EAAiB;QACxD,IAAI,CAAC,KAAK,GAAG,IAAI,CAAC;QAClB,IAAI,CAAC,cAAc,GAAG,EAAE,CAAC;IAC7B,CAAC;IAOS,gBAAgB;QACtB,OAAO,IAAI,CAAC,cAAc,CAAC;IAC/B,CAAC;CAoBJ"}

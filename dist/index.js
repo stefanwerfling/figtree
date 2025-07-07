@@ -54,6 +54,7 @@ export { HttpRouteLoader } from './Server/HttpServer/HttpRouteLoader.js';
 export { BaseHttpServer } from './Server/HttpServer/BaseHttpServer.js';
 export { USHttpServer } from './Server/HttpServer/USHttpServer.js';
 export { HttpUpload } from './Server/HttpServer/HttpUpload.js';
+export { HttpFileStream } from './Server/HttpServer/HttpFileStream.js';
 export { SwaggerUIRoute } from './Server/HttpServer/Routes/SwaggerUIRoute.js';
 export { ServiceRoute } from './Server/HttpServer/Routes/ServiceRoute.js';
 export { ProcessAwait } from './Process/ProcessAwait.js';
