@@ -1,9 +1,7 @@
 {
   "compilerOptions": {
-    "rootDir": "src",
     "allowSyntheticDefaultImports": true,
     "baseUrl": "./",
-    "composite": true,
     "declaration": true,
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
@@ -12,6 +10,7 @@
     "module": "NodeNext",
     "outDir": "dist",
     "removeComments": true,
+    "rootDir": "src",
     "sourceMap": true,
     "strict": true,
     "target": "ES2022"
