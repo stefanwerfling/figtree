@@ -88,7 +88,7 @@
   },
   "scripts": {
     "build": "npm run clean && npm run compile",
-    "clean": "rm -rf dist && rm tsconfig.tsbuildinfo",
+    "clean": "rm -rf dist",
     "compile": "tsc --project tsconfig.json"
   },
   "bin": {

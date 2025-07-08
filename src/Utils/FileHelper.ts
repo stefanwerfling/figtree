@@ -1,6 +1,7 @@
 import {Ets} from 'ets';
 import {stat, rename, unlink, readFile, chmod, writeFile, realpath} from 'fs/promises';
 import {createReadStream, ReadStream} from 'fs';
+import {Stream} from 'node:stream';
 import {Logger} from '../Logger/Logger.js';
 
 export class FileHelper {
@@ -168,9 +169,17 @@ export class FileHelper {
     /**
      * Create a file with content
      * @param {string} file
-     * @param {string} content
+     * @param {string|NodeJS.ArrayBufferView|Stream} content
      */
-    public static async create(file: string, content: string): Promise<void> {
+    public static async create(
+        file: string,
+        content:
+            | string
+            | NodeJS.ArrayBufferView
+            | Iterable<string | NodeJS.ArrayBufferView>
+            | AsyncIterable<string | NodeJS.ArrayBufferView>
+            | Stream
+    ): Promise<void> {
         return writeFile(file, content);
     }
 
