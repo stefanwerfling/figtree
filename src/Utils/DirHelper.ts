@@ -19,7 +19,7 @@ export class DirHelper {
         const files = await Promise.all(entries.map(async(entry) => {
             const fullPath = path.join(dir, entry.name);
 
-            if (entry.isDirectory()) {
+            if (entry.isDirectory() && recursive) {
                 return this.getFiles(fullPath, recursive, base);
             } else {
                 return [path.relative(base, fullPath)];
