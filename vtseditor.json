@@ -1,0 +1,18 @@
+{
+  "project": {
+    "schemaPath": "./schemas.json",
+    "code": {
+      "schemaPrefix": "Schema",
+      "createTypes": true,
+      "createIndex": false,
+      "codeComment": true,
+      "codeIndent": "    "
+    },
+    "autoGenerate": true,
+    "destinationPath": "./src/Schemas",
+    "destinationClear": true
+  },
+  "server": {
+    "port": 5173
+  }
+}

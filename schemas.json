@@ -1,0 +1,1601 @@
+{
+  "fs": {
+    "unid": "Root",
+    "name": "Root",
+    "type": "root",
+    "icon": "root",
+    "istoggle": true,
+    "entrys": [
+      {
+        "unid": "48191543-1ef0-4b5d-844f-d4b13de78937",
+        "name": "Args",
+        "type": "folder",
+        "icon": "folder",
+        "istoggle": true,
+        "entrys": [
+          {
+            "unid": "748b6f2e-38de-4e79-888b-26f98da55a94",
+            "name": "ArgsBase",
+            "type": "file",
+            "icon": "file",
+            "istoggle": false,
+            "entrys": [],
+            "schemas": [
+              {
+                "unid": "82daaec5-3430-41a2-96fe-0cd4b121f521",
+                "name": "ArgsBase",
+                "extend": "object",
+                "values_schema": "",
+                "options": {},
+                "pos": {
+                  "x": 116,
+                  "y": 121
+                },
+                "fields": [
+                  {
+                    "unid": "574f66a9-a0cb-42e0-804f-6bdaf6e820ce",
+                    "name": "config",
+                    "type": {
+                      "type": "string",
+                      "optional": true,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": "Config file with path"
+                  }
+                ],
+                "description": ""
+              }
+            ],
+            "enums": [],
+            "links": []
+          },
+          {
+            "unid": "6183d4a4-5c88-443f-a74a-f229249eefcb",
+            "name": "DefaultArgs",
+            "type": "file",
+            "icon": "file",
+            "istoggle": false,
+            "entrys": [],
+            "schemas": [
+              {
+                "unid": "9d01bab2-e1fe-4c56-9058-6de2279ec5c9",
+                "name": "DefaultArgs",
+                "extend": "82daaec5-3430-41a2-96fe-0cd4b121f521",
+                "values_schema": "",
+                "options": {},
+                "pos": {
+                  "x": 84,
+                  "y": 171
+                },
+                "fields": [
+                  {
+                    "unid": "b89125f1-d1c2-466c-be67-599290ad0a35",
+                    "name": "envargs",
+                    "type": {
+                      "type": "string",
+                      "optional": true,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  }
+                ],
+                "description": ""
+              }
+            ],
+            "enums": [],
+            "links": []
+          }
+        ],
+        "schemas": [],
+        "enums": [],
+        "links": []
+      },
+      {
+        "unid": "03749970-15f4-4187-a298-952eef121e36",
+        "name": "Config",
+        "type": "folder",
+        "icon": "folder",
+        "istoggle": true,
+        "entrys": [
+          {
+            "unid": "066c3327-efd7-4bd4-b17e-ef914c814e21",
+            "name": "ConfigBackendOptions",
+            "type": "file",
+            "icon": "file",
+            "istoggle": false,
+            "entrys": [],
+            "schemas": [
+              {
+                "unid": "cf3c56f2-a0a5-42bb-812d-cec317d21f18",
+                "name": "ConfigBackendOptions",
+                "extend": "3ec71c52-2bda-42d6-be26-a499170b09fd",
+                "values_schema": "",
+                "options": {},
+                "pos": {
+                  "x": 152,
+                  "y": 50
+                },
+                "fields": [
+                  {
+                    "unid": "848251bf-59b4-4fec-a572-4465f83f25b4",
+                    "name": "db",
+                    "type": {
+                      "type": "5c2e4fd7-62ed-46be-afe6-2a9cb05fe3a2",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "8bd29363-2a26-4e12-8e74-e6014c701a9f",
+                    "name": "httpserver",
+                    "type": {
+                      "type": "dbcb39be-f755-4dbf-b147-e58a58b7903f",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  }
+                ],
+                "description": ""
+              }
+            ],
+            "enums": [],
+            "links": [
+              {
+                "unid": "7ce6d4fe-a6a2-4160-8f62-a8fbd0bdb22f",
+                "pos": {
+                  "x": 1141,
+                  "y": 36
+                },
+                "link_unid": "5c2e4fd7-62ed-46be-afe6-2a9cb05fe3a2"
+              },
+              {
+                "unid": "80ce1bc7-ed62-4e71-9c96-320b6083bbf3",
+                "pos": {
+                  "x": 615,
+                  "y": 242
+                },
+                "link_unid": "dbcb39be-f755-4dbf-b147-e58a58b7903f"
+              },
+              {
+                "unid": "04c5cdd8-8e41-4abd-af86-0a927eef12eb",
+                "pos": {
+                  "x": 1696,
+                  "y": 30
+                },
+                "link_unid": "dddef514-d321-4c32-bb30-f2f9ed621209"
+              },
+              {
+                "unid": "bfbbfaf9-20d2-48f6-bd30-fa5fe8daf3cf",
+                "pos": {
+                  "x": 1698,
+                  "y": 218
+                },
+                "link_unid": "70dbcde3-16d3-4f01-adf8-e06dcacec5d7"
+              },
+              {
+                "unid": "803225cc-a19d-45c7-9049-1ce004a4c252",
+                "pos": {
+                  "x": 1636,
+                  "y": 438
+                },
+                "link_unid": "07ae5b78-62e1-4fc8-a4eb-3e38f4283bab"
+              },
+              {
+                "unid": "949ea4fe-cb6f-4f8a-a732-b9432a5840ce",
+                "pos": {
+                  "x": 1560,
+                  "y": 540
+                },
+                "link_unid": "966903d2-0998-4ca9-9385-bff957831f03"
+              },
+              {
+                "unid": "4bf26f45-2873-439a-887b-735e007f3d74",
+                "pos": {
+                  "x": 1059,
+                  "y": 242
+                },
+                "link_unid": "163a943e-134c-44b9-b89d-770a520b9a6c"
+              },
+              {
+                "unid": "8c7a7f94-92aa-4355-9e94-bbb401798244",
+                "pos": {
+                  "x": 1073,
+                  "y": 371
+                },
+                "link_unid": "39cb4ec0-20a3-4f54-bedc-57097dc95cea"
+              },
+              {
+                "unid": "a60101a9-baed-4cc0-951c-b86feefe87a3",
+                "pos": {
+                  "x": 1073,
+                  "y": 468
+                },
+                "link_unid": "460bc080-4cb8-4b4e-a185-67ef02eb6764"
+              }
+            ]
+          },
+          {
+            "unid": "608fad9b-b889-4c00-aa75-bd62d51f3acb",
+            "name": "ConfigDb",
+            "type": "file",
+            "icon": "file",
+            "istoggle": false,
+            "entrys": [],
+            "schemas": [
+              {
+                "unid": "dddef514-d321-4c32-bb30-f2f9ed621209",
+                "name": "ConfigDbOptionsMySql",
+                "extend": "object",
+                "values_schema": "",
+                "options": {},
+                "pos": {
+                  "x": 547,
+                  "y": 159
+                },
+                "fields": [
+                  {
+                    "unid": "5cc555db-04e6-46ed-bcd0-5585465f33e3",
+                    "name": "host",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "022d8f76-7f63-42fe-8e40-4618ea2fb4c6",
+                    "name": "port",
+                    "type": {
+                      "type": "number",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "80312f69-68d8-4c68-96fb-5c3d9fa6979e",
+                    "name": "username",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "98dcc2b5-f0c6-46d4-b4a4-1ad4a37b6984",
+                    "name": "password",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "122906c8-9000-4cfa-ba0c-6aecb5e80659",
+                    "name": "database",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  }
+                ],
+                "description": ""
+              },
+              {
+                "unid": "5c2e4fd7-62ed-46be-afe6-2a9cb05fe3a2",
+                "name": "ConfigDbOptions",
+                "extend": "object",
+                "values_schema": "",
+                "options": {},
+                "pos": {
+                  "x": 119.80368794354303,
+                  "y": 302.0057737464415
+                },
+                "fields": [
+                  {
+                    "unid": "1a520834-08da-4e28-8495-3e6f7df4fbf9",
+                    "name": "mysql",
+                    "type": {
+                      "type": "dddef514-d321-4c32-bb30-f2f9ed621209",
+                      "optional": true,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": "Settings for MySQL/MariaDB"
+                  },
+                  {
+                    "unid": "7ca27e85-ff74-4b20-a37e-44d3efc92017",
+                    "name": "influx",
+                    "type": {
+                      "type": "70dbcde3-16d3-4f01-adf8-e06dcacec5d7",
+                      "optional": true,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": "Settings for InfluxDB"
+                  },
+                  {
+                    "unid": "757510c1-62a6-4e82-9a88-97c29808cbec",
+                    "name": "redis",
+                    "type": {
+                      "type": "07ae5b78-62e1-4fc8-a4eb-3e38f4283bab",
+                      "optional": true,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": "Settings for Redis"
+                  },
+                  {
+                    "unid": "489e9070-af88-4cd4-96f5-73079beea788",
+                    "name": "chroma",
+                    "type": {
+                      "type": "966903d2-0998-4ca9-9385-bff957831f03",
+                      "optional": true,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": "Settings for Chroma"
+                  }
+                ],
+                "description": ""
+              },
+              {
+                "unid": "70dbcde3-16d3-4f01-adf8-e06dcacec5d7",
+                "name": "ConfigDbOptionsInflux",
+                "extend": "object",
+                "values_schema": "",
+                "options": {},
+                "pos": {
+                  "x": 574,
+                  "y": 346
+                },
+                "fields": [
+                  {
+                    "unid": "2e0f3af0-54b4-4bb8-aa9e-b0d9a0601a16",
+                    "name": "url",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "e54a6702-2f70-4a75-8683-3ca6734bc595",
+                    "name": "token",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "1ad74f03-4df4-4745-89b7-9b589f89a012",
+                    "name": "org",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "01004667-72f6-4db2-9f8a-0d28b327370d",
+                    "name": "bucket",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "4ad8cde8-abb6-4cd9-b6f9-adfa64a1d7f6",
+                    "name": "username",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "5d8a12fb-7fcb-45a2-819c-3a804592e510",
+                    "name": "password",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  }
+                ],
+                "description": ""
+              },
+              {
+                "unid": "07ae5b78-62e1-4fc8-a4eb-3e38f4283bab",
+                "name": "ConfigDbOptionsRedis",
+                "extend": "object",
+                "values_schema": "",
+                "options": {},
+                "pos": {
+                  "x": 596,
+                  "y": 599
+                },
+                "fields": [
+                  {
+                    "unid": "f041bd5c-9428-47b3-bc54-2530f2fa622f",
+                    "name": "url",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "d32a27c3-44a8-4c40-bc89-a34ac2d6456e",
+                    "name": "password",
+                    "type": {
+                      "type": "string",
+                      "optional": true,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  }
+                ],
+                "description": ""
+              },
+              {
+                "unid": "966903d2-0998-4ca9-9385-bff957831f03",
+                "name": "ConfigDbOptionsChroma",
+                "extend": "object",
+                "values_schema": "",
+                "options": {},
+                "pos": {
+                  "x": 554,
+                  "y": 713
+                },
+                "fields": [
+                  {
+                    "unid": "97850680-bed7-4b10-be69-14ea92f2f0b3",
+                    "name": "url",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  }
+                ],
+                "description": ""
+              }
+            ],
+            "enums": [
+              {
+                "unid": "1b140608-3c38-46ea-89e5-7d651c253983",
+                "name": "ENV_DB",
+                "pos": {
+                  "x": 1078,
+                  "y": 136
+                },
+                "values": [
+                  {
+                    "unid": "153dde0d-b5e0-440d-96cf-efc4d800c0be",
+                    "name": "DB_MYSQL_HOST",
+                    "value": "DB_MYSQL_HOST"
+                  },
+                  {
+                    "unid": "a81f6736-6b5d-4b9e-a9f6-14b1849a6354",
+                    "name": "DB_MYSQL_PORT",
+                    "value": "DB_MYSQL_PORT"
+                  },
+                  {
+                    "unid": "624ca40f-7d39-45f3-9707-1280db237406",
+                    "name": "DB_MYSQL_USERNAME",
+                    "value": "DB_MYSQL_USERNAME"
+                  },
+                  {
+                    "unid": "3c59ed28-563b-4129-84e0-db291f3c5198",
+                    "name": "DB_MYSQL_PASSWORD",
+                    "value": "DB_MYSQL_PASSWORD"
+                  },
+                  {
+                    "unid": "e581d3f9-9286-4a82-b2ac-728a3dc7faa6",
+                    "name": "DB_MYSQL_DATABASE",
+                    "value": "DB_MYSQL_DATABASE"
+                  },
+                  {
+                    "unid": "8ddd2ce9-1506-4c03-a3ba-2c6c98a8e071",
+                    "name": "DB_INFLUX_URL",
+                    "value": "DB_INFLUX_URL"
+                  },
+                  {
+                    "unid": "716c40fa-c834-4079-9ec2-557b1fe02124",
+                    "name": "DB_INFLUX_TOKEN",
+                    "value": "DB_INFLUX_TOKEN"
+                  },
+                  {
+                    "unid": "e2391172-444b-431a-8a1a-66e7792a8589",
+                    "name": "DB_INFLUX_ORG",
+                    "value": "DB_INFLUX_ORG"
+                  },
+                  {
+                    "unid": "fe79b318-5e2c-4a9a-a62c-915156bdefd6",
+                    "name": "DB_INFLUX_BUCKET",
+                    "value": "DB_INFLUX_BUCKET"
+                  },
+                  {
+                    "unid": "2c618186-55f9-4305-a8d8-a8a74c69ee4d",
+                    "name": "DB_REDIS_URL",
+                    "value": "DB_REDIS_URL"
+                  },
+                  {
+                    "unid": "927ef3a4-96a5-46ab-ac15-c493cf773f38",
+                    "name": "DB_REDIS_PASSWORD",
+                    "value": "DB_REDIS_PASSWORD"
+                  },
+                  {
+                    "unid": "b5902618-def6-4121-ac5b-efad2a9ca176",
+                    "name": "DB_CHROMA_URL",
+                    "value": "DB_CHROMA_URL"
+                  }
+                ],
+                "description": ""
+              }
+            ],
+            "links": []
+          },
+          {
+            "unid": "cdc5e81f-b037-42d7-bfd0-7c006c66fa4d",
+            "name": "ConfigHttpServer",
+            "type": "file",
+            "icon": "file",
+            "istoggle": false,
+            "entrys": [],
+            "schemas": [
+              {
+                "unid": "163a943e-134c-44b9-b89d-770a520b9a6c",
+                "name": "ConfigHttpServerSession",
+                "extend": "object",
+                "values_schema": "",
+                "options": {
+                  "ignore_additional_items": false
+                },
+                "pos": {
+                  "x": 689,
+                  "y": 60
+                },
+                "fields": [
+                  {
+                    "unid": "e2becf7a-7b92-4b79-8c79-a9327c58f0de",
+                    "name": "secret",
+                    "type": {
+                      "type": "string",
+                      "optional": true,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "1a36ad08-b05a-4aea-95e2-d52a3f859ca1",
+                    "name": "cookie_path",
+                    "type": {
+                      "type": "string",
+                      "optional": true,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "7f84785e-7473-4629-8d0b-686367671ef1",
+                    "name": "cookie_max_age",
+                    "type": {
+                      "type": "number",
+                      "optional": true,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  }
+                ],
+                "description": ""
+              },
+              {
+                "unid": "39cb4ec0-20a3-4f54-bedc-57097dc95cea",
+                "name": "ConfigHttpServerProxy",
+                "extend": "object",
+                "values_schema": "",
+                "options": {
+                  "ignore_additional_items": false
+                },
+                "pos": {
+                  "x": 711,
+                  "y": 254
+                },
+                "fields": [
+                  {
+                    "unid": "9167f2d1-8af1-4bd9-8cda-e195fe4e4ad5",
+                    "name": "trust",
+                    "type": {
+                      "type": "or",
+                      "optional": false,
+                      "array": false,
+                      "types": [
+                        {
+                          "type": "string",
+                          "optional": false,
+                          "array": false,
+                          "types": []
+                        },
+                        {
+                          "type": "boolean",
+                          "optional": false,
+                          "array": false,
+                          "types": []
+                        },
+                        {
+                          "type": "string",
+                          "optional": false,
+                          "array": true,
+                          "types": []
+                        }
+                      ]
+                    },
+                    "description": ""
+                  }
+                ],
+                "description": ""
+              },
+              {
+                "unid": "460bc080-4cb8-4b4e-a185-67ef02eb6764",
+                "name": "ConfigHttpServerCsrf",
+                "extend": "object",
+                "values_schema": "",
+                "options": {
+                  "ignore_additional_items": false
+                },
+                "pos": {
+                  "x": 662,
+                  "y": 385
+                },
+                "fields": [
+                  {
+                    "unid": "b172b7ff-9b44-4cf4-9c4a-84af1da29102",
+                    "name": "cookie",
+                    "type": {
+                      "type": "boolean",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  }
+                ],
+                "description": ""
+              },
+              {
+                "unid": "dbcb39be-f755-4dbf-b147-e58a58b7903f",
+                "name": "ConfigHttpServer",
+                "extend": "object",
+                "values_schema": "",
+                "options": {
+                  "ignore_additional_items": false
+                },
+                "pos": {
+                  "x": 153,
+                  "y": 90
+                },
+                "fields": [
+                  {
+                    "unid": "4032f248-02ba-4ca3-82f8-49dff17fa28a",
+                    "name": "port",
+                    "type": {
+                      "type": "number",
+                      "optional": true,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "3c058371-bd19-42eb-9cc9-cb729ca1fad4",
+                    "name": "publicdir",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "f569672d-eaa6-41e9-b180-46187d240224",
+                    "name": "session",
+                    "type": {
+                      "type": "163a943e-134c-44b9-b89d-770a520b9a6c",
+                      "optional": true,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "701fda00-17ce-4848-b287-a224fb575538",
+                    "name": "sslpath",
+                    "type": {
+                      "type": "string",
+                      "optional": true,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "b10417bb-e6a0-4fb8-880f-de74cd120cad",
+                    "name": "proxy",
+                    "type": {
+                      "type": "39cb4ec0-20a3-4f54-bedc-57097dc95cea",
+                      "optional": true,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "2526564a-62ee-4b83-9d64-7675289baffa",
+                    "name": "csrf",
+                    "type": {
+                      "type": "460bc080-4cb8-4b4e-a185-67ef02eb6764",
+                      "optional": true,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  }
+                ],
+                "description": ""
+              }
+            ],
+            "enums": [],
+            "links": []
+          },
+          {
+            "unid": "beda943b-01c7-450c-9b0d-c7b17172f30e",
+            "name": "ConfigOptions",
+            "type": "file",
+            "icon": "file",
+            "istoggle": false,
+            "entrys": [],
+            "schemas": [
+              {
+                "unid": "3ec71c52-2bda-42d6-be26-a499170b09fd",
+                "name": "ConfigOptions",
+                "extend": "object",
+                "values_schema": "",
+                "options": {},
+                "pos": {
+                  "x": 267,
+                  "y": 309
+                },
+                "fields": [
+                  {
+                    "unid": "810454fb-cd6e-410b-af20-9f0dc67de4e9",
+                    "name": "logging",
+                    "type": {
+                      "type": "d73610e1-3a1f-4250-a324-9cb6b9a13645",
+                      "optional": true,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  }
+                ],
+                "description": ""
+              }
+            ],
+            "enums": [],
+            "links": [
+              {
+                "unid": "d9442df6-f096-4915-999e-7b3cd8ac987e",
+                "pos": {
+                  "x": 714,
+                  "y": 233
+                },
+                "link_unid": "d73610e1-3a1f-4250-a324-9cb6b9a13645"
+              }
+            ]
+          }
+        ],
+        "schemas": [],
+        "enums": [],
+        "links": []
+      },
+      {
+        "unid": "4a8a97f7-47cd-45e4-a608-fef620877c1f",
+        "name": "Logger",
+        "type": "folder",
+        "icon": "folder",
+        "istoggle": true,
+        "entrys": [
+          {
+            "unid": "31b2da57-04dc-488e-a8ff-6aa4d241f7c0",
+            "name": "LoggerConfig",
+            "type": "file",
+            "icon": "file",
+            "istoggle": false,
+            "entrys": [],
+            "schemas": [
+              {
+                "unid": "d73610e1-3a1f-4250-a324-9cb6b9a13645",
+                "name": "LoggerConfig",
+                "extend": "object",
+                "values_schema": "",
+                "options": {},
+                "pos": {
+                  "x": 177,
+                  "y": 235
+                },
+                "fields": [
+                  {
+                    "unid": "d6f07efa-e518-4654-a380-b5d5c92f317c",
+                    "name": "dirname",
+                    "type": {
+                      "type": "string",
+                      "optional": true,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "5deb34e2-d15b-4dd9-8739-b926bade173b",
+                    "name": "filename",
+                    "type": {
+                      "type": "string",
+                      "optional": true,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "3f46e6f1-2b2a-48ee-a408-056f199ebf41",
+                    "name": "zippedArchive",
+                    "type": {
+                      "type": "boolean",
+                      "optional": true,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "7429f8e8-0e8c-4939-8703-4710d2abbcb6",
+                    "name": "maxSize",
+                    "type": {
+                      "type": "string",
+                      "optional": true,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "ac2de005-03c3-4043-bdd6-e5f6506a7e4b",
+                    "name": "maxFiles",
+                    "type": {
+                      "type": "string",
+                      "optional": true,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "e66f6aab-d263-4041-8aad-ba5f378d5675",
+                    "name": "enableConsole",
+                    "type": {
+                      "type": "boolean",
+                      "optional": true,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "a2543793-38af-4b31-857f-b94412e079d8",
+                    "name": "level",
+                    "type": {
+                      "type": "string",
+                      "optional": true,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  }
+                ],
+                "description": ""
+              }
+            ],
+            "enums": [],
+            "links": []
+          }
+        ],
+        "schemas": [],
+        "enums": [],
+        "links": []
+      },
+      {
+        "unid": "aaa01c70-7f35-4900-8339-469e28937283",
+        "name": "Plugin",
+        "type": "folder",
+        "icon": "folder",
+        "istoggle": true,
+        "entrys": [
+          {
+            "unid": "eeac10b7-82e0-45a9-92a6-d1c4f327af27",
+            "name": "PluginDefinition",
+            "type": "file",
+            "icon": "file",
+            "istoggle": false,
+            "entrys": [],
+            "schemas": [
+              {
+                "unid": "52756b7d-1b99-41ca-b590-a0239c996309",
+                "name": "PluginDefinition",
+                "extend": "object",
+                "values_schema": "",
+                "options": {
+                  "ignore_additional_items": false
+                },
+                "pos": {
+                  "x": 199,
+                  "y": 178
+                },
+                "fields": [
+                  {
+                    "unid": "0e826a78-e317-49c4-b8ca-c327bb1541ee",
+                    "name": "name",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": "Plugin name"
+                  },
+                  {
+                    "unid": "873b0ddc-84a5-419f-93ee-0e2d4d9c71fd",
+                    "name": "description",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": "Plugin description"
+                  },
+                  {
+                    "unid": "696445df-24a6-4ed5-9f9c-708552d86c17",
+                    "name": "version",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": "Plugin version"
+                  },
+                  {
+                    "unid": "b672a3c4-51b1-4e9d-80f5-bdeb8ace5a64",
+                    "name": "author",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": "Author from plugin"
+                  },
+                  {
+                    "unid": "62ff5708-c767-42d2-ae3c-cddf36779dfa",
+                    "name": "url",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": "Page url from plugin"
+                  },
+                  {
+                    "unid": "3ebfb5aa-571f-4b45-a426-7b3a8556f567",
+                    "name": "main",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": "Main Class"
+                  },
+                  {
+                    "unid": "2f41d718-7b57-4f91-97e1-1e709b891767",
+                    "name": "main_directory",
+                    "type": {
+                      "type": "string",
+                      "optional": true,
+                      "array": true,
+                      "types": []
+                    },
+                    "description": "You can set your plugin main directory, is optional"
+                  },
+                  {
+                    "unid": "9c3b26fd-7b6b-4f5a-a715-54194ffb6ccc",
+                    "name": "distHash",
+                    "type": {
+                      "type": "string",
+                      "optional": true,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": "dist merkle hash for code protection by plugins"
+                  }
+                ],
+                "description": "Plugin definition for package.json"
+              }
+            ],
+            "enums": [],
+            "links": []
+          }
+        ],
+        "schemas": [],
+        "enums": [],
+        "links": []
+      },
+      {
+        "unid": "e900e4bf-c1db-45bd-b194-ee0e259cf5d1",
+        "name": "Provider",
+        "type": "folder",
+        "icon": "folder",
+        "istoggle": true,
+        "entrys": [
+          {
+            "unid": "16cd25f7-d24c-497f-be2e-db6def2989c8",
+            "name": "ProviderEntry",
+            "type": "file",
+            "icon": "file",
+            "istoggle": false,
+            "entrys": [],
+            "schemas": [
+              {
+                "unid": "b3f84d64-ab51-478d-acd3-876c4a73f867",
+                "name": "ProviderEntry",
+                "extend": "object",
+                "values_schema": "",
+                "options": {},
+                "pos": {
+                  "x": 183,
+                  "y": 218
+                },
+                "fields": [
+                  {
+                    "unid": "73360b69-ad85-40fb-8f6d-54cb512d33b7",
+                    "name": "name",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "a6847abe-eb86-4a89-b018-a78bbb303c4d",
+                    "name": "title",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  }
+                ],
+                "description": ""
+              }
+            ],
+            "enums": [],
+            "links": []
+          }
+        ],
+        "schemas": [],
+        "enums": [],
+        "links": []
+      },
+      {
+        "unid": "9ad0aa0b-c584-4a31-bedf-ebf77b101386",
+        "name": "Server",
+        "type": "folder",
+        "icon": "folder",
+        "istoggle": true,
+        "entrys": [
+          {
+            "unid": "6282df2b-51d8-4d1e-a21b-eb4643eff31f",
+            "name": "Routes",
+            "type": "folder",
+            "icon": "folder",
+            "istoggle": true,
+            "entrys": [
+              {
+                "unid": "9972256b-1b28-4028-94b5-0dc03de0a060",
+                "name": "DefaultReturn",
+                "type": "file",
+                "icon": "file",
+                "istoggle": false,
+                "entrys": [],
+                "schemas": [
+                  {
+                    "unid": "7155c203-9ba0-4f9b-b7c9-0b7356c4e599",
+                    "name": "DefaultReturn",
+                    "extend": "object",
+                    "values_schema": "",
+                    "options": {
+                      "ignore_additional_items": false
+                    },
+                    "pos": {
+                      "x": 136,
+                      "y": 96
+                    },
+                    "fields": [
+                      {
+                        "unid": "6a7ea74e-73d7-48dd-a6a7-7a204767401e",
+                        "name": "statusCode",
+                        "type": {
+                          "type": "or",
+                          "optional": false,
+                          "array": false,
+                          "types": [
+                            {
+                              "type": "string",
+                              "optional": false,
+                              "array": false,
+                              "types": []
+                            },
+                            {
+                              "type": "580ae090-16b8-40d2-8ea1-849c90537a8e",
+                              "optional": false,
+                              "array": false,
+                              "types": []
+                            }
+                          ]
+                        },
+                        "description": ""
+                      },
+                      {
+                        "unid": "3bc9d7b9-9285-4c1d-b9ec-abd048da6355",
+                        "name": "msg",
+                        "type": {
+                          "type": "string",
+                          "optional": true,
+                          "array": false,
+                          "types": []
+                        },
+                        "description": "Optional string message, is only set by a error code."
+                      }
+                    ],
+                    "description": "Default response from server."
+                  }
+                ],
+                "enums": [],
+                "links": [
+                  {
+                    "unid": "92c4a63e-2455-4901-9e2c-89e2ea3e6a2c",
+                    "pos": {
+                      "x": 775,
+                      "y": 95
+                    },
+                    "link_unid": "580ae090-16b8-40d2-8ea1-849c90537a8e"
+                  }
+                ]
+              },
+              {
+                "unid": "65a3c5fb-a2db-47ae-aaaf-8dadad5c224d",
+                "name": "Service",
+                "type": "file",
+                "icon": "file",
+                "istoggle": false,
+                "entrys": [],
+                "schemas": [
+                  {
+                    "unid": "a07297ad-f7d7-4b24-988b-10de1807609a",
+                    "name": "ServiceStatusResponse",
+                    "extend": "7155c203-9ba0-4f9b-b7c9-0b7356c4e599",
+                    "values_schema": "",
+                    "options": {
+                      "ignore_additional_items": false
+                    },
+                    "pos": {
+                      "x": 167,
+                      "y": 168
+                    },
+                    "fields": [
+                      {
+                        "unid": "24d7415f-56c2-46ff-afaa-c2c71949caa3",
+                        "name": "services",
+                        "type": {
+                          "type": "e39f54d3-0add-45fc-96b1-2c7815c6f679",
+                          "optional": false,
+                          "array": true,
+                          "types": []
+                        },
+                        "description": "List of services"
+                      }
+                    ],
+                    "description": ""
+                  },
+                  {
+                    "unid": "b32dbff6-0e97-4081-953c-16a271d7643a",
+                    "name": "ServiceByNameRequest",
+                    "extend": "object",
+                    "values_schema": "",
+                    "options": {
+                      "ignore_additional_items": false
+                    },
+                    "pos": {
+                      "x": 170,
+                      "y": 315
+                    },
+                    "fields": [
+                      {
+                        "unid": "1a8c64bd-e460-46b4-8d5d-31657731754b",
+                        "name": "name",
+                        "type": {
+                          "type": "string",
+                          "optional": false,
+                          "array": false,
+                          "types": []
+                        },
+                        "description": "Name of the service to be addressed"
+                      }
+                    ],
+                    "description": "Service by name request"
+                  }
+                ],
+                "enums": [],
+                "links": []
+              },
+              {
+                "unid": "855b7557-a71f-4831-bd3f-0e7164bbc56c",
+                "name": "StatusCodes",
+                "type": "file",
+                "icon": "file",
+                "istoggle": false,
+                "entrys": [],
+                "schemas": [],
+                "enums": [
+                  {
+                    "unid": "580ae090-16b8-40d2-8ea1-849c90537a8e",
+                    "name": "StatusCodes",
+                    "pos": {
+                      "x": 145,
+                      "y": 39
+                    },
+                    "values": [
+                      {
+                        "unid": "ab1663b9-fb31-4a3e-be40-38147f075beb",
+                        "name": "OK",
+                        "value": "200"
+                      },
+                      {
+                        "unid": "7390cf59-f71f-43be-88ef-55dd55d9bd2b",
+                        "name": "UNAUTHORIZED",
+                        "value": "401"
+                      },
+                      {
+                        "unid": "6a97e12e-bf9d-4efa-a630-40df2e5a69db",
+                        "name": "FORBIDDEN",
+                        "value": "403"
+                      },
+                      {
+                        "unid": "6823931f-f81e-42fc-a908-f25ef1c15149",
+                        "name": "INTERNAL_ERROR",
+                        "value": "500"
+                      }
+                    ],
+                    "description": ""
+                  }
+                ],
+                "links": []
+              }
+            ],
+            "schemas": [],
+            "enums": [],
+            "links": []
+          },
+          {
+            "unid": "7bda5eaa-9242-4efa-9c06-cff6ee23c008",
+            "name": "RequestData",
+            "type": "file",
+            "icon": "file",
+            "istoggle": false,
+            "entrys": [],
+            "schemas": [
+              {
+                "unid": "27862143-9440-4044-bef7-77b72c45a2b1",
+                "name": "SessionUserData",
+                "extend": "object",
+                "values_schema": "",
+                "options": {},
+                "pos": {
+                  "x": 940,
+                  "y": 311
+                },
+                "fields": [
+                  {
+                    "unid": "d4ddd187-704b-466b-9c50-6e02aba1362b",
+                    "name": "isLogin",
+                    "type": {
+                      "type": "boolean",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "ad5b2060-b647-4e29-9609-60834e6370e4",
+                    "name": "userid",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "c591900d-3b28-494c-bf44-ff78d4485cec",
+                    "name": "role",
+                    "type": {
+                      "type": "string",
+                      "optional": true,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  }
+                ],
+                "description": ""
+              },
+              {
+                "unid": "aca01792-5cae-442b-bc86-a31f2dca34b9",
+                "name": "SessionData",
+                "extend": "object",
+                "values_schema": "",
+                "options": {
+                  "ignore_additional_items": true,
+                  "not_export": false
+                },
+                "pos": {
+                  "x": 514,
+                  "y": 312
+                },
+                "fields": [
+                  {
+                    "unid": "a4c1b906-0078-4a60-989b-3af6e6097e0e",
+                    "name": "id",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  },
+                  {
+                    "unid": "be446dc7-4d2a-4f53-b1bc-9884a873d35e",
+                    "name": "user",
+                    "type": {
+                      "type": "27862143-9440-4044-bef7-77b72c45a2b1",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  }
+                ],
+                "description": ""
+              },
+              {
+                "unid": "150a1c4a-a461-491c-96e1-8bcbfa52fa85",
+                "name": "RequestData",
+                "extend": "object",
+                "values_schema": "",
+                "options": {
+                  "ignore_additional_items": true,
+                  "not_export": false
+                },
+                "pos": {
+                  "x": 73,
+                  "y": 174
+                },
+                "fields": [
+                  {
+                    "unid": "ed3b3e8e-2b2a-4827-85d0-c71d709123e1",
+                    "name": "session",
+                    "type": {
+                      "type": "aca01792-5cae-442b-bc86-a31f2dca34b9",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": ""
+                  }
+                ],
+                "description": ""
+              }
+            ],
+            "enums": [],
+            "links": []
+          }
+        ],
+        "schemas": [],
+        "enums": [],
+        "links": []
+      },
+      {
+        "unid": "bd1b916f-380a-4392-944d-1f974cf49975",
+        "name": "Service",
+        "type": "folder",
+        "icon": "folder",
+        "istoggle": true,
+        "entrys": [
+          {
+            "unid": "7271f56a-b5c1-4929-84ca-88959f5eb3da",
+            "name": "ServiceInfoEntry",
+            "type": "file",
+            "icon": "file",
+            "istoggle": false,
+            "entrys": [],
+            "schemas": [
+              {
+                "unid": "e39f54d3-0add-45fc-96b1-2c7815c6f679",
+                "name": "ServiceInfoEntry",
+                "extend": "object",
+                "values_schema": "",
+                "options": {
+                  "ignore_additional_items": false
+                },
+                "pos": {
+                  "x": 278,
+                  "y": 100
+                },
+                "fields": [
+                  {
+                    "unid": "2ba545db-7561-474d-8c62-c7095fdf1872",
+                    "name": "type",
+                    "type": {
+                      "type": "number",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": "Type of service"
+                  },
+                  {
+                    "unid": "c75c07ca-4129-48f2-b6b5-6db08f1c7292",
+                    "name": "name",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": "Name of service"
+                  },
+                  {
+                    "unid": "91ac5b46-b179-4658-bdc0-44ac9b058dfb",
+                    "name": "status",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": "Status of service"
+                  },
+                  {
+                    "unid": "3771cc09-28da-48ba-86b9-03d2c90fcc43",
+                    "name": "statusMsg",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": "Last status message"
+                  },
+                  {
+                    "unid": "7ac80de5-6745-4938-b88c-fdf31cab638c",
+                    "name": "importance",
+                    "type": {
+                      "type": "number",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": "Is the service importance"
+                  },
+                  {
+                    "unid": "1741e91a-8754-4f9f-9732-f2065ee2ccd2",
+                    "name": "inProcess",
+                    "type": {
+                      "type": "boolean",
+                      "optional": false,
+                      "array": false,
+                      "types": []
+                    },
+                    "description": "Is the service in process"
+                  },
+                  {
+                    "unid": "4d96956c-f449-407a-aeb0-81f458945808",
+                    "name": "dependencies",
+                    "type": {
+                      "type": "string",
+                      "optional": false,
+                      "array": true,
+                      "types": []
+                    },
+                    "description": "A service dependencie"
+                  }
+                ],
+                "description": "Service Entry information"
+              }
+            ],
+            "enums": [],
+            "links": []
+          }
+        ],
+        "schemas": [],
+        "enums": [],
+        "links": []
+      }
+    ],
+    "schemas": [],
+    "enums": [],
+    "links": []
+  },
+  "editor": {
+    "controls_width": 359
+  }
+}
