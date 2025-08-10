@@ -13,7 +13,7 @@ export class DirHelper {
      * @param {string} base
      * @returns {string[]}
      */
-    public static async getFiles(dir: string, recursive: boolean = false, base = dir): Promise<string[]> {
+    public static async getFiles(dir: string, recursive: boolean = false, base: string = dir): Promise<string[]> {
         const entries = await readdir(dir, { withFileTypes: true });
 
         const files = await Promise.all(entries.map(async(entry) => {
