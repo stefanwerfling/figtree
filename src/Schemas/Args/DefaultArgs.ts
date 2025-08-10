@@ -2,13 +2,15 @@ import {ExtractSchemaResultType, Vts} from 'vts';
 import {SchemaArgsBase} from './ArgsBase.js';
 
 /**
- * Schema for default args
+ * Schema of DefaultArgs
  */
 export const SchemaDefaultArgs = SchemaArgsBase.extend({
-    envargs: Vts.optional(Vts.string())
+    envargs: Vts.optional(Vts.string()),
+}, {
+    description: '',
 });
 
 /**
- * Type of schema for default args
+ * Type of schema DefaultArgs
  */
 export type DefaultArgs = ExtractSchemaResultType<typeof SchemaDefaultArgs>;

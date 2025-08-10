@@ -1,7 +1,8 @@
 import {ExtractSchemaResultType, Vts} from 'vts';
 
 /**
- * Schema service info entry
+ * Schema of ServiceInfoEntry
+ * Service Entry information
  */
 export const SchemaServiceInfoEntry = Vts.object({
     type: Vts.number({description: 'Type of service'}),
@@ -10,13 +11,12 @@ export const SchemaServiceInfoEntry = Vts.object({
     statusMsg: Vts.string({description: 'Last status message'}),
     importance: Vts.number({description: 'Is the service importance'}),
     inProcess: Vts.boolean({description: 'Is the service in process'}),
-    dependencies: Vts.array(
-        Vts.string({description: 'A service dependencie'}),
-        {description: 'The service dependencie list'}
-    )
-}, {description: 'Service Entry information'});
+    dependencies: Vts.array(Vts.string({description: 'A service dependencie'})),
+}, {
+    description: 'Service Entry information',
+});
 
 /**
- * Type of schema service info entry
+ * Type of schema ServiceInfoEntry
  */
 export type ServiceInfoEntry = ExtractSchemaResultType<typeof SchemaServiceInfoEntry>;

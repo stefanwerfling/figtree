@@ -1,17 +1,19 @@
-import {ExtractSchemaResultType} from 'vts';
+import {ExtractSchemaResultType, Vts} from 'vts';
+import {SchemaConfigOptions} from './ConfigOptions.js';
 import {SchemaConfigDbOptions} from './ConfigDb.js';
 import {SchemaConfigHttpServer} from './ConfigHttpServer.js';
-import {SchemaConfigOptions} from './ConfigOptions.js';
 
 /**
- * Schema config backend options
+ * Schema of ConfigBackendOptions
  */
 export const SchemaConfigBackendOptions = SchemaConfigOptions.extend({
     db: SchemaConfigDbOptions,
-    httpserver: SchemaConfigHttpServer
+    httpserver: SchemaConfigHttpServer,
+}, {
+    description: '',
 });
 
 /**
- * Type of config backend options
+ * Type of schema ConfigBackendOptions
  */
 export type ConfigBackendOptions = ExtractSchemaResultType<typeof SchemaConfigBackendOptions>;

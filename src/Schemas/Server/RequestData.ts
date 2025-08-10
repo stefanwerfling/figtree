@@ -1,48 +1,52 @@
 import {ExtractSchemaResultType, Vts} from 'vts';
 
 /**
- * Schema for session user data
+ * Schema of SessionUserData
  */
 export const SchemaSessionUserData = Vts.object({
     isLogin: Vts.boolean(),
     userid: Vts.string(),
-    role: Vts.optional(Vts.string())
+    role: Vts.optional(Vts.string()),
+}, {
+    description: '',
 });
 
 /**
- * Type of schema for session user data
+ * Type of schema SessionUserData
  */
 export type SessionUserData = ExtractSchemaResultType<typeof SchemaSessionUserData>;
 
 /**
- * Schema for session data
+ * Schema of SessionData
  */
 export const SchemaSessionData = Vts.object({
     id: Vts.string(),
-    user: Vts.optional(SchemaSessionUserData)
+    user: SchemaSessionUserData,
 }, {
+    description: '',
     objectSchema: {
         ignoreAdditionalItems: true
     }
 });
 
 /**
- * Type of schema for session data
+ * Type of schema SessionData
  */
 export type SessionData = ExtractSchemaResultType<typeof SchemaSessionData>;
 
 /**
- * Schema for request data
+ * Schema of RequestData
  */
 export const SchemaRequestData = Vts.object({
-    session: SchemaSessionData
+    session: SchemaSessionData,
 }, {
+    description: '',
     objectSchema: {
         ignoreAdditionalItems: true
     }
 });
 
 /**
- * Type of schema for request data
+ * Type of schema RequestData
  */
 export type RequestData = ExtractSchemaResultType<typeof SchemaRequestData>;

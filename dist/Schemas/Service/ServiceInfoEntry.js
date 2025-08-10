@@ -6,6 +6,8 @@ export const SchemaServiceInfoEntry = Vts.object({
     statusMsg: Vts.string({ description: 'Last status message' }),
     importance: Vts.number({ description: 'Is the service importance' }),
     inProcess: Vts.boolean({ description: 'Is the service in process' }),
-    dependencies: Vts.array(Vts.string({ description: 'A service dependencie' }), { description: 'The service dependencie list' })
-}, { description: 'Service Entry information' });
+    dependencies: Vts.array(Vts.string({ description: 'A service dependencie' })),
+}, {
+    description: 'Service Entry information',
+});
 //# sourceMappingURL=ServiceInfoEntry.js.map

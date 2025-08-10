@@ -1,14 +1,16 @@
 import {ExtractSchemaResultType, Vts} from 'vts';
 
 /**
- * Schema of a Provider entry
+ * Schema of ProviderEntry
  */
 export const SchemaProviderEntry = Vts.object({
     name: Vts.string(),
-    title: Vts.string()
+    title: Vts.string(),
+}, {
+    description: '',
 });
 
 /**
- * Type of Provider entry
+ * Type of schema ProviderEntry
  */
 export type ProviderEntry = ExtractSchemaResultType<typeof SchemaProviderEntry>;

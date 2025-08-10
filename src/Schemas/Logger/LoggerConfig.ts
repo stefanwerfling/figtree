@@ -1,7 +1,7 @@
 import {ExtractSchemaResultType, Vts} from 'vts';
 
 /**
- * Schema Logger config
+ * Schema of LoggerConfig
  */
 export const SchemaLoggerConfig = Vts.object({
     dirname: Vts.optional(Vts.string()),
@@ -10,10 +10,12 @@ export const SchemaLoggerConfig = Vts.object({
     maxSize: Vts.optional(Vts.string()),
     maxFiles: Vts.optional(Vts.string()),
     enableConsole: Vts.optional(Vts.boolean()),
-    level: Vts.optional(Vts.string())
+    level: Vts.optional(Vts.string()),
+}, {
+    description: '',
 });
 
 /**
- * Type of Logger config
+ * Type of schema LoggerConfig
  */
 export type LoggerConfig = ExtractSchemaResultType<typeof SchemaLoggerConfig>;

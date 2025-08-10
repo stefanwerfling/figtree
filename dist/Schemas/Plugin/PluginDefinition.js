@@ -7,6 +7,8 @@ export const SchemaPluginDefinition = Vts.object({
     url: Vts.string({ description: 'Page url from plugin' }),
     main: Vts.string({ description: 'Main Class' }),
     main_directory: Vts.optional(Vts.array(Vts.string({ description: 'You can set your plugin main directory, is optional' }))),
-    distHash: Vts.optional(Vts.string({ description: 'dist merkle hash for code protection by plugins' }))
-}, { description: 'Plugin definition for package.json' });
+    distHash: Vts.optional(Vts.string({ description: 'dist merkle hash for code protection by plugins' })),
+}, {
+    description: 'Plugin definition for package.json',
+});
 //# sourceMappingURL=PluginDefinition.js.map
