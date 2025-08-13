@@ -99,8 +99,11 @@
   "types": "dist/index.d.ts",
   "version": "1.0.19",
   "vtseditor": {
-    "schemaFiles": [
-      "schemas.json"
+    "exports": [
+      {
+        "schemaFile": "schemas.json",
+        "schemaPrefix": "Schema"
+      }
     ]
   }
 }
