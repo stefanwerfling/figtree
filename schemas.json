@@ -1,10 +1,10 @@
 {
   "fs": {
-    "unid": "Root",
-    "name": "Root",
-    "type": "root",
-    "icon": "root",
+    "unid": "root",
+    "name": "root",
     "istoggle": true,
+    "icon": "root",
+    "type": "root",
     "entrys": [
       {
         "unid": "48191543-1ef0-4b5d-844f-d4b13de78937",
@@ -24,9 +24,13 @@
               {
                 "unid": "82daaec5-3430-41a2-96fe-0cd4b121f521",
                 "name": "ArgsBase",
-                "extend": "object",
-                "values_schema": "",
-                "options": {},
+                "extend": {
+                  "type": "object",
+                  "options": {
+                    "not_export": false,
+                    "ignore_additional_items": false
+                  }
+                },
                 "pos": {
                   "x": 133,
                   "y": 113
@@ -61,9 +65,13 @@
               {
                 "unid": "9d01bab2-e1fe-4c56-9058-6de2279ec5c9",
                 "name": "DefaultArgs",
-                "extend": "82daaec5-3430-41a2-96fe-0cd4b121f521",
-                "values_schema": "",
-                "options": {},
+                "extend": {
+                  "type": "82daaec5-3430-41a2-96fe-0cd4b121f521",
+                  "options": {
+                    "not_export": false,
+                    "ignore_additional_items": false
+                  }
+                },
                 "pos": {
                   "x": 84,
                   "y": 171
@@ -110,9 +118,13 @@
               {
                 "unid": "cf3c56f2-a0a5-42bb-812d-cec317d21f18",
                 "name": "ConfigBackendOptions",
-                "extend": "3ec71c52-2bda-42d6-be26-a499170b09fd",
-                "values_schema": "",
-                "options": {},
+                "extend": {
+                  "type": "3ec71c52-2bda-42d6-be26-a499170b09fd",
+                  "options": {
+                    "not_export": false,
+                    "ignore_additional_items": false
+                  }
+                },
                 "pos": {
                   "x": 152,
                   "y": 50
@@ -231,9 +243,13 @@
               {
                 "unid": "dddef514-d321-4c32-bb30-f2f9ed621209",
                 "name": "ConfigDbOptionsMySql",
-                "extend": "object",
-                "values_schema": "",
-                "options": {},
+                "extend": {
+                  "type": "object",
+                  "options": {
+                    "not_export": false,
+                    "ignore_additional_items": false
+                  }
+                },
                 "pos": {
                   "x": 547,
                   "y": 159
@@ -300,9 +316,13 @@
               {
                 "unid": "5c2e4fd7-62ed-46be-afe6-2a9cb05fe3a2",
                 "name": "ConfigDbOptions",
-                "extend": "object",
-                "values_schema": "",
-                "options": {},
+                "extend": {
+                  "type": "object",
+                  "options": {
+                    "not_export": false,
+                    "ignore_additional_items": false
+                  }
+                },
                 "pos": {
                   "x": 119.80368794354303,
                   "y": 302.0057737464415
@@ -358,9 +378,13 @@
               {
                 "unid": "70dbcde3-16d3-4f01-adf8-e06dcacec5d7",
                 "name": "ConfigDbOptionsInflux",
-                "extend": "object",
-                "values_schema": "",
-                "options": {},
+                "extend": {
+                  "type": "object",
+                  "options": {
+                    "not_export": false,
+                    "ignore_additional_items": false
+                  }
+                },
                 "pos": {
                   "x": 574,
                   "y": 346
@@ -438,9 +462,13 @@
               {
                 "unid": "07ae5b78-62e1-4fc8-a4eb-3e38f4283bab",
                 "name": "ConfigDbOptionsRedis",
-                "extend": "object",
-                "values_schema": "",
-                "options": {},
+                "extend": {
+                  "type": "object",
+                  "options": {
+                    "not_export": false,
+                    "ignore_additional_items": false
+                  }
+                },
                 "pos": {
                   "x": 596,
                   "y": 599
@@ -474,9 +502,13 @@
               {
                 "unid": "966903d2-0998-4ca9-9385-bff957831f03",
                 "name": "ConfigDbOptionsChroma",
-                "extend": "object",
-                "values_schema": "",
-                "options": {},
+                "extend": {
+                  "type": "object",
+                  "options": {
+                    "not_export": false,
+                    "ignore_additional_items": false
+                  }
+                },
                 "pos": {
                   "x": 554,
                   "y": 713
@@ -583,13 +615,15 @@
               {
                 "unid": "163a943e-134c-44b9-b89d-770a520b9a6c",
                 "name": "ConfigHttpServerSession",
-                "extend": "object",
-                "values_schema": "",
-                "options": {
-                  "ignore_additional_items": false
+                "extend": {
+                  "type": "object",
+                  "options": {
+                    "not_export": false,
+                    "ignore_additional_items": false
+                  }
                 },
                 "pos": {
-                  "x": 689,
+                  "x": 690,
                   "y": 60
                 },
                 "fields": [
@@ -632,10 +666,12 @@
               {
                 "unid": "39cb4ec0-20a3-4f54-bedc-57097dc95cea",
                 "name": "ConfigHttpServerProxy",
-                "extend": "object",
-                "values_schema": "",
-                "options": {
-                  "ignore_additional_items": false
+                "extend": {
+                  "type": "object",
+                  "options": {
+                    "not_export": false,
+                    "ignore_additional_items": false
+                  }
                 },
                 "pos": {
                   "x": 711,
@@ -678,10 +714,12 @@
               {
                 "unid": "460bc080-4cb8-4b4e-a185-67ef02eb6764",
                 "name": "ConfigHttpServerCsrf",
-                "extend": "object",
-                "values_schema": "",
-                "options": {
-                  "ignore_additional_items": false
+                "extend": {
+                  "type": "object",
+                  "options": {
+                    "not_export": false,
+                    "ignore_additional_items": false
+                  }
                 },
                 "pos": {
                   "x": 662,
@@ -705,10 +743,12 @@
               {
                 "unid": "dbcb39be-f755-4dbf-b147-e58a58b7903f",
                 "name": "ConfigHttpServer",
-                "extend": "object",
-                "values_schema": "",
-                "options": {
-                  "ignore_additional_items": false
+                "extend": {
+                  "type": "object",
+                  "options": {
+                    "not_export": false,
+                    "ignore_additional_items": false
+                  }
                 },
                 "pos": {
                   "x": 153,
@@ -799,9 +839,13 @@
               {
                 "unid": "3ec71c52-2bda-42d6-be26-a499170b09fd",
                 "name": "ConfigOptions",
-                "extend": "object",
-                "values_schema": "",
-                "options": {},
+                "extend": {
+                  "type": "object",
+                  "options": {
+                    "not_export": false,
+                    "ignore_additional_items": false
+                  }
+                },
                 "pos": {
                   "x": 267,
                   "y": 309
@@ -831,6 +875,14 @@
                   "y": 233
                 },
                 "link_unid": ""
+              },
+              {
+                "unid": "1b2fa928-1f11-4b5b-915e-17b137452255",
+                "pos": {
+                  "x": 767,
+                  "y": 213
+                },
+                "link_unid": "d73610e1-3a1f-4250-a324-9cb6b9a13645"
               }
             ]
           }
@@ -857,9 +909,13 @@
               {
                 "unid": "d73610e1-3a1f-4250-a324-9cb6b9a13645",
                 "name": "LoggerConfig",
-                "extend": "object",
-                "values_schema": "",
-                "options": {},
+                "extend": {
+                  "type": "object",
+                  "options": {
+                    "not_export": false,
+                    "ignore_additional_items": false
+                  }
+                },
                 "pos": {
                   "x": 177,
                   "y": 235
@@ -972,10 +1028,12 @@
               {
                 "unid": "52756b7d-1b99-41ca-b590-a0239c996309",
                 "name": "PluginDefinition",
-                "extend": "object",
-                "values_schema": "",
-                "options": {
-                  "ignore_additional_items": false
+                "extend": {
+                  "type": "object",
+                  "options": {
+                    "not_export": false,
+                    "ignore_additional_items": false
+                  }
                 },
                 "pos": {
                   "x": 199,
@@ -1100,9 +1158,13 @@
               {
                 "unid": "b3f84d64-ab51-478d-acd3-876c4a73f867",
                 "name": "ProviderEntry",
-                "extend": "object",
-                "values_schema": "",
-                "options": {},
+                "extend": {
+                  "type": "object",
+                  "options": {
+                    "not_export": false,
+                    "ignore_additional_items": false
+                  }
+                },
                 "pos": {
                   "x": 183,
                   "y": 218
@@ -1167,10 +1229,12 @@
                   {
                     "unid": "7155c203-9ba0-4f9b-b7c9-0b7356c4e599",
                     "name": "DefaultReturn",
-                    "extend": "object",
-                    "values_schema": "",
-                    "options": {
-                      "ignore_additional_items": false
+                    "extend": {
+                      "type": "object",
+                      "options": {
+                        "not_export": false,
+                        "ignore_additional_items": false
+                      }
                     },
                     "pos": {
                       "x": 136,
@@ -1225,6 +1289,14 @@
                       "y": 95
                     },
                     "link_unid": ""
+                  },
+                  {
+                    "unid": "ce72d06c-d002-41b6-a2b0-eb0940dd0a99",
+                    "pos": {
+                      "x": 740,
+                      "y": 220
+                    },
+                    "link_unid": "580ae090-16b8-40d2-8ea1-849c90537a8e"
                   }
                 ]
               },
@@ -1239,10 +1311,12 @@
                   {
                     "unid": "a07297ad-f7d7-4b24-988b-10de1807609a",
                     "name": "ServiceStatusResponse",
-                    "extend": "7155c203-9ba0-4f9b-b7c9-0b7356c4e599",
-                    "values_schema": "",
-                    "options": {
-                      "ignore_additional_items": false
+                    "extend": {
+                      "type": "7155c203-9ba0-4f9b-b7c9-0b7356c4e599",
+                      "options": {
+                        "not_export": false,
+                        "ignore_additional_items": false
+                      }
                     },
                     "pos": {
                       "x": 167,
@@ -1266,10 +1340,12 @@
                   {
                     "unid": "b32dbff6-0e97-4081-953c-16a271d7643a",
                     "name": "ServiceByNameRequest",
-                    "extend": "object",
-                    "values_schema": "",
-                    "options": {
-                      "ignore_additional_items": false
+                    "extend": {
+                      "type": "object",
+                      "options": {
+                        "not_export": false,
+                        "ignore_additional_items": false
+                      }
                     },
                     "pos": {
                       "x": 170,
@@ -1353,9 +1429,13 @@
               {
                 "unid": "27862143-9440-4044-bef7-77b72c45a2b1",
                 "name": "SessionUserData",
-                "extend": "object",
-                "values_schema": "",
-                "options": {},
+                "extend": {
+                  "type": "object",
+                  "options": {
+                    "not_export": false,
+                    "ignore_additional_items": false
+                  }
+                },
                 "pos": {
                   "x": 940,
                   "y": 311
@@ -1400,11 +1480,12 @@
               {
                 "unid": "aca01792-5cae-442b-bc86-a31f2dca34b9",
                 "name": "SessionData",
-                "extend": "object",
-                "values_schema": "",
-                "options": {
-                  "ignore_additional_items": true,
-                  "not_export": false
+                "extend": {
+                  "type": "object",
+                  "options": {
+                    "not_export": false,
+                    "ignore_additional_items": true
+                  }
                 },
                 "pos": {
                   "x": 514,
@@ -1439,11 +1520,12 @@
               {
                 "unid": "150a1c4a-a461-491c-96e1-8bcbfa52fa85",
                 "name": "RequestData",
-                "extend": "object",
-                "values_schema": "",
-                "options": {
-                  "ignore_additional_items": true,
-                  "not_export": false
+                "extend": {
+                  "type": "object",
+                  "options": {
+                    "not_export": false,
+                    "ignore_additional_items": true
+                  }
                 },
                 "pos": {
                   "x": 73,
@@ -1491,14 +1573,16 @@
               {
                 "unid": "e39f54d3-0add-45fc-96b1-2c7815c6f679",
                 "name": "ServiceInfoEntry",
-                "extend": "object",
-                "values_schema": "",
-                "options": {
-                  "ignore_additional_items": false
+                "extend": {
+                  "type": "object",
+                  "options": {
+                    "not_export": false,
+                    "ignore_additional_items": false
+                  }
                 },
                 "pos": {
-                  "x": 278,
-                  "y": 100
+                  "x": 261,
+                  "y": 99
                 },
                 "fields": [
                   {
@@ -1592,8 +1676,7 @@
       }
     ],
     "schemas": [],
-    "enums": [],
-    "links": []
+    "enums": []
   },
   "editor": {
     "controls_width": 359
