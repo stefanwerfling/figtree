@@ -3,7 +3,10 @@ import { DBBaseEntityId } from './DBBaseEntityId.js';
 export declare abstract class DBRepository<T extends DBBaseEntityId> {
     protected static _instance: Map<string, DBRepository<any>>;
     protected readonly _repository: Repository<T>;
-    protected static getSingleInstance<I extends DBBaseEntityId, S extends DBRepository<I>>(tclass: new (tentrie: EntityTarget<I>) => S, tentrie: EntityTarget<I>, registerName: string): S;
+    protected static getSingleInstance<S extends DBRepository<any>, TEntity extends DBBaseEntityId>(this: {
+        new (target: EntityTarget<TEntity>): S;
+        REGISTER_NAME: string;
+    }, target: EntityTarget<TEntity>): S;
     protected constructor(target: EntityTarget<T>);
     countAll(): Promise<number>;
     findAll(): Promise<T[]>;

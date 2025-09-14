@@ -3,7 +3,10 @@ import { DBBaseEntityUnid } from './DBBaseEntityUnid.js';
 export declare abstract class DBRepositoryUnid<T extends DBBaseEntityUnid> {
     protected static _instance: Map<string, DBRepositoryUnid<any>>;
     protected readonly _repository: Repository<T>;
-    protected static getSingleInstance<I extends DBBaseEntityUnid, S extends DBRepositoryUnid<I>>(tclass: new (tentrie: EntityTarget<I>) => S, tentrie: EntityTarget<I>, registerName: string): S;
+    protected static getSingleInstance<S extends DBRepositoryUnid<any>, TEntityUnid extends DBBaseEntityUnid>(this: {
+        new (target: EntityTarget<TEntityUnid>): S;
+        REGISTER_NAME: string;
+    }, target: EntityTarget<TEntityUnid>): S;
     protected constructor(target: EntityTarget<T>);
     countAll(): Promise<number>;
     findAll(): Promise<T[]>;

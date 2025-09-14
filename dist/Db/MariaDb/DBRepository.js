@@ -2,19 +2,11 @@ import { DBHelper } from './DBHelper.js';
 export class DBRepository {
     static _instance = new Map();
     _repository;
-    static getSingleInstance(tclass, tentrie, registerName) {
-        let cls;
-        if (DBRepository._instance.has(registerName)) {
-            cls = DBRepository._instance.get(registerName);
-            if (!(cls instanceof tclass)) {
-                throw new Error('Class not found in register!');
-            }
+    static getSingleInstance(target) {
+        if (!DBRepository._instance.has(this.REGISTER_NAME)) {
+            DBRepository._instance.set(this.REGISTER_NAME, new this(target));
         }
-        else {
-            cls = new tclass(tentrie);
-            DBRepository._instance.set(registerName, cls);
-        }
-        return cls;
+        return DBRepository._instance.get(this.REGISTER_NAME);
     }
     constructor(target) {
         this._repository = DBHelper.getRepository(target);

@@ -12,7 +12,7 @@ export abstract class DBRepositoryUnid<T extends DBBaseEntityUnid> {
      * instance
      * @protected
      */
-    protected static _instance = new Map<string, DBRepositoryUnid<any>>();
+    protected static _instance: Map<string, DBRepositoryUnid<any>> = new Map();
 
     /**
      * repository for T
@@ -22,33 +22,19 @@ export abstract class DBRepositoryUnid<T extends DBBaseEntityUnid> {
 
     /**
      * Get Single Instance
-     * @template I extends DBBaseEntityUnid
-     * @template S extends DBRepositoryUnid<I>
-     * @param {new (tentrie: EntityTarget<I>) => S} tclass
-     * @param {EntityTarget} tentrie
-     * @param {string} registerName
+     * @template S extends DBRepositoryUnid
+     * @template TEntityUnid extends DBBaseEntityUnid
      * @return {S}
      */
-    protected static getSingleInstance<I extends DBBaseEntityUnid, S extends DBRepositoryUnid<I>>(
-        tclass: new (tentrie: EntityTarget<I>) => S,
-        tentrie: EntityTarget<I>,
-        registerName: string
+    protected static getSingleInstance<S extends DBRepositoryUnid<any>, TEntityUnid extends DBBaseEntityUnid>(
+        this: { new(target: EntityTarget<TEntityUnid>): S; REGISTER_NAME: string },
+        target: EntityTarget<TEntityUnid>
     ): S {
-        let cls;
-
-        if (DBRepositoryUnid._instance.has(registerName)) {
-            cls = DBRepositoryUnid._instance.get(registerName);
-
-            if (!(cls instanceof tclass)) {
-                throw new Error('Class not found in register!');
-            }
-        } else {
-            cls = new tclass(tentrie);
-
-            DBRepositoryUnid._instance.set(registerName, cls);
+        if (!DBRepositoryUnid._instance.has(this.REGISTER_NAME)) {
+            DBRepositoryUnid._instance.set(this.REGISTER_NAME, new this(target));
         }
 
-        return cls;
+        return DBRepositoryUnid._instance.get(this.REGISTER_NAME) as S;
     }
 
     /**
