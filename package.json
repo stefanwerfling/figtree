@@ -1,5 +1,8 @@
 {
   "author": "Stefan Werfling",
+  "bin": {
+    "figtree": "./dist/Cli/index.js"
+  },
   "description": "Figtree - Server Core",
   "devDependencies": {
     "@stylistic/eslint-plugin-ts": "^3.0.0",
@@ -22,9 +25,9 @@
   },
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.js"
     }
   },
   "keywords": [
@@ -91,9 +94,6 @@
     "build": "npm run clean && npm run compile",
     "clean": "rm -rf dist",
     "compile": "tsc --project tsconfig.json"
-  },
-  "bin": {
-    "figtree": "./dist/Cli/index.js"
   },
   "type": "module",
   "types": "dist/index.d.ts",

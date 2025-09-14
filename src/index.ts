@@ -153,6 +153,14 @@ export {HttpRouteProviderType} from './Server/HttpServer/HttpRouteProviderType.j
 export {IHttpRouteProvider} from './Server/HttpServer/IHttpRouteProvider.js';
 export {HttpRouteProviders} from './Server/HttpServer/HttpRouteProviders.js';
 
+// ACL -----------------------------------------------------------------------------------------------------------------
+
+export {ACLRight} from './ACL/ACLRight.js';
+export {ACLRole} from './ACL/ACLRole.js';
+export {IACLController} from './ACL/IACLController.js';
+export {ACLRbac} from './ACL/ACLRbac.js';
+export {ACL} from './ACL/ACL.js';
+
 // Application ---------------------------------------------------------------------------------------------------------
 export {BackendApp} from './Application/BackendApp.js';
 export {PluginService} from './Application/Services/PluginService.js';

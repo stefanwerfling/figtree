@@ -68,6 +68,8 @@ export { AProviderOnLoadEvent } from './Provider/AProviderOnLoadEvent.js';
 export { BaseProviders } from './Provider/BaseProviders.js';
 export { HttpRouteProviderType } from './Server/HttpServer/HttpRouteProviderType.js';
 export { HttpRouteProviders } from './Server/HttpServer/HttpRouteProviders.js';
+export { ACLRbac } from './ACL/ACLRbac.js';
+export { ACL } from './ACL/ACL.js';
 export { BackendApp } from './Application/BackendApp.js';
 export { PluginService } from './Application/Services/PluginService.js';
 export { MariaDBService } from './Application/Services/MariaDBService.js';

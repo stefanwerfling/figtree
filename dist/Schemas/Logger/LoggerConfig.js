@@ -6,6 +6,8 @@ export const SchemaLoggerConfig = Vts.object({
     maxSize: Vts.optional(Vts.string()),
     maxFiles: Vts.optional(Vts.string()),
     enableConsole: Vts.optional(Vts.boolean()),
-    level: Vts.optional(Vts.string())
+    level: Vts.optional(Vts.string()),
+}, {
+    description: '',
 });
 //# sourceMappingURL=LoggerConfig.js.map

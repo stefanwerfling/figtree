@@ -19,7 +19,9 @@ export const SchemaConfigDbOptionsMySql = Vts.object({
     port: Vts.number(),
     username: Vts.string(),
     password: Vts.string(),
-    database: Vts.string()
+    database: Vts.string(),
+}, {
+    description: '',
 });
 export const SchemaConfigDbOptionsInflux = Vts.object({
     url: Vts.string(),
@@ -27,19 +29,27 @@ export const SchemaConfigDbOptionsInflux = Vts.object({
     org: Vts.string(),
     bucket: Vts.string(),
     username: Vts.string(),
-    password: Vts.string()
+    password: Vts.string(),
+}, {
+    description: '',
 });
 export const SchemaConfigDbOptionsRedis = Vts.object({
     url: Vts.string(),
-    password: Vts.optional(Vts.string())
+    password: Vts.optional(Vts.string()),
+}, {
+    description: '',
 });
 export const SchemaConfigDbOptionsChroma = Vts.object({
-    url: Vts.string()
+    url: Vts.string(),
+}, {
+    description: '',
 });
 export const SchemaConfigDbOptions = Vts.object({
     mysql: Vts.optional(SchemaConfigDbOptionsMySql),
     influx: Vts.optional(SchemaConfigDbOptionsInflux),
     redis: Vts.optional(SchemaConfigDbOptionsRedis),
-    chroma: Vts.optional(SchemaConfigDbOptionsChroma)
+    chroma: Vts.optional(SchemaConfigDbOptionsChroma),
+}, {
+    description: '',
 });
 //# sourceMappingURL=ConfigDb.js.map
