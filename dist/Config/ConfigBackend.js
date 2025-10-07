@@ -67,6 +67,15 @@ export class ConfigBackend extends Config {
                 config.db.mysql.port = parseInt(process.env[ENV_DB.DB_MYSQL_PORT], 10) ||
                     ConfigBackend.DEFAULT_DB_MYSQL_PORT;
             }
+            if (process.env[ENV_DB.DB_MYSQL_DATABASE]) {
+                config.db.mysql.database = process.env[ENV_DB.DB_MYSQL_DATABASE];
+            }
+            if (process.env[ENV_DB.DB_MYSQL_USERNAME]) {
+                config.db.mysql.username = process.env[ENV_DB.DB_MYSQL_USERNAME];
+            }
+            if (process.env[ENV_DB.DB_MYSQL_PASSWORD]) {
+                config.db.mysql.password = process.env[ENV_DB.DB_MYSQL_PASSWORD];
+            }
         }
         return config;
     }
