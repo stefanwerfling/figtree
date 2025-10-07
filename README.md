@@ -35,6 +35,8 @@ FigTree is a comprehensive Node.js backend framework designed for rapid developm
   - [x] Pem Helper/Parser
   - [x] Certificate generator (node-forge)
 - [ ] Access Control List 
+- [ ] Cluster
+  - [x] SharedStore (IPC/Redis)
 
 ## Installation
 
