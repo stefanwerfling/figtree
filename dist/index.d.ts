@@ -43,6 +43,9 @@ export { RedisClientOptions, FunChannelCallback, RedisClient } from './Db/RedisD
 export { ChromaDbCollection } from './Db/ChromaDb/ChromaDbCollection.js';
 export { ChromaDbCollectionLoader } from './Db/ChromaDb/ChromaDbCollectionLoader.js';
 export { ChromaDbClientOptions, ChromaDbClient } from './Db/ChromaDb/ChromaDbClient.js';
+export { SharedStore } from './SharedStore/SharedStore.js';
+export { IPCSharedStore } from './SharedStore/IPCSharedStore.js';
+export { RedisSharedStore } from './SharedStore/RedisSharedStore.js';
 export { Message as RawMessage } from './Server/RawServer/Base/Message.js';
 export { Server as RawServer } from './Server/RawServer/Server.js';
 export { Client as RawClient } from './Server/RawServer/Client/Client.js';

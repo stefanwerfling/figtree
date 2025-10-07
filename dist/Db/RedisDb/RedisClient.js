@@ -70,5 +70,65 @@ export class RedisClient {
     async sendChannel(channel, data) {
         await this._client.publish(channel, data);
     }
+    isConnected() {
+        try {
+            return this._client.isOpen && this._client.isReady;
+        }
+        catch {
+            return false;
+        }
+    }
+    _buildKey(key, namespace) {
+        if (!namespace) {
+            return key;
+        }
+        const normalizedNs = namespace.endsWith(':') ? namespace : namespace + ':';
+        return `${normalizedNs}${key}`;
+    }
+    async get(key, namespace) {
+        const rkey = this._buildKey(key, namespace);
+        const raw = await this._client.get(rkey);
+        if (!raw) {
+            return null;
+        }
+        try {
+            return JSON.parse(raw);
+        }
+        catch {
+            return null;
+        }
+    }
+    async set(key, value, namespace) {
+        const rkey = this._buildKey(key, namespace);
+        await this._client.set(rkey, JSON.stringify(value));
+    }
+    async delete(key, namespace) {
+        const rkey = this._buildKey(key, namespace);
+        await this._client.del(rkey);
+    }
+    async unlink(key, namespace) {
+        const rkey = this._buildKey(key, namespace);
+        await this._client.unlink(rkey);
+    }
+    async has(key, namespace) {
+        const rkey = this._buildKey(key, namespace);
+        const exists = await this._client.exists(rkey);
+        return exists === 1;
+    }
+    async clearAll() {
+        await this._client.flushDb();
+    }
+    async clearNamespace(namespace) {
+        if (!this.isConnected()) {
+            return;
+        }
+        const keys = [];
+        for await (const key of this._client.scanIterator({ MATCH: `${namespace}:*` })) {
+            keys.push(key);
+        }
+        if (keys.length > 0) {
+            await this._client.unlink(keys);
+        }
+    }
 }
 //# sourceMappingURL=RedisClient.js.map

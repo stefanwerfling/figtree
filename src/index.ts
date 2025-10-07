@@ -91,6 +91,11 @@ export {ChromaDbCollection} from './Db/ChromaDb/ChromaDbCollection.js';
 export {ChromaDbCollectionLoader} from './Db/ChromaDb/ChromaDbCollectionLoader.js';
 export {ChromaDbClientOptions, ChromaDbClient} from './Db/ChromaDb/ChromaDbClient.js';
 
+// SharedStore ---------------------------------------------------------------------------------------------------------
+export {SharedStore} from './SharedStore/SharedStore.js';
+export {IPCSharedStore} from './SharedStore/IPCSharedStore.js';
+export {RedisSharedStore} from './SharedStore/RedisSharedStore.js';
+
 // Raw Server ----------------------------------------------------------------------------------------------------------
 export {Message as RawMessage} from './Server/RawServer/Base/Message.js';
 export {Server as RawServer} from './Server/RawServer/Server.js';

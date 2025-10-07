@@ -15,12 +15,16 @@ import {ExampleBackend} from './Application/ExampleBackend.js';
     /**
      * Backend
      */
-    let backend: ExampleBackend|BackendCluster = new ExampleBackend();
+    let backend: ExampleBackend|BackendCluster;
 
     if (useCluster) {
+        // use the backend with multiple process
         backend = new BackendCluster({
             appFactory: () => new ExampleBackend()
         });
+    } else {
+        // use the backend directly with single process
+        backend = new ExampleBackend();
     }
 
     await backend.start();

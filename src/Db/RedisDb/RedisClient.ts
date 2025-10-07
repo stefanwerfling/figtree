@@ -1,3 +1,4 @@
+import {exists} from 'node:fs';
 import {createClient, RedisClientType} from 'redis';
 import {Logger} from '../../Logger/Logger.js';
 import {RedisChannel} from './RedisChannel.js';
@@ -146,6 +147,128 @@ export class RedisClient {
      */
     public async sendChannel(channel: string, data: string): Promise<void> {
         await this._client.publish(channel, data);
+    }
+
+    /**
+     * Return is connected
+     * @return {boolean}
+     */
+    public isConnected(): boolean {
+        try {
+            return this._client.isOpen && this._client.isReady;
+        } catch {
+            return false;
+        }
+    }
+
+    /**
+     * Build the key for namespace
+     * @param {string} key
+     * @param {string} namespace
+     * @return {string}
+     * @protected
+     */
+    protected _buildKey(key: string, namespace?: string): string {
+        if (!namespace) {
+            return key;
+        }
+
+        const normalizedNs = namespace.endsWith(':') ? namespace : namespace + ':';
+        return `${normalizedNs}${key}`;
+    }
+
+    /**
+     * Get value by key (and namespace)
+     * @param {string} key
+     * @param {string} namespace
+     * @return {T|null}
+     * @template T = any
+     */
+    public async get<T = any>(key: string, namespace?: string): Promise<T|null> {
+        const rkey = this._buildKey(key, namespace);
+        const raw = await this._client.get(rkey);
+
+        if (!raw) {
+            return null;
+        }
+
+        try {
+            return JSON.parse(raw);
+        } catch {
+            return null;
+        }
+    }
+
+    /**
+     * Set the value by key
+     * @param {string} key
+     * @param {T} value
+     * @param {string} namespace
+     * @template T = any
+     */
+    public async set<T = any>(key: string, value: T, namespace?: string): Promise<void> {
+        const rkey = this._buildKey(key, namespace);
+        await this._client.set(rkey, JSON.stringify(value));
+    }
+
+    /**
+     * Delete the value by key
+     * @param {string} key
+     * @param {string} namespace
+     */
+    public async delete(key: string, namespace?: string): Promise<void> {
+        const rkey = this._buildKey(key, namespace);
+        await this._client.del(rkey);
+    }
+
+    /**
+     * Unlink a delete witout blocking
+     * @param {string} key
+     * @param {string} namespace
+     */
+    public async unlink(key: string, namespace?: string): Promise<void> {
+        const rkey = this._buildKey(key, namespace);
+        await this._client.unlink(rkey);
+    }
+
+    /**
+     * has a value by key
+     * @param {string} key
+     * @param {string} namespace
+     * @return {boolean}
+     */
+    public async has(key: string, namespace?: string): Promise<boolean> {
+        const rkey = this._buildKey(key, namespace);
+        const exists = await this._client.exists(rkey);
+
+        return exists === 1;
+    }
+
+    /**
+     * clear all
+     */
+    public async clearAll(): Promise<void> {
+        await this._client.flushDb();
+    }
+
+    /**
+     * clear all by namespace
+     * @param {string} namespace
+     */
+    public async clearNamespace(namespace: string): Promise<void> {
+        if (!this.isConnected()) {
+            return;
+        }
+
+        const keys: string[] = [];
+
+        for await (const key of this._client.scanIterator({ MATCH: `${namespace}:*` })) {
+            keys.push(key);
+        }
+
+        if (keys.length > 0) {
+            await this._client.unlink(keys);
+        }
     }
 
 }

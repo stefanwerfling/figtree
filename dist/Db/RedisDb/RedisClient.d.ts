@@ -17,4 +17,13 @@ export declare class RedisClient {
     protected _registerChannel(channel: string, callback: FunChannelCallback): Promise<void>;
     registerChannels(channels: RedisChannel<any>[]): Promise<void>;
     sendChannel(channel: string, data: string): Promise<void>;
+    isConnected(): boolean;
+    protected _buildKey(key: string, namespace?: string): string;
+    get<T = any>(key: string, namespace?: string): Promise<T | null>;
+    set<T = any>(key: string, value: T, namespace?: string): Promise<void>;
+    delete(key: string, namespace?: string): Promise<void>;
+    unlink(key: string, namespace?: string): Promise<void>;
+    has(key: string, namespace?: string): Promise<boolean>;
+    clearAll(): Promise<void>;
+    clearNamespace(namespace: string): Promise<void>;
 }
