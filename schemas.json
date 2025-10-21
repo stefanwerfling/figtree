@@ -1406,6 +1406,46 @@
                         "unid": "6823931f-f81e-42fc-a908-f25ef1c15149",
                         "name": "INTERNAL_ERROR",
                         "value": "500"
+                      },
+                      {
+                        "unid": "361a6ba9-8812-49c7-87bf-c90af6a80380",
+                        "name": "BAD_REQUEST",
+                        "value": "400"
+                      },
+                      {
+                        "unid": "7aacdaae-ea7d-46b7-9f2c-baf137d8e90e",
+                        "name": "PAYMENT_REQUIRED",
+                        "value": "402"
+                      },
+                      {
+                        "unid": "6f180757-de3e-47ce-9912-b8c417e4d677",
+                        "name": "NOT_FOUND",
+                        "value": "404"
+                      },
+                      {
+                        "unid": "3f7affa1-4442-4403-b239-92d4ef2fd36c",
+                        "name": "METHOD_NOT_ALLOWED",
+                        "value": "405"
+                      },
+                      {
+                        "unid": "242fd658-6e39-4650-9b6b-52819b2d8704",
+                        "name": "NOT_ACCEPTABLE",
+                        "value": "406"
+                      },
+                      {
+                        "unid": "b34cfc5e-95ee-430a-858f-6e2077850d9a",
+                        "name": "REQUEST_TIMEOUT",
+                        "value": "408"
+                      },
+                      {
+                        "unid": "1b5fbf46-e9af-4e2d-9011-3f4d245ef64b",
+                        "name": "CONFLICT",
+                        "value": "409"
+                      },
+                      {
+                        "unid": "f6538df9-967a-44ae-81f3-2c188a68c2e1",
+                        "name": "GONE",
+                        "value": "410"
                       }
                     ],
                     "description": ""
