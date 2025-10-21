@@ -1,4 +1,4 @@
-import {DeleteResult, EntityTarget, Repository} from 'typeorm';
+import {DeepPartial, DeleteResult, EntityTarget, Repository} from 'typeorm';
 import {DBBaseEntityUnid} from './DBBaseEntityUnid.js';
 import {DBHelper} from './DBHelper.js';
 
@@ -80,6 +80,15 @@ export abstract class DBRepositoryUnid<T extends DBBaseEntityUnid> {
         }
 
         return null;
+    }
+
+    /**
+     * Create a entity (only create an instance)
+     * @param {DeepPartial<T>} entityLike
+     * @return {T}
+     */
+    public async createEntity(entityLike: DeepPartial<T>): Promise<T> {
+        return this._repository.create();
     }
 
     /**

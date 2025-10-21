@@ -29,6 +29,9 @@ export class DBRepository {
         }
         return null;
     }
+    async createEntity(entityLike) {
+        return this._repository.create();
+    }
     async remove(id) {
         return this._repository.delete(id);
     }
