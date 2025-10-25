@@ -2,6 +2,7 @@ import {Request, RequestHandler, Response, Router} from 'express';
 import {ACLRight} from '../../../ACL/ACLRight.js';
 import {Logger} from '../../../Logger/Logger.js';
 import {StatusCodes} from '../../../Schemas/Server/Routes/StatusCodes.js';
+import {StringHelper} from '../../../Utils/StringHelper.js';
 import {DefaultReturn} from './../../../Schemas/Server/Routes/DefaultReturn.js';
 import path from 'path';
 import {Schema, SchemaErrors} from 'vts';
@@ -270,7 +271,12 @@ export class DefaultRoute implements IDefaultRoute {
                     if (description.responseBodySchema.validate(result, [])) {
                         res.status(200).json(result);
                     } else {
-                        throw new Error(`The result have a error in: ${description.responseBodySchema.describe().description}`);
+                        throw new Error(
+                            StringHelper.sprintf(
+                                'The result have a error in: %s',
+                                description.responseBodySchema.describe().description
+                            )
+                        );
                     }
                 }
             } catch (ie) {
@@ -284,7 +290,14 @@ export class DefaultRoute implements IDefaultRoute {
                     return;
                 }
 
-                Logger.getLogger().error('DefaultRoute::_all<%0>::routeHandle: Exception intern, path can not call: %0', cMethod, uriPath);
+                Logger.getLogger().error(
+                    StringHelper.sprintf(
+                        'DefaultRoute::_all<%s>::routeHandle: Exception intern, path can not call: %e error:',
+                        cMethod,
+                        uriPath,
+                        ie
+                    )
+                );
             }
         };
 
@@ -314,7 +327,14 @@ export class DefaultRoute implements IDefaultRoute {
                     }
                 }
             } catch (e) {
-                Logger.getLogger().error('DefaultRoute::_all<%0>: Exception extern, path can not call: %0', cMethod, uriPath);
+                Logger.getLogger().error(
+                    StringHelper.sprintf(
+                        'DefaultRoute::_all<%s>: Exception extern, path can not call: %s error: %e',
+                        cMethod,
+                        uriPath,
+                        e
+                    )
+                );
             }
         }
     }

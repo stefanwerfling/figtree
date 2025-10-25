@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { Logger } from '../../../Logger/Logger.js';
 import { StatusCodes } from '../../../Schemas/Server/Routes/StatusCodes.js';
+import { StringHelper } from '../../../Utils/StringHelper.js';
 import path from 'path';
 import { DefaultRouteCheckUserIsLogin } from './DefaultRouteCheckUser.js';
 import { RequestContext } from './RequestContext.js';
@@ -122,7 +123,7 @@ export class DefaultRoute {
                         res.status(200).json(result);
                     }
                     else {
-                        throw new Error(`The result have a error in: ${description.responseBodySchema.describe().description}`);
+                        throw new Error(StringHelper.sprintf('The result have a error in: %s', description.responseBodySchema.describe().description));
                     }
                 }
             }
@@ -136,7 +137,7 @@ export class DefaultRoute {
                     }
                     return;
                 }
-                Logger.getLogger().error('DefaultRoute::_all<%0>::routeHandle: Exception intern, path can not call: %0', cMethod, uriPath);
+                Logger.getLogger().error(StringHelper.sprintf('DefaultRoute::_all<%s>::routeHandle: Exception intern, path can not call: %e error:', cMethod, uriPath, ie));
             }
         };
         for (const url of urls) {
@@ -160,7 +161,7 @@ export class DefaultRoute {
                 }
             }
             catch (e) {
-                Logger.getLogger().error('DefaultRoute::_all<%0>: Exception extern, path can not call: %0', cMethod, uriPath);
+                Logger.getLogger().error(StringHelper.sprintf('DefaultRoute::_all<%s>: Exception extern, path can not call: %s error: %e', cMethod, uriPath, e));
             }
         }
     }
