@@ -88,7 +88,7 @@ export abstract class DBRepository<T extends DBBaseEntityId> {
      * @return {T}
      */
     public async createEntity(entityLike: DeepPartial<T>): Promise<T> {
-        return this._repository.create();
+        return this._repository.create(entityLike);
     }
 
     /**

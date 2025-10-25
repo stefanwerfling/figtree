@@ -30,7 +30,7 @@ export class DBRepositoryUnid {
         return null;
     }
     async createEntity(entityLike) {
-        return this._repository.create();
+        return this._repository.create(entityLike);
     }
     async remove(unid) {
         return this._repository.delete(unid);
