@@ -137,7 +137,7 @@ export class DefaultRoute {
                     }
                     return;
                 }
-                Logger.getLogger().error(StringHelper.sprintf('DefaultRoute::_all<%s>::routeHandle: Exception intern, path can not call: %e error:', cMethod, uriPath, ie));
+                Logger.getLogger().error(StringHelper.sprintf('DefaultRoute::_all<%s>::routeHandle: Exception intern, path can not call: %s error: %e', cMethod, uriPath, ie));
             }
         };
         for (const url of urls) {

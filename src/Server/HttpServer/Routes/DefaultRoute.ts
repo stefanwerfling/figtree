@@ -292,7 +292,7 @@ export class DefaultRoute implements IDefaultRoute {
 
                 Logger.getLogger().error(
                     StringHelper.sprintf(
-                        'DefaultRoute::_all<%s>::routeHandle: Exception intern, path can not call: %e error:',
+                        'DefaultRoute::_all<%s>::routeHandle: Exception intern, path can not call: %s error: %e',
                         cMethod,
                         uriPath,
                         ie
