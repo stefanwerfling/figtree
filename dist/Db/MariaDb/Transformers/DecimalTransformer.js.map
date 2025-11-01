@@ -1,0 +1,1 @@
+{"version":3,"file":"DecimalTransformer.js","sourceRoot":"","sources":["../../../../src/Db/MariaDb/Transformers/DecimalTransformer.ts"],"names":[],"mappings":"AAMA,MAAM,OAAO,kBAAkB;IAOpB,EAAE,CAAC,KAAa;QACnB,OAAO,UAAU,CAAC,KAAK,CAAC,IAAI,CAAC,CAAC;IAClC,CAAC;IAOM,IAAI,CAAC,KAAkB;QAC1B,OAAO,KAAK,CAAC,CAAC,CAAC,KAAK,CAAC,QAAQ,EAAE,CAAC,CAAC,CAAC,EAAE,CAAC;IACzC,CAAC;CAEJ"}

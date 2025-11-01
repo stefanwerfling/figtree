@@ -74,6 +74,9 @@ export {
 } from './Crypto/CertificateHelper.js';
 
 // DB ------------------------------------------------------------------------------------------------------------------
+export {BoolTransformer} from './Db/MariaDb/Transformers/BoolTransformer.js';
+export {DecimalTransformer} from './Db/MariaDb/Transformers/DecimalTransformer.js';
+export {IntTransformer} from './Db/MariaDb/Transformers/IntTransformer.js';
 export {DBBaseEntityId} from './Db/MariaDb/DBBaseEntityId.js';
 export {DBBaseEntityUnid} from './Db/MariaDb/DBBaseEntityUnid.js';
 export {DBRepository} from './Db/MariaDb/DBRepository.js';
