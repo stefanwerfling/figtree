@@ -83,7 +83,7 @@ export abstract class DBRepository<T extends DBBaseEntityId> {
     }
 
     /**
-     * Create a entity (only create an instance)
+     * Create an entity (only create an instance)
      * @param {DeepPartial<T>} entityLike
      * @return {T}
      */

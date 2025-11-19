@@ -22,7 +22,8 @@ export class Login extends DefaultRoute {
             description: 'Is a user login and return a status to the current session',
             responseBodySchema: SchemaIsLogin,
             querySchema: SchemaIsLoginParameter,
-            pathSchema: SchemaIsLoginParameterPath
+            pathSchema: SchemaIsLoginParameterPath,
+            useLocalStorage: true
         });
         this._post(this._getUrl('v1', Login.BASE, 'login/'), false, async (req, res, data) => {
             if (!data.session) {

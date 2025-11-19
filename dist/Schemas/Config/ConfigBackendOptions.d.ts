@@ -44,7 +44,7 @@ export declare const SchemaConfigBackendOptions: import("vts").ObjectSchema<{
         }>>;
         sslpath: import("vts").OptionalSchema<import("vts").StringSchema<import("vts").StringSchemaOptions>>;
         proxy: import("vts").OptionalSchema<import("vts").ObjectSchema<{
-            trust: import("vts").OrSchema<import("vts").BooleanSchema | import("vts").StringSchema<import("vts").StringSchemaOptions> | import("vts").ArraySchema<import("vts").StringSchema<import("vts").StringSchemaOptions>>>;
+            trust: import("vts").OrSchema<import("vts").StringSchema<import("vts").StringSchemaOptions> | import("vts").BooleanSchema | import("vts").ArraySchema<import("vts").StringSchema<import("vts").StringSchemaOptions>>>;
         }>>;
         csrf: import("vts").OptionalSchema<import("vts").ObjectSchema<{
             cookie: import("vts").BooleanSchema;

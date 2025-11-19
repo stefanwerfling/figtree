@@ -1,4 +1,4 @@
-import {SessionData} from '../../Schemas/Server/RequestData.js';
+import {RequestData, SessionData, SessionUserData} from '../../Schemas/Server/RequestData.js';
 
 /**
  * Session
@@ -16,6 +16,19 @@ export class Session {
         }
 
         return false;
+    }
+
+    /**
+     * Default init session
+     * @return {T}
+     * @template T
+     */
+    public static defaultInitSession<T=SessionUserData>(): T {
+        return {
+            isLogin: false,
+            userid: '',
+            role: ''
+        } as T;
     }
 
 }

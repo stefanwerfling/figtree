@@ -3,6 +3,8 @@ import {ACLRight} from '../../../ACL/ACLRight.js';
 import {Logger} from '../../../Logger/Logger.js';
 import {StatusCodes} from '../../../Schemas/Server/Routes/StatusCodes.js';
 import {StringHelper} from '../../../Utils/StringHelper.js';
+import {VtsSchemaError} from '../../../VtsExtend/VtsSchemaError.js';
+import {Session} from '../Session.js';
 import {DefaultReturn} from './../../../Schemas/Server/Routes/DefaultReturn.js';
 import path from 'path';
 import {Schema, SchemaErrors} from 'vts';
@@ -10,38 +12,63 @@ import {DefaultRouteCheckUserIsLogin, DefaultRouteCheckUserLogin} from './Defaul
 import {IDefaultRoute} from './IDefaultRoute.js';
 import {RequestContext} from './RequestContext.js';
 import {RouteError} from './RouteError.js';
+import {SchemaRouteError} from './SchemaRouteError.js';
 import {SwaggerUIRoute} from './SwaggerUIRoute.js';
 
 /**
  * DefaultRouteHandler
  */
-export type DefaultRouteHandler<A, B, C, D, E, F, S> = (
+export type DefaultRouteHandler<
+    Header,
+    Query,
+    Path,
+    Cookies,
+    Body,
+    Result,
+    Session
+> = (
     request: Request,
     response: Response,
     data: {
-        headers: A|undefined
-        params: C|undefined,
-        query: B|undefined,
-        cookies: D|undefined,
-        session: S|undefined,
-        body: E|undefined
+        headers: Header|undefined
+        params: Path|undefined,
+        query: Query|undefined,
+        cookies: Cookies|undefined,
+        session: Session|undefined,
+        body: Body|undefined
     }
-) => Promise<F>;
+) => Promise<Result>;
+
+/**
+ * Default route session init Handler
+ */
+export type DefaultRouteSessionInitHandler<SessionUser> = () => Promise<SessionUser>;
 
 /**
  * DefaultRouteMethodeDescription
  */
-export type DefaultRouteMethodeDescription<A, B, C, D, E, F, G, S> = {
+export type DefaultRouteMethodeDescription<
+    Header,
+    Query,
+    Path,
+    Cookies,
+    Body,
+    ResponseBody,
+    ResponseHeader,
+    Session,
+    SessionUser
+> = {
     description?: string;
     tags?: string[];
-    headerSchema?: Schema<A>;
-    querySchema?: Schema<B>;
-    pathSchema?: Schema<C>;
-    cookieSchema?: Schema<D>;
-    bodySchema?: Schema<E>;
-    responseBodySchema?: Schema<F>;
-    responseHeaderSchema?: Schema<G>;
-    sessionSchema?: Schema<S>;
+    headerSchema?: Schema<Header>;
+    querySchema?: Schema<Query>;
+    pathSchema?: Schema<Path>;
+    cookieSchema?: Schema<Cookies>;
+    bodySchema?: Schema<Body>;
+    responseBodySchema?: Schema<ResponseBody>;
+    responseHeaderSchema?: Schema<ResponseHeader>;
+    sessionSchema?: Schema<Session>;
+    sessionInit?: DefaultRouteSessionInitHandler<SessionUser>;
     parser?: RequestHandler,
     useLocalStorage?: boolean;
     aclRight?: ACLRight;
@@ -88,31 +115,29 @@ export class DefaultRoute implements IDefaultRoute {
      * Is Schema Validate
      * @param {Schema<T>} schema
      * @param {unknown} data
-     * @param {Response} res
-     * @param {boolean} autoSend
+     * @param {string} descriptionName
+     * @param {boolean} throwError
      * @template T
-     * @return {T}
+     * @return {boolean}
+     * @throws {SchemaRouteError}
      */
     public isSchemaValidate<T>(
         schema: Schema<T>,
         data: unknown,
-        res: Response,
-        autoSend: boolean = true
+        descriptionName: string,
+        throwError: boolean = true
     ): data is T {
         const errors: SchemaErrors = [];
 
-        if (!schema.validate(data, errors)) {
-            if (autoSend) {
-                res.status(200).json({
-                    statusCode: StatusCodes.INTERNAL_ERROR,
-                    msg: JSON.stringify(errors, null, 2)
-                } as DefaultReturn);
-            }
-
-            return false;
+        if (schema.validate(data, errors)) {
+            return true;
         }
 
-        return true;
+        if (throwError) {
+            throw new SchemaRouteError(schema, data, errors, descriptionName);
+        }
+
+        return false;
     }
 
     /**
@@ -131,11 +156,39 @@ export class DefaultRoute implements IDefaultRoute {
      * @param {DefaultRouteMethodeDescription} description
      * @protected
      */
-    protected _get<A, B, C, D, E, F, G, S>(
+    protected _get<
+        Header,
+        Query,
+        Path,
+        Cookies,
+        Body,
+        ResponseBody,
+        ResponseHeader,
+        Session,
+        SessionUser
+    >(
         uriPath: string|string[],
         checkUserLogin: boolean|DefaultRouteCheckUserLogin,
-        handler: DefaultRouteHandler<A, B, C, D, E, F, S>,
-        description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G, S>
+        handler: DefaultRouteHandler<
+            Header,
+            Query,
+            Path,
+            Cookies,
+            Body,
+            ResponseBody,
+            Session
+        >,
+        description: DefaultRouteMethodeDescription<
+            Header,
+            Query,
+            Path,
+            Cookies,
+            Body,
+            ResponseBody,
+            ResponseHeader,
+            Session,
+            SessionUser
+        >
     ): void {
         this._all('get', uriPath, checkUserLogin, handler, description);
     }
@@ -148,11 +201,39 @@ export class DefaultRoute implements IDefaultRoute {
      * @param {DefaultRouteMethodeDescription} description
      * @protected
      */
-    protected _post<A, B, C, D, E, F, G, S>(
+    protected _post<
+        Header,
+        Query,
+        Path,
+        Cookies,
+        Body,
+        ResponseBody,
+        ResponseHeader,
+        Session,
+        SessionUser
+    >(
         uriPath: string|string[],
         checkUserLogin: boolean|DefaultRouteCheckUserLogin,
-        handler: DefaultRouteHandler<A, B, C, D, E, F, S>,
-        description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G, S>
+        handler: DefaultRouteHandler<
+            Header,
+            Query,
+            Path,
+            Cookies,
+            Body,
+            ResponseBody,
+            Session
+        >,
+        description: DefaultRouteMethodeDescription<
+            Header,
+            Query,
+            Path,
+            Cookies,
+            Body,
+            ResponseBody,
+            ResponseHeader,
+            Session,
+            SessionUser
+        >
     ): void {
         this._all('post', uriPath, checkUserLogin, handler, description);
     }
@@ -166,12 +247,40 @@ export class DefaultRoute implements IDefaultRoute {
      * @param description
      * @protected
      */
-    protected _all<A, B, C, D, E, F, G, S>(
+    protected _all<
+        Header,
+        Query,
+        Path,
+        Cookies,
+        Body,
+        ResponseBody,
+        ResponseHeader,
+        Session,
+        SessionUser
+    >(
         method: string,
         uriPath: string|string[],
         checkUserLogin: boolean|DefaultRouteCheckUserLogin,
-        handler: DefaultRouteHandler<A, B, C, D, E, F, S>,
-        description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G, S>
+        handler: DefaultRouteHandler<
+            Header,
+            Query,
+            Path,
+            Cookies,
+            Body,
+            ResponseBody,
+            Session
+        >,
+        description: DefaultRouteMethodeDescription<
+            Header,
+            Query,
+            Path,
+            Cookies,
+            Body,
+            ResponseBody,
+            ResponseHeader,
+            Session,
+            SessionUser
+        >
     ): void {
         const cMethod = method.toLowerCase();
         const urls = Array.isArray(uriPath) ? uriPath : [uriPath];
@@ -195,58 +304,60 @@ export class DefaultRoute implements IDefaultRoute {
 
                 // check schemas ---------------------------------------------------------------------------------------
 
-                let headers: undefined|A = undefined;
-                let params: undefined|C = undefined;
-                let query: undefined|B = undefined;
-                let cookies: undefined|D = undefined;
-                let session: undefined|S = undefined;
-                let body: undefined|E = undefined;
+                let headers: undefined|Header = undefined;
+                let params: undefined|Path = undefined;
+                let query: undefined|Query = undefined;
+                let cookies: undefined|Cookies = undefined;
+                let session: undefined|Session = undefined;
+                let body: undefined|Body = undefined;
 
                 if (description.headerSchema) {
-                    if (this.isSchemaValidate(description.headerSchema, req.headers, res)) {
+                    if (this.isSchemaValidate(description.headerSchema, req.headers, 'Header')) {
                         headers = req.headers;
-                    } else {
-                        return;
                     }
                 }
 
                 if (description.pathSchema) {
-                    if (this.isSchemaValidate(description.pathSchema, req.params, res)) {
+                    if (this.isSchemaValidate(description.pathSchema, req.params, 'Path')) {
                         params = req.params;
-                    } else {
-                        return;
                     }
                 }
 
                 if (description.querySchema) {
-                    if (this.isSchemaValidate(description.querySchema, req.query, res)) {
+                    if (this.isSchemaValidate(description.querySchema, req.query, 'Query')) {
                         query = req.query;
-                    } else {
-                        return;
                     }
                 }
 
                 if (description.cookieSchema) {
-                    if (this.isSchemaValidate(description.cookieSchema, req.cookies, res)) {
+                    if (this.isSchemaValidate(description.cookieSchema, req.cookies, 'Cookies')) {
                         cookies = req.cookies;
-                    } else {
-                        return;
                     }
                 }
 
                 if (description.sessionSchema) {
-                    if (this.isSchemaValidate(description.sessionSchema, req.session, res)) {
+                    if (this.isSchemaValidate(description.sessionSchema, req.session, 'Session', false)) {
                         session = req.session;
                     } else {
-                        return;
+                        if (description.sessionInit) {
+                            req.session.user = await description.sessionInit();
+
+                            if (this.isSchemaValidate(description.sessionSchema, req.session, 'Session2')) {
+                                session = req.session;
+                            }
+                        } else {
+                            req.session.user = Session.defaultInitSession();
+
+                            if (this.isSchemaValidate(description.sessionSchema, req.session, 'Session3')) {
+                                session = req.session;
+                            }
+                        }
                     }
                 }
 
                 if (description.bodySchema) {
-                    if (this.isSchemaValidate(description.bodySchema, req.body, res)) {
+                    if (this.isSchemaValidate(description.bodySchema, req.body, 'Body')) {
                         body = req.body;
-                    } else {
-                        return;
                     }
                 }
 
@@ -280,6 +391,10 @@ export class DefaultRoute implements IDefaultRoute {
                     }
                 }
             } catch (ie) {
+                if (ie instanceof VtsSchemaError) {
+                    Logger.getLogger().error(ie.toString());
+                }
+
                 if (ie instanceof RouteError) {
                     if (ie.asJson()) {
                         res.status(200).json(ie.defaultReturn());
@@ -298,6 +413,13 @@ export class DefaultRoute implements IDefaultRoute {
                         ie
                     )
                 );
+
+                res.status(200).json({
+                    statusCode: StatusCodes.INTERNAL_ERROR,
+                    msg: 'Internal error, check the server logs.'
+                } as DefaultReturn);
+
+                return;
             }
         };
 

@@ -2,10 +2,13 @@ import { Router } from 'express';
 import { Logger } from '../../../Logger/Logger.js';
 import { StatusCodes } from '../../../Schemas/Server/Routes/StatusCodes.js';
 import { StringHelper } from '../../../Utils/StringHelper.js';
+import { VtsSchemaError } from '../../../VtsExtend/VtsSchemaError.js';
+import { Session } from '../Session.js';
 import path from 'path';
 import { DefaultRouteCheckUserIsLogin } from './DefaultRouteCheckUser.js';
 import { RequestContext } from './RequestContext.js';
 import { RouteError } from './RouteError.js';
+import { SchemaRouteError } from './SchemaRouteError.js';
 import { SwaggerUIRoute } from './SwaggerUIRoute.js';
 export class DefaultRoute {
     _routes;
@@ -16,18 +19,15 @@ export class DefaultRoute {
     _getUrl(version, base, controller) {
         return path.join(this._uriBase, version, base, controller);
     }
-    isSchemaValidate(schema, data, res, autoSend = true) {
+    isSchemaValidate(schema, data, descriptionName, throwError = true) {
         const errors = [];
-        if (!schema.validate(data, errors)) {
-            if (autoSend) {
-                res.status(200).json({
-                    statusCode: StatusCodes.INTERNAL_ERROR,
-                    msg: JSON.stringify(errors, null, 2)
-                });
-            }
-            return false;
+        if (schema.validate(data, errors)) {
+            return true;
         }
-        return true;
+        if (throwError) {
+            throw new SchemaRouteError(schema, data, errors, descriptionName);
+        }
+        return false;
     }
     getExpressRouter() {
         return this._routes;
@@ -63,51 +63,47 @@ export class DefaultRoute {
                 let session = undefined;
                 let body = undefined;
                 if (description.headerSchema) {
-                    if (this.isSchemaValidate(description.headerSchema, req.headers, res)) {
+                    if (this.isSchemaValidate(description.headerSchema, req.headers, 'Header')) {
                         headers = req.headers;
-                    }
-                    else {
-                        return;
                     }
                 }
                 if (description.pathSchema) {
-                    if (this.isSchemaValidate(description.pathSchema, req.params, res)) {
+                    if (this.isSchemaValidate(description.pathSchema, req.params, 'Path')) {
                         params = req.params;
-                    }
-                    else {
-                        return;
                     }
                 }
                 if (description.querySchema) {
-                    if (this.isSchemaValidate(description.querySchema, req.query, res)) {
+                    if (this.isSchemaValidate(description.querySchema, req.query, 'Query')) {
                         query = req.query;
-                    }
-                    else {
-                        return;
                     }
                 }
                 if (description.cookieSchema) {
-                    if (this.isSchemaValidate(description.cookieSchema, req.cookies, res)) {
+                    if (this.isSchemaValidate(description.cookieSchema, req.cookies, 'Cookies')) {
                         cookies = req.cookies;
-                    }
-                    else {
-                        return;
                     }
                 }
                 if (description.sessionSchema) {
-                    if (this.isSchemaValidate(description.sessionSchema, req.session, res)) {
+                    if (this.isSchemaValidate(description.sessionSchema, req.session, 'Session', false)) {
                         session = req.session;
                     }
                     else {
-                        return;
+                        if (description.sessionInit) {
+                            req.session.user = await description.sessionInit();
+                            if (this.isSchemaValidate(description.sessionSchema, req.session, 'Session2')) {
+                                session = req.session;
+                            }
+                        }
+                        else {
+                            req.session.user = Session.defaultInitSession();
+                            if (this.isSchemaValidate(description.sessionSchema, req.session, 'Session3')) {
+                                session = req.session;
+                            }
+                        }
                     }
                 }
                 if (description.bodySchema) {
-                    if (this.isSchemaValidate(description.bodySchema, req.body, res)) {
+                    if (this.isSchemaValidate(description.bodySchema, req.body, 'Body')) {
                         body = req.body;
-                    }
-                    else {
-                        return;
                     }
                 }
                 const result = await handler(req, res, {
@@ -128,6 +124,9 @@ export class DefaultRoute {
                 }
             }
             catch (ie) {
+                if (ie instanceof VtsSchemaError) {
+                    Logger.getLogger().error(ie.toString());
+                }
                 if (ie instanceof RouteError) {
                     if (ie.asJson()) {
                         res.status(200).json(ie.defaultReturn());
@@ -138,6 +137,11 @@ export class DefaultRoute {
                     return;
                 }
                 Logger.getLogger().error(StringHelper.sprintf('DefaultRoute::_all<%s>::routeHandle: Exception intern, path can not call: %s error: %e', cMethod, uriPath, ie));
+                res.status(200).json({
+                    statusCode: StatusCodes.INTERNAL_ERROR,
+                    msg: 'Internal error, check the server logs.'
+                });
+                return;
             }
         };
         for (const url of urls) {

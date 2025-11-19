@@ -6,7 +6,7 @@ export declare const SchemaConfigHttpServerSession: import("vts").ObjectSchema<{
 }>;
 export type ConfigHttpServerSession = ExtractSchemaResultType<typeof SchemaConfigHttpServerSession>;
 export declare const SchemaConfigHttpServerProxy: import("vts").ObjectSchema<{
-    trust: import("vts").OrSchema<import("vts").BooleanSchema | import("vts").StringSchema<import("vts").StringSchemaOptions> | import("vts").ArraySchema<import("vts").StringSchema<import("vts").StringSchemaOptions>>>;
+    trust: import("vts").OrSchema<import("vts").StringSchema<import("vts").StringSchemaOptions> | import("vts").BooleanSchema | import("vts").ArraySchema<import("vts").StringSchema<import("vts").StringSchemaOptions>>>;
 }>;
 export type ConfigHttpServerProxy = ExtractSchemaResultType<typeof SchemaConfigHttpServerProxy>;
 export declare const SchemaConfigHttpServerCsrf: import("vts").ObjectSchema<{
@@ -23,7 +23,7 @@ export declare const SchemaConfigHttpServer: import("vts").ObjectSchema<{
     }>>;
     sslpath: import("vts").OptionalSchema<import("vts").StringSchema<import("vts").StringSchemaOptions>>;
     proxy: import("vts").OptionalSchema<import("vts").ObjectSchema<{
-        trust: import("vts").OrSchema<import("vts").BooleanSchema | import("vts").StringSchema<import("vts").StringSchemaOptions> | import("vts").ArraySchema<import("vts").StringSchema<import("vts").StringSchemaOptions>>>;
+        trust: import("vts").OrSchema<import("vts").StringSchema<import("vts").StringSchemaOptions> | import("vts").BooleanSchema | import("vts").ArraySchema<import("vts").StringSchema<import("vts").StringSchemaOptions>>>;
     }>>;
     csrf: import("vts").OptionalSchema<import("vts").ObjectSchema<{
         cookie: import("vts").BooleanSchema;

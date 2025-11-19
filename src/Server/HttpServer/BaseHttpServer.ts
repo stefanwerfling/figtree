@@ -16,6 +16,16 @@ import {ITlsClientError} from './Tls/ITlsClientError.js';
 import {ITlsSocket} from './Tls/ITlsSocket.js';
 
 /**
+ * Declare module
+ */
+declare module 'express-session' {
+
+    interface SessionData {
+        user?: unknown;
+    }
+}
+
+/**
  * BaseHttpServerOptionCrypt
  */
 export type BaseHttpServerOptionCrypt = {

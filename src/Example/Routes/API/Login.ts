@@ -54,7 +54,8 @@ export class Login extends DefaultRoute {
                 description: 'Is a user login and return a status to the current session',
                 responseBodySchema: SchemaIsLogin,
                 querySchema: SchemaIsLoginParameter,
-                pathSchema: SchemaIsLoginParameterPath
+                pathSchema: SchemaIsLoginParameterPath,
+                useLocalStorage: true
             }
         );
 

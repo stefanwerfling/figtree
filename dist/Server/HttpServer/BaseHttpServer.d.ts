@@ -2,6 +2,11 @@ import * as http from 'node:http';
 import express, { Application } from 'express';
 import { Store } from 'express-session';
 import { IDefaultRoute } from './Routes/IDefaultRoute.js';
+declare module 'express-session' {
+    interface SessionData {
+        user?: unknown;
+    }
+}
 export type BaseHttpServerOptionCrypt = {
     sslPath: string;
     key: string;

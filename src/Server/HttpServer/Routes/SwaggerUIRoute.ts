@@ -65,7 +65,27 @@ export class SwaggerUIRoute implements IDefaultRoute {
      * @param {DefaultRouteMethodeDescription} description
      * @protected
      */
-    protected _addRouteToSwagger<A, B, C, D, E, F, G, S>(url: string, method: string, description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G, S>) {
+    protected _addRouteToSwagger<
+        Header,
+        Query,
+        Path,
+        Cookies,
+        Body,
+        ResponseBody,
+        ResponseHeader,
+        Session,
+        SessionUser
+    >(url: string, method: string, description: DefaultRouteMethodeDescription<
+        Header,
+        Query,
+        Path,
+        Cookies,
+        Body,
+        ResponseBody,
+        ResponseHeader,
+        Session,
+        SessionUser
+    >) {
         let swagUrl = url;
         const spec = {
             summary: description.description,
@@ -121,7 +141,27 @@ export class SwaggerUIRoute implements IDefaultRoute {
      * @param {string} url
      * @param {DefaultRouteMethodeDescription} description
      */
-    public registerPost<A, B, C, D, E, F, G, S>(url: string, description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G, S>): void {
+    public registerPost<
+        Header,
+        Query,
+        Path,
+        Cookies,
+        Body,
+        ResponseBody,
+        ResponseHeader,
+        Session,
+        SessionUser
+    >(url: string, description: DefaultRouteMethodeDescription<
+        Header,
+        Query,
+        Path,
+        Cookies,
+        Body,
+        ResponseBody,
+        ResponseHeader,
+        Session,
+        SessionUser
+    >): void {
         this._addRouteToSwagger(url, 'post', description);
     }
 
@@ -130,7 +170,27 @@ export class SwaggerUIRoute implements IDefaultRoute {
      * @param {string} url
      * @param {DefaultRouteMethodeDescription} description
      */
-    public registerGet<A, B, C, D, E, F, G, S>(url: string, description: DefaultRouteMethodeDescription<A, B, C, D, E, F, G, S>): void {
+    public registerGet<
+        Header,
+        Query,
+        Path,
+        Cookies,
+        Body,
+        ResponseBody,
+        ResponseHeader,
+        Session,
+        SessionUser
+    >(url: string, description: DefaultRouteMethodeDescription<
+        Header,
+        Query,
+        Path,
+        Cookies,
+        Body,
+        ResponseBody,
+        ResponseHeader,
+        Session,
+        SessionUser
+    >): void {
         this._addRouteToSwagger(url, 'get', description);
     }
 

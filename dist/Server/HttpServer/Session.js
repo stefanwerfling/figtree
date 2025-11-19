@@ -5,5 +5,12 @@ export class Session {
         }
         return false;
     }
+    static defaultInitSession() {
+        return {
+            isLogin: false,
+            userid: '',
+            role: ''
+        };
+    }
 }
 //# sourceMappingURL=Session.js.map

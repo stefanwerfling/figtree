@@ -57,19 +57,21 @@ export const DefaultRouteCheckUserIsLogin = (
     sendAutoResoonse: boolean = true
 ): req is RequestData =>  {
     if (SchemaRequestData.validate(req, [])) {
-        if (Session.isUserLogin(req.session)) {
-            return true;
-        }
-
         if (RequestContext.hasInstance()) {
             RequestContext.getInstance().set(RequestContext.SESSIONID, req.session.id);
             RequestContext.getInstance().set(RequestContext.USERID, '');
             RequestContext.getInstance().set(RequestContext.ISLOGIN, false);
+        }
 
-            if (req.session.user) {
-                RequestContext.getInstance().set(RequestContext.USERID, req.session.user.userid);
-                RequestContext.getInstance().set(RequestContext.ISLOGIN, req.session.user.isLogin);
+        if (Session.isUserLogin(req.session)) {
+            if (RequestContext.hasInstance()) {
+                if (req.session.user) {
+                    RequestContext.getInstance().set(RequestContext.USERID, req.session.user.userid);
+                    RequestContext.getInstance().set(RequestContext.ISLOGIN, req.session.user.isLogin);
+                }
             }
+
+            return true;
         }
     }
 
