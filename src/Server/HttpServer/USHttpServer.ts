@@ -81,6 +81,10 @@ export class USHttpServer extends BaseHttpServer {
      * start the listen
      */
     public override async listen(): Promise<void> {
+        if (this._express === undefined) {
+            throw new Error('Express isnt init!');
+        }
+
         const app = this._express;
         this._unixPath = await this._getUnixSocket();
 

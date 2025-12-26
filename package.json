@@ -62,7 +62,8 @@
     "vts": "git+https://github.com/OpenSourcePKG/vts.git",
     "winston": "^3.13.0",
     "winston-daily-rotate-file": "^5.0.0",
-    "ws": "^8.18.1"
+    "ws": "^8.18.1",
+    "vite": "^5.0.0"
   },
   "peerDependenciesMeta": {
     "@types/async-exit-hook": {
@@ -87,6 +88,9 @@
       "optional": true
     },
     "@types/uuid": {
+      "optional": true
+    },
+    "vite": {
       "optional": true
     }
   },

@@ -143,7 +143,7 @@ export class HttpService extends ServiceAbstract {
                 csrf: csrf
             });
 
-            await this._server.listen();
+            await this._server.setupAndListen();
         } catch(error) {
             this._status = ServiceStatus.Error;
             this._inProcess = false;

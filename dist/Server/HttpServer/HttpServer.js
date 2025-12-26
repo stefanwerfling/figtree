@@ -8,8 +8,11 @@ import { DirHelper } from '../../Utils/DirHelper.js';
 import { BaseHttpServer } from './BaseHttpServer.js';
 import { Session } from './Session.js';
 export class HttpServer extends BaseHttpServer {
-    _initServer() {
-        super._initServer();
+    _initExpressUsePre() {
+        if (this._express === undefined) {
+            throw new Error('Express isnt init!');
+        }
+        super._initExpressUsePre();
         this._express.use(helmet());
         this._express.use(helmet.contentSecurityPolicy({
             directives: {

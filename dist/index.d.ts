@@ -63,6 +63,7 @@ export { Session } from './Server/HttpServer/Session.js';
 export { HttpRouteLoader, HttpRouteLoaderType } from './Server/HttpServer/HttpRouteLoader.js';
 export { BaseHttpCertKey, BaseHttpServerOptionCrypt, BaseHttpServerOptionSession, BaseHttpServerOptionProxy, BaseHttpServerOptionCsrf, BaseHttpServerOptions, BaseHttpServer } from './Server/HttpServer/BaseHttpServer.js';
 export { USHttpServerOptions, USHttpServer } from './Server/HttpServer/USHttpServer.js';
+export { ViteHttpServerOptions, ViteHttpServer } from './Server/HttpServer/ViteHttpServer.js';
 export { HttpUploadChunkInfo, FnHttpUploadHandleSuccess, HttpUpload } from './Server/HttpServer/HttpUpload.js';
 export { HttpFileStream } from './Server/HttpServer/HttpFileStream.js';
 export { SwaggerUIRoute } from './Server/HttpServer/Routes/SwaggerUIRoute.js';

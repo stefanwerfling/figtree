@@ -59,6 +59,7 @@ export { Session } from './Server/HttpServer/Session.js';
 export { HttpRouteLoader } from './Server/HttpServer/HttpRouteLoader.js';
 export { BaseHttpServer } from './Server/HttpServer/BaseHttpServer.js';
 export { USHttpServer } from './Server/HttpServer/USHttpServer.js';
+export { ViteHttpServer } from './Server/HttpServer/ViteHttpServer.js';
 export { HttpUpload } from './Server/HttpServer/HttpUpload.js';
 export { HttpFileStream } from './Server/HttpServer/HttpFileStream.js';
 export { SwaggerUIRoute } from './Server/HttpServer/Routes/SwaggerUIRoute.js';

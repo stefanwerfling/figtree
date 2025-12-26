@@ -18,8 +18,12 @@ export class HttpServer extends BaseHttpServer {
      * _initServer
      * @protected
      */
-    protected _initServer(): void {
-        super._initServer();
+    protected _initExpressUsePre(): void {
+        if (this._express === undefined) {
+            throw new Error('Express isnt init!');
+        }
+
+        super._initExpressUsePre();
 
         this._express.use(helmet());
         this._express.use(helmet.contentSecurityPolicy({

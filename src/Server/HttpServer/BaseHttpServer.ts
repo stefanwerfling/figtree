@@ -101,7 +101,7 @@ export class BaseHttpServer {
      * express object
      * @private
      */
-    protected readonly _express: Application;
+    protected _express?: Application;
 
     /**
      * Server object
@@ -119,7 +119,19 @@ export class BaseHttpServer {
      * realm
      * @private
      */
-    protected readonly _realm: string;
+    protected _realm: string;
+
+    /**
+     * public dir
+     * @protected
+     */
+    protected _publicDir?: string;
+
+    /**
+     * routes
+     * @protected
+     */
+    protected _routes: IDefaultRoute[] = [];
 
     /**
      * session
@@ -168,30 +180,97 @@ export class BaseHttpServer {
             this._csrf = serverInit.csrf;
         }
 
-        this._express = express();
-        this._express.use((req, _, next) => {
-            Logger.getLogger().silly('BaseHttpServer::request: Url: %s Protocol: %s Method: %s', req.url, req.protocol, req.method);
-            next();
-        });
-
-        this._initServer();
-
-        // -------------------------------------------------------------------------------------------------------------
-
-        if (serverInit.routes) {
-            this._routes(serverInit.routes);
-        }
-
-        if (serverInit.publicDir) {
-            this._assets(serverInit.publicDir);
-        }
-
         if (serverInit.crypt) {
             this._crypt = serverInit.crypt;
         }
 
+        if (serverInit.publicDir) {
+            this._publicDir = serverInit.publicDir;
+        }
+
+        if (serverInit.routes) {
+            this._routes = serverInit.routes;
+        }
+    }
+
+    /**
+     * init session
+     * @protected
+     */
+    protected _initSession(): void {
+        if (this._session) {
+            this._sessionParser = session({
+                secret: this._session.secret,
+                proxy: true,
+                resave: true,
+                saveUninitialized: true,
+                store: this._getSessionStore(),
+                cookie: {
+                    path: this._session.cookie_path,
+                    secure: this._session.ssl_path !== '',
+                    maxAge: this._session.max_age
+                }
+            });
+        }
+    }
+
+    /**
+     * init express
+     * @protected
+     */
+    protected _initExpress(): void {
+        this._express = express();
+
+        if (this._proxy) {
+            this._express.set('trust proxy', this._proxy.trust);
+        }
+
+        this._express.use((req, _, next) => {
+            Logger.getLogger().silly('BaseHttpServer::request: Url: %s Protocol: %s Method: %s', req.url, req.protocol, req.method);
+            next();
+        });
+    }
+
+    /**
+     * init express use pre
+     * @protected
+     */
+    protected _initExpressUsePre(): void {
+        if (this._express === undefined) {
+            throw new Error('Express isnt init!');
+        }
+
+        this._express.use(bodyParser.urlencoded({extended: true}));
+        this._express.use(bodyParser.json());
+        this._express.use(cookieParser());
+
+        // -------------------------------------------------------------------------------------------------------------
+
+        if (this._csrf) {
+            this._express.use(csurf({ cookie: this._csrf.cookie }));
+        }
+
+        // -------------------------------------------------------------------------------------------------------------
+
+        if (this._session) {
+            if (this._sessionParser === null) {
+                throw new Error('Session isnt init!');
+            }
+
+            this._express.use(this._sessionParser);
+        }
+    }
+
+    /**
+     * init express use after
+     * @protected
+     */
+    protected _initExpressUseAfter(): void {
+        if (this._express === undefined) {
+            throw new Error('Express isnt init!');
+        }
+
         // add error handling
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         this._express.use((error: any, _request: Request, response: Response, _next: NextFunction): void => {
             if (error instanceof SyntaxError && 'body' in error) {
                 Logger.getLogger().warn('Invalid JSON received:', error.message);
@@ -211,6 +290,20 @@ export class BaseHttpServer {
     }
 
     /**
+     * init express use main
+     * @protected
+     */
+    protected _initExpressUseMain(): void {
+        if (this._routes.length > 0) {
+            this._routesUse(this._routes);
+        }
+
+        if (this._publicDir) {
+            this._assets(this._publicDir);
+        }
+    }
+
+    /**
      * Return the session store, default is Memory Store
      * @protected
      * @return {Store}
@@ -220,54 +313,72 @@ export class BaseHttpServer {
     }
 
     /**
-     * _initServer
+     * setup
      * @protected
      */
-    protected _initServer(): void {
-        this._express.use(bodyParser.urlencoded({extended: true}));
-        this._express.use(bodyParser.json());
-        this._express.use(cookieParser());
+    public async setup(): Promise<void> {
+        this._initExpress();
 
         // -------------------------------------------------------------------------------------------------------------
 
-        if (this._csrf) {
-            this._express.use(csurf({ cookie: this._csrf.cookie }));
+        await this._initServer();
+
+        // -------------------------------------------------------------------------------------------------------------
+
+        this._initSession();
+        this._initExpressUsePre();
+        this._initExpressUseMain();
+        this._initExpressUseAfter();
+    }
+
+    protected async _initServer(): Promise<void> {
+        if (this._express === undefined) {
+            throw new Error('Express isnt init!');
         }
 
-        // -------------------------------------------------------------------------------------------------------------
+        if (this._crypt) {
+            const ck = await this._getCertAndKey(this._crypt);
 
-        if (this._session) {
-            this._sessionParser = session({
-                secret: this._session.secret,
-                proxy: true,
-                resave: true,
-                saveUninitialized: true,
-                store: this._getSessionStore(),
-                cookie: {
-                    path: this._session.cookie_path,
-                    secure: this._session.ssl_path !== '',
-                    maxAge: this._session.max_age
-                }
-            });
+            if (ck) {
+                this._server = https.createServer({
+                    key: ck.key,
+                    cert: ck.crt
+                }, this._express);
 
-            this._express.use(this._sessionParser);
-        }
+                this._server.on('tlsClientError', (err, atlsSocket) => {
+                    const tlsError = err as ITlsClientError;
 
-        // -------------------------------------------------------------------------------------------------------------
+                    if (tlsError.reason === 'http request') {
+                        const tTlsSocket = atlsSocket as ITlsSocket;
 
-        if (this._proxy) {
-            this._express.set('trust proxy', this._proxy.trust);
+                        if (tTlsSocket._parent) {
+                            tTlsSocket._parent.write('HTTP/1.1 302 Found\n' +
+                                `Location: https://${BaseHttpServer._listenHost}:${this._port}`);
+                        }
+
+                        Logger.getLogger().error(
+                            'BaseHttpServer::listen: The client call the Server over HTTP protocol. Please use HTTPS, example: https://%s:%d',
+                            BaseHttpServer._listenHost,
+                            this._port
+                        );
+                    }
+                });
+            } else {
+                Logger.getLogger().error('BaseHttpServer::listen: Key and Certificate not found for http server!');
+            }
+        } else {
+            this._server = http.createServer(this._express);
         }
     }
 
     /**
-     * _routes
+     * _routesUse
      * @param {IDefaultRoute[]} routes
      * @private
      */
-    private _routes(routes: IDefaultRoute[]): void {
+    private _routesUse(routes: IDefaultRoute[]): void {
         routes.forEach((route) => {
-            this._express.use(route.getExpressRouter());
+            this._express?.use(route.getExpressRouter());
         });
     }
 
@@ -277,7 +388,7 @@ export class BaseHttpServer {
      * @private
      */
     private _assets(publicDir: string | null): void {
-        if (publicDir !== null) {
+        if (this._express && publicDir !== null) {
             this._express.use(express.static(publicDir));
         }
     }
@@ -337,55 +448,30 @@ export class BaseHttpServer {
      * listen
      */
     public async listen(): Promise<void> {
-        if (this._crypt) {
-            const ck = await this._getCertAndKey(this._crypt);
-
-            if (ck) {
-                this._server = https.createServer({
-                    key: ck.key,
-                    cert: ck.crt
-                }, this._express);
-
-                this._server.on('tlsClientError', (err, atlsSocket) => {
-                    const tlsError = err as ITlsClientError;
-
-                    if (tlsError.reason === 'http request') {
-                        const tTlsSocket = atlsSocket as ITlsSocket;
-
-                        if (tTlsSocket._parent) {
-                            tTlsSocket._parent.write('HTTP/1.1 302 Found\n' +
-                                `Location: https://${BaseHttpServer._listenHost}:${this._port}`);
-                        }
-
-                        Logger.getLogger().error(
-                            'BaseHttpServer::listen: The client call the Server over HTTP protocol. Please use HTTPS, example: https://%s:%d',
-                            BaseHttpServer._listenHost,
-                            this._port
-                        );
-                    }
-                });
-
-                this._server.listen(this._port, () => {
-                    Logger.getLogger().info(
-                        'BaseHttpServer::listen: %s listening on the https://%s:%d',
-                        this._realm,
-                        BaseHttpServer._listenHost,
-                        this._port
-                    );
-                });
-            } else {
-                Logger.getLogger().error('BaseHttpServer::listen: Key and Certificate not found for http server!');
-            }
-        } else {
-            this._server = this._express.listen(this._port, () => {
-                Logger.getLogger().info(
-                    'BaseHttpServer::listen: %s listening on the http://%s:%d',
-                    this._realm,
-                    BaseHttpServer._listenHost,
-                    this._port
-                );
-            });
+        if (this._server === null) {
+            throw new Error('Server isnt init!');
         }
+
+        this._server.listen(this._port, () => {
+            const isHttps = this._server instanceof https.Server;
+            const protocol = isHttps ? 'https' : 'http';
+
+            Logger.getLogger().info(
+                'BaseHttpServer::listen: %s listening on the %s://%s:%d',
+                this._realm,
+                protocol,
+                BaseHttpServer._listenHost,
+                this._port
+            );
+        });
+    }
+
+    /**
+     * Setup and listen
+     */
+    public async setupAndListen(): Promise<void> {
+        await this.setup();
+        await this.listen();
     }
 
     /**
