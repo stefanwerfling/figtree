@@ -6,5 +6,5 @@ export declare class RedisDBService extends ServiceAbstract {
     protected _channels: RedisChannel<any>[];
     constructor(channels: RedisChannel<any>[], serviceName?: string, serviceDependencies?: string[]);
     start(): Promise<void>;
-    stop(forced?: boolean): Promise<void>;
+    stop(): Promise<void>;
 }

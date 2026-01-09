@@ -80,9 +80,8 @@ export class PluginService extends ServiceAbstract {
 
     /**
      * Stop the service
-     * @param {boolean} forced
      */
-    public override async stop(forced: boolean = false): Promise<void> {
+    public override async stop(): Promise<void> {
         try {
             await this._pluginManager.stop();
         } catch (error) {

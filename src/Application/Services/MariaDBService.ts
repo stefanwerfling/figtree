@@ -2,7 +2,7 @@ import {Config} from '../../Config/Config.js';
 import {DBHelper} from '../../Db/MariaDb/DBHelper.js';
 import {DBLoaderType} from '../../Db/MariaDb/DBLoader.js';
 import {Logger} from '../../Logger/Logger.js';
-import {ConfigBackendOptions, SchemaConfigBackendOptions} from '../../Schemas/Config/ConfigBackendOptions.js';
+import {ConfigBackendOptions} from '../../Schemas/Config/ConfigBackendOptions.js';
 import {SchemaConfigDbOptionsMySql} from '../../Schemas/Config/ConfigDb.js';
 import {ServiceAbstract, ServiceImportance, ServiceStatus} from '../../Service/ServiceAbstract.js';
 import {ServiceError} from '../../Service/ServiceError.js';
@@ -104,9 +104,8 @@ export class MariaDBService extends ServiceAbstract {
 
     /**
      * Stop the service
-     * @param {boolean} forced
      */
-    public override async stop(forced: boolean = false): Promise<void> {
+    public override async stop(): Promise<void> {
         try {
             await DBHelper.closeAllSources();
         } catch (error) {

@@ -1,7 +1,7 @@
 import {Config} from '../../Config/Config.js';
 import {ChromaDbClient} from '../../Db/ChromaDb/ChromaDbClient.js';
 import {Logger} from '../../Logger/Logger.js';
-import {ConfigBackendOptions, SchemaConfigBackendOptions} from '../../Schemas/Config/ConfigBackendOptions.js';
+import {ConfigBackendOptions} from '../../Schemas/Config/ConfigBackendOptions.js';
 import {SchemaConfigDbOptionsChroma} from '../../Schemas/Config/ConfigDb.js';
 import {ServiceAbstract, ServiceImportance, ServiceStatus} from '../../Service/ServiceAbstract.js';
 import {ServiceError} from '../../Service/ServiceError.js';
@@ -100,9 +100,8 @@ export class ChromaDBService extends ServiceAbstract {
 
     /**
      * Stop the service
-     * @param {boolean} forced
      */
-    public override async stop(forced: boolean = false): Promise<void> {
+    public override async stop(): Promise<void> {
         try {
             this._chromaDbClient = null;
         } catch (error) {

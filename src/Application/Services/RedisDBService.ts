@@ -3,7 +3,7 @@ import {RedisChannel} from '../../Db/RedisDb/RedisChannel.js';
 import {RedisClient} from '../../Db/RedisDb/RedisClient.js';
 import {RedisSubscribe} from '../../Db/RedisDb/RedisSubscribe.js';
 import {Logger} from '../../Logger/Logger.js';
-import {ConfigBackendOptions, SchemaConfigBackendOptions} from '../../Schemas/Config/ConfigBackendOptions.js';
+import {ConfigBackendOptions} from '../../Schemas/Config/ConfigBackendOptions.js';
 import {SchemaConfigDbOptionsRedis} from '../../Schemas/Config/ConfigDb.js';
 import {ServiceAbstract, ServiceImportance, ServiceStatus} from '../../Service/ServiceAbstract.js';
 import {ServiceError} from '../../Service/ServiceError.js';
@@ -103,9 +103,8 @@ export class RedisDBService extends ServiceAbstract {
 
     /**
      * Stop the service
-     * @param {boolean} forced
      */
-    public override async stop(forced: boolean = false): Promise<void> {
+    public override async stop(): Promise<void> {
         try {
             await RedisClient.getInstance().disconnect();
         } catch (error) {

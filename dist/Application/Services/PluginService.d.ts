@@ -7,5 +7,5 @@ export declare class PluginService extends ServiceAbstract {
     constructor(appName: string, serviceName?: string, serviceDependencies?: string[], options?: PluginManagerOptions);
     getPluginManager(): PluginManager;
     start(): Promise<void>;
-    stop(forced?: boolean): Promise<void>;
+    stop(): Promise<void>;
 }

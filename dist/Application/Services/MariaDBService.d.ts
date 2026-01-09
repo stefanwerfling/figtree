@@ -6,5 +6,5 @@ export declare class MariaDBService extends ServiceAbstract {
     protected _loader: DBLoaderType;
     constructor(loader: DBLoaderType, serviceName?: string, serviceDependencies?: string[]);
     start(): Promise<void>;
-    stop(forced?: boolean): Promise<void>;
+    stop(): Promise<void>;
 }

@@ -44,7 +44,7 @@ export class ChromaDBService extends ServiceAbstract {
     getClient() {
         return this._chromaDbClient;
     }
-    async stop(forced = false) {
+    async stop() {
         try {
             this._chromaDbClient = null;
         }

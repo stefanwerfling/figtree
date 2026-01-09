@@ -45,7 +45,7 @@ export class InfluxDBService extends ServiceAbstract {
         this._status = ServiceStatus.Success;
         this._inProcess = false;
     }
-    async stop(forced = false) {
+    async stop() {
         try {
         }
         catch (error) {

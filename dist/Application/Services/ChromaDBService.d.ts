@@ -7,5 +7,5 @@ export declare class ChromaDBService extends ServiceAbstract {
     constructor(serviceName?: string, serviceDependencies?: string[]);
     start(): Promise<void>;
     getClient(): ChromaDbClient | null;
-    stop(forced?: boolean): Promise<void>;
+    stop(): Promise<void>;
 }
