@@ -5,6 +5,9 @@ import {HttpServer} from './HttpServer.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
+/**
+ * Vite http server options
+ */
 export type ViteHttpServerOptions = BaseHttpServerOptions & {
     vitePublicDir?: string;
     viteIndexFile?: string;

@@ -1,7 +1,7 @@
 import {v4 as uuid} from 'uuid';
 import {Config} from '../../Config/Config.js';
 import {Logger} from '../../Logger/Logger.js';
-import {ConfigBackendOptions, SchemaConfigBackendOptions} from '../../Schemas/Config/ConfigBackendOptions.js';
+import {ConfigBackendOptions} from '../../Schemas/Config/ConfigBackendOptions.js';
 import {SchemaConfigHttpServer} from '../../Schemas/Config/ConfigHttpServer.js';
 import {BaseHttpServerOptionCsrf, BaseHttpServerOptionProxy} from '../../Server/HttpServer/BaseHttpServer.js';
 import {HttpRouteLoaderType} from '../../Server/HttpServer/HttpRouteLoader.js';
@@ -165,9 +165,8 @@ export class HttpService extends ServiceAbstract {
 
     /**
      * Stop the service
-     * @param {boolean} forced
      */
-    public override async stop(forced: boolean = false): Promise<void> {
+    public override async stop(): Promise<void> {
         try {
             if (this._server) {
                 this._server.close();

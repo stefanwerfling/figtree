@@ -7,7 +7,7 @@ import { SchemaIsLogin, SchemaIsLoginParameter, SchemaIsLoginParameterPath, Sche
 export class Login extends DefaultRoute {
     static BASE = 'login';
     getExpressRouter() {
-        this._get(this._getUrl('v1', Login.BASE, 'islogin/:userid'), false, async (req, res, data) => {
+        this._get(this._getUrl('v1', Login.BASE, 'islogin/:userid'), false, async (req, _res, _data) => {
             if (DefaultRouteCheckUserIsLogin(req, false)) {
                 return {
                     statusCode: StatusCodes.OK,
@@ -25,7 +25,7 @@ export class Login extends DefaultRoute {
             pathSchema: SchemaIsLoginParameterPath,
             useLocalStorage: true
         });
-        this._post(this._getUrl('v1', Login.BASE, 'login/'), false, async (req, res, data) => {
+        this._post(this._getUrl('v1', Login.BASE, 'login/'), false, async (_req, _res, data) => {
             if (!data.session) {
                 return {
                     statusCode: StatusCodes.INTERNAL_ERROR,

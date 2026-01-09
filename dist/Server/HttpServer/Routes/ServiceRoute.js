@@ -14,7 +14,7 @@ export class ServiceRoute extends DefaultRoute {
         this._accessRights = accessRights;
     }
     getExpressRouter() {
-        this._get(this._getUrl('v1', 'service', 'status'), this._onlyUserAccess, async (request, response, data) => {
+        this._get(this._getUrl('v1', 'service', 'status'), this._onlyUserAccess, async (_request, _response, _data) => {
             const backend = BackendApp.getInstance(this._backendInstanceName);
             if (backend) {
                 const sm = backend.getServiceManager();
@@ -34,7 +34,7 @@ export class ServiceRoute extends DefaultRoute {
             responseBodySchema: SchemaServiceStatusResponse,
             aclRight: this._accessRights?.status
         });
-        this._post(this._getUrl('v1', 'service', 'start'), this._onlyUserAccess, async (request, response, data) => {
+        this._post(this._getUrl('v1', 'service', 'start'), this._onlyUserAccess, async (_request, _response, data) => {
             const backend = BackendApp.getInstance(this._backendInstanceName);
             if (backend) {
                 try {
@@ -61,7 +61,7 @@ export class ServiceRoute extends DefaultRoute {
             responseBodySchema: SchemaDefaultReturn,
             aclRight: this._accessRights?.start
         });
-        this._post(this._getUrl('v1', 'service', 'stop'), this._onlyUserAccess, async (request, response, data) => {
+        this._post(this._getUrl('v1', 'service', 'stop'), this._onlyUserAccess, async (_request, _response, data) => {
             const backend = BackendApp.getInstance(this._backendInstanceName);
             if (backend) {
                 try {

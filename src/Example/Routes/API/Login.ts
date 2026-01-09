@@ -12,6 +12,9 @@ import {
     SchemaIsLoginParameterPath, SchemaLoginRequest
 } from '../../Schemas/Routes/Login/Login.js';
 
+/**
+ * Login Example route
+ */
 export class Login extends DefaultRoute {
 
     /**
@@ -29,8 +32,8 @@ export class Login extends DefaultRoute {
             false,
             async(
                 req,
-                res,
-                data
+                _res,
+                _data
             ): Promise<IsLogin> => {
 
                 // Your code -------------------------------------------------------------------------------------------
@@ -63,8 +66,8 @@ export class Login extends DefaultRoute {
             this._getUrl('v1', Login.BASE, 'login/'),
             false,
             async(
-                req,
-                res,
+                _req,
+                _res,
                 data
             ): Promise<DefaultReturn> => {
                 if (!data.session) {

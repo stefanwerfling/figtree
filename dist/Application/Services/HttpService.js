@@ -98,7 +98,7 @@ export class HttpService extends ServiceAbstract {
         this._status = ServiceStatus.Success;
         this._inProcess = false;
     }
-    async stop(forced = false) {
+    async stop() {
         try {
             if (this._server) {
                 this._server.close();
