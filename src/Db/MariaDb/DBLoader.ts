@@ -15,9 +15,9 @@ export class DBLoader {
 
     /**
      * load Migrations
-     * @return {MixedList<Function | string> }
+     * @return {MixedList<Function | string>|undefined}
      */
-    public static loadMigrations(): MixedList<Function | string> {
+    public static loadMigrations(): MixedList<Function | string>|undefined {
         throw new Error('DBLoader::loadMigrations: please set your own class!');
     }
 }
@@ -35,7 +35,8 @@ export type DBLoaderType = { new(): DBLoader;
 
     /**
      * load Migrations
-     * @return {MixedList<Function | string> }
+     * @return {MixedList<Function | string>|undefined}
      */
-    loadMigrations(): MixedList<Function | string>;
+    loadMigrations(): MixedList<Function | string>|undefined;
+
 };
