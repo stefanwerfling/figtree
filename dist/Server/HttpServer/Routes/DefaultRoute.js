@@ -136,7 +136,7 @@ export class DefaultRoute {
                     }
                     return;
                 }
-                Logger.getLogger().error(StringHelper.sprintf('DefaultRoute::_all<%s>::routeHandle: Exception intern, path can not call: %s error: %e', cMethod, uriPath, ie));
+                Logger.getLogger().error(StringHelper.sprintf('DefaultRoute::_all<%s>::routeHandle: Exception intern, path can not call: %s sessionid: %s error: %e', cMethod, uriPath, req.session.id ?? 'none', ie));
                 res.status(200).json({
                     statusCode: StatusCodes.INTERNAL_ERROR,
                     msg: 'Internal error, check the server logs.'
