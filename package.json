@@ -23,7 +23,7 @@
     "figtree-schemas": "./schemas",
     "typescript": "^5.7.3",
     "vite": "^5.0.0",
-    "vtseditor": "github:stefanwerfling/vtseditor"
+    "vtseditor": "git+https://github.com/stefanwerfling/vtseditor.git"
   },
   "exports": {
     ".": {
