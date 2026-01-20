@@ -1,4 +1,4 @@
-import {SessionData, SessionUserData} from 'figtree_schemas';
+import {SessionData, SessionUserData} from 'figtree-schemas';
 
 /**
  * Session

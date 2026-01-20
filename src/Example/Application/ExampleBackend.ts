@@ -1,4 +1,4 @@
-import {ConfigOptions, DefaultArgs, SchemaDefaultArgs} from 'figtree_schemas';
+import {ConfigOptions, DefaultArgs, SchemaDefaultArgs} from 'figtree-schemas';
 import {Schema} from 'vts';
 import {ACL} from '../../ACL/ACL.js';
 import {BackendApp} from '../../Application/BackendApp.js';

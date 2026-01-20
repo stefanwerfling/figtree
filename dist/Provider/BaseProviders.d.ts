@@ -1,4 +1,4 @@
-import { ProviderEntry } from 'figtree_schemas';
+import { ProviderEntry } from 'figtree-schemas';
 import { IProvider } from './IProvider.js';
 import { IProviders } from './IProviders.js';
 export declare class BaseProviders<E extends ProviderEntry, T extends IProvider<E>> implements IProviders<E, T> {

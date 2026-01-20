@@ -1,4 +1,4 @@
-import { SchemaDefaultArgs } from 'figtree_schemas';
+import { SchemaDefaultArgs } from 'figtree-schemas';
 import { ACL } from '../../ACL/ACL.js';
 import { BackendApp } from '../../Application/BackendApp.js';
 import { HttpService } from '../../Application/Services/HttpService.js';

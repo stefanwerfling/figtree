@@ -1,5 +1,5 @@
 import rateLimit from 'express-rate-limit';
-import { SchemaRequestData } from 'figtree_schemas';
+import { SchemaRequestData } from 'figtree-schemas';
 import helmet from 'helmet';
 import { Config } from '../../Config/Config.js';
 import { CertificateHelper } from '../../Crypto/CertificateHelper.js';

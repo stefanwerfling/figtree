@@ -1,4 +1,4 @@
-import { PluginDefinition } from 'figtree_schemas';
+import { PluginDefinition } from 'figtree-schemas';
 import { PluginManager } from './PluginManager.js';
 export declare abstract class APlugin {
     protected _info: PluginDefinition;

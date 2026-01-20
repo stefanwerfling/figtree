@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { StatusCodes } from 'figtree_schemas';
+import { StatusCodes } from 'figtree-schemas';
 import { Logger } from '../../../Logger/Logger.js';
 import { StringHelper } from '../../../Utils/StringHelper.js';
 import { VtsSchemaError } from '../../../VtsExtend/VtsSchemaError.js';

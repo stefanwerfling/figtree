@@ -1,4 +1,4 @@
-import {SchemaDefaultReturn} from 'figtree_schemas';
+import {SchemaDefaultReturn} from 'figtree-schemas';
 import {ExtractSchemaResultType, Vts} from 'vts';
 
 export const SchemaTest = Vts.object({

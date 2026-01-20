@@ -1,4 +1,4 @@
-import { ENV_DB, SchemaConfigBackendOptions } from 'figtree_schemas';
+import { ENV_DB, SchemaConfigBackendOptions } from 'figtree-schemas';
 import { Config } from './Config.js';
 export var ENV_OPTIONAL;
 (function (ENV_OPTIONAL) {

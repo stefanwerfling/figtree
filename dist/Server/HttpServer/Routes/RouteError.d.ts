@@ -1,4 +1,4 @@
-import { DefaultReturn } from 'figtree_schemas';
+import { DefaultReturn } from 'figtree-schemas';
 export declare class RouteError extends Error {
     protected _status: string;
     protected _msg: string;

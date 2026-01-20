@@ -1,4 +1,4 @@
-import {DefaultReturn} from 'figtree_schemas';
+import {DefaultReturn} from 'figtree-schemas';
 
 /**
  * Route Error

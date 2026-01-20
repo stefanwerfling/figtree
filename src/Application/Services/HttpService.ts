@@ -1,4 +1,4 @@
-import {ConfigBackendOptions, SchemaConfigHttpServer} from 'figtree_schemas';
+import {ConfigBackendOptions, SchemaConfigHttpServer} from 'figtree-schemas';
 import {v4 as uuid} from 'uuid';
 import {Config} from '../../Config/Config.js';
 import {Logger} from '../../Logger/Logger.js';

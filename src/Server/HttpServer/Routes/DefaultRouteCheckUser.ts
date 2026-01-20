@@ -1,5 +1,5 @@
 import {Request, Response} from 'express';
-import {RequestData, SchemaRequestData, StatusCodes} from 'figtree_schemas';
+import {RequestData, SchemaRequestData, StatusCodes} from 'figtree-schemas';
 import {ACL} from '../../../ACL/ACL.js';
 import {Session} from '../Session.js';
 import {RequestContext} from './RequestContext.js';

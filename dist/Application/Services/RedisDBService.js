@@ -1,4 +1,4 @@
-import { SchemaConfigDbOptionsRedis } from 'figtree_schemas';
+import { SchemaConfigDbOptionsRedis } from 'figtree-schemas';
 import { Config } from '../../Config/Config.js';
 import { RedisClient } from '../../Db/RedisDb/RedisClient.js';
 import { RedisSubscribe } from '../../Db/RedisDb/RedisSubscribe.js';

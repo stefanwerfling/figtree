@@ -1,4 +1,4 @@
-import {ProviderEntry} from 'figtree_schemas';
+import {ProviderEntry} from 'figtree-schemas';
 import {IProvider} from './IProvider.js';
 
 /**

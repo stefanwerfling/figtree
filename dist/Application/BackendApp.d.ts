@@ -1,4 +1,4 @@
-import { ConfigOptions, DefaultArgs } from 'figtree_schemas';
+import { ConfigOptions, DefaultArgs } from 'figtree-schemas';
 import { Schema } from 'vts';
 import { ConfigBackend } from '../Config/ConfigBackend.js';
 import { ServiceManager } from '../Service/ServiceManager.js';

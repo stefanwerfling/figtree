@@ -1,4 +1,4 @@
-import {ConfigBackendOptions, SchemaConfigDbOptionsMySql} from 'figtree_schemas';
+import {ConfigBackendOptions, SchemaConfigDbOptionsMySql} from 'figtree-schemas';
 import {Config} from '../../Config/Config.js';
 import {DBHelper} from '../../Db/MariaDb/DBHelper.js';
 import {DBLoaderType} from '../../Db/MariaDb/DBLoader.js';

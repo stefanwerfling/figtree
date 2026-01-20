@@ -1,4 +1,4 @@
-import {ConfigOptions, DefaultArgs} from 'figtree_schemas';
+import {ConfigOptions, DefaultArgs} from 'figtree-schemas';
 import path from 'path';
 import {Schema} from 'vts';
 import {Config} from '../Config/Config.js';

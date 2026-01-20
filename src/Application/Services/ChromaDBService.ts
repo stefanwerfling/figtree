@@ -1,4 +1,4 @@
-import {ConfigBackendOptions, SchemaConfigDbOptionsChroma} from 'figtree_schemas';
+import {ConfigBackendOptions, SchemaConfigDbOptionsChroma} from 'figtree-schemas';
 import {Config} from '../../Config/Config.js';
 import {ChromaDbClient} from '../../Db/ChromaDb/ChromaDbClient.js';
 import {Logger} from '../../Logger/Logger.js';

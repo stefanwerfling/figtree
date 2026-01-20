@@ -1,4 +1,4 @@
-import { SchemaDefaultReturn, SchemaSessionData, StatusCodes } from 'figtree_schemas';
+import { SchemaDefaultReturn, SchemaSessionData, StatusCodes } from 'figtree-schemas';
 import { DefaultRoute } from '../../../Server/HttpServer/Routes/DefaultRoute.js';
 import { DefaultRouteCheckUserIsLogin } from '../../../Server/HttpServer/Routes/DefaultRouteCheckUser.js';
 import { SchemaIsLogin, SchemaIsLoginParameter, SchemaIsLoginParameterPath, SchemaLoginRequest } from '../../Schemas/Routes/Login/Login.js';

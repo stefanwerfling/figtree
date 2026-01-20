@@ -1,4 +1,4 @@
-import { SchemaDefaultReturn, SchemaServiceByNameRequest, SchemaServiceStatusResponse, StatusCodes } from 'figtree_schemas';
+import { SchemaDefaultReturn, SchemaServiceByNameRequest, SchemaServiceStatusResponse, StatusCodes } from 'figtree-schemas';
 import { BackendApp } from '../../../Application/BackendApp.js';
 import { DefaultRoute } from './DefaultRoute.js';
 export class ServiceRoute extends DefaultRoute {

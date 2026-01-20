@@ -5,7 +5,7 @@ import {
     SchemaServiceStatusResponse,
     ServiceStatusResponse,
     StatusCodes
-} from 'figtree_schemas';
+} from 'figtree-schemas';
 import {ACLRight} from '../../../ACL/ACLRight.js';
 import {BackendApp} from '../../../Application/BackendApp.js';
 import {DefaultRoute} from './DefaultRoute.js';

@@ -1,4 +1,4 @@
-import {ConfigBackendOptions, SchemaConfigDbOptionsInflux} from 'figtree_schemas';
+import {ConfigBackendOptions, SchemaConfigDbOptionsInflux} from 'figtree-schemas';
 import {Config} from '../../Config/Config.js';
 import {InfluxDbHelper} from '../../Db/InfluxDb/InfluxDbHelper.js';
 import {Logger} from '../../Logger/Logger.js';

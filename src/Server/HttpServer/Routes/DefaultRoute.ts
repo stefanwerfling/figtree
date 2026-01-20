@@ -1,5 +1,5 @@
 import {Request, RequestHandler, Response, Router} from 'express';
-import {DefaultReturn, StatusCodes} from 'figtree_schemas';
+import {DefaultReturn, StatusCodes} from 'figtree-schemas';
 import {ACLRight} from '../../../ACL/ACLRight.js';
 import {Logger} from '../../../Logger/Logger.js';
 import {StringHelper} from '../../../Utils/StringHelper.js';

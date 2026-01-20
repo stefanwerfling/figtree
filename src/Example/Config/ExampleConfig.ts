@@ -1,4 +1,4 @@
-import {ConfigBackendOptions, SchemaConfigBackendOptions} from 'figtree_schemas';
+import {ConfigBackendOptions, SchemaConfigBackendOptions} from 'figtree-schemas';
 import {Config} from '../../Config/Config.js';
 import {ConfigBackend} from '../../Config/ConfigBackend.js';
 

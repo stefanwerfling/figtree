@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import {DefaultReturn, SchemaDefaultReturn, SchemaSessionData, StatusCodes} from 'figtree_schemas';
+import {DefaultReturn, SchemaDefaultReturn, SchemaSessionData, StatusCodes} from 'figtree-schemas';
 import {DefaultRoute} from '../../../Server/HttpServer/Routes/DefaultRoute.js';
 import {DefaultRouteCheckUserIsLogin} from '../../../Server/HttpServer/Routes/DefaultRouteCheckUser.js';
 import {Role} from '../../ACL/MyACLRbac.js';

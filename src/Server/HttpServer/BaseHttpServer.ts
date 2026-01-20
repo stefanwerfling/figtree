@@ -1,5 +1,5 @@
 import csurf from 'csurf';
-import {DefaultReturn, StatusCodes} from 'figtree_schemas';
+import {DefaultReturn, StatusCodes} from 'figtree-schemas';
 import fs from 'fs';
 import https from 'https';
 import * as http from 'node:http';
