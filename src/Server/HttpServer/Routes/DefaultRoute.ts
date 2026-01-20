@@ -1,11 +1,10 @@
 import {Request, RequestHandler, Response, Router} from 'express';
+import {DefaultReturn, StatusCodes} from 'figtree_schemas';
 import {ACLRight} from '../../../ACL/ACLRight.js';
 import {Logger} from '../../../Logger/Logger.js';
-import {StatusCodes} from '../../../Schemas/Server/Routes/StatusCodes.js';
 import {StringHelper} from '../../../Utils/StringHelper.js';
 import {VtsSchemaError} from '../../../VtsExtend/VtsSchemaError.js';
 import {Session} from '../Session.js';
-import {DefaultReturn} from './../../../Schemas/Server/Routes/DefaultReturn.js';
 import path from 'path';
 import {Schema, SchemaErrors} from 'vts';
 import {DefaultRouteCheckUserIsLogin, DefaultRouteCheckUserLogin} from './DefaultRouteCheckUser.js';

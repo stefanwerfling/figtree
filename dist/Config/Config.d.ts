@@ -1,5 +1,5 @@
+import { ConfigOptions } from 'figtree_schemas';
 import { ObjectSchema } from 'vts';
-import { ConfigOptions } from '../Schemas/Config/ConfigOptions.js';
 export declare class Config<T extends ConfigOptions = ConfigOptions> {
     static readonly DEFAULT_CONFIG_FILE = "config.json";
     static readonly DEFAULT_DIR: string;

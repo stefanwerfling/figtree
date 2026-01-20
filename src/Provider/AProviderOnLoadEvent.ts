@@ -1,5 +1,5 @@
+import {ProviderEntry} from 'figtree_schemas';
 import {APluginEvent} from '../Plugins/APluginEvent.js';
-import {ProviderEntry} from '../Schemas/Provider/ProviderEntry.js';
 import {IProvider} from './IProvider.js';
 
 /**

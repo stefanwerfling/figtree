@@ -1,4 +1,4 @@
-import {PluginDefinition} from '../Schemas/Plugin/PluginDefinition.js';
+import {PluginDefinition} from 'figtree_schemas';
 import {PluginManager} from './PluginManager.js';
 
 /**

@@ -1,9 +1,8 @@
+import {ConfigBackendOptions, SchemaConfigDbOptionsMySql} from 'figtree_schemas';
 import {Config} from '../../Config/Config.js';
 import {DBHelper} from '../../Db/MariaDb/DBHelper.js';
 import {DBLoaderType} from '../../Db/MariaDb/DBLoader.js';
 import {Logger} from '../../Logger/Logger.js';
-import {ConfigBackendOptions} from '../../Schemas/Config/ConfigBackendOptions.js';
-import {SchemaConfigDbOptionsMySql} from '../../Schemas/Config/ConfigDb.js';
 import {ServiceAbstract, ServiceImportance, ServiceStatus} from '../../Service/ServiceAbstract.js';
 import {ServiceError} from '../../Service/ServiceError.js';
 import {StringHelper} from '../../Utils/StringHelper.js';

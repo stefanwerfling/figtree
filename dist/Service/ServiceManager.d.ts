@@ -1,4 +1,4 @@
-import { ServiceInfoEntry } from '../Schemas/Service/ServiceInfoEntry.js';
+import { ServiceInfoEntry } from 'figtree_schemas';
 import { ServiceAbstract } from './ServiceAbstract.js';
 export declare class ServiceManager {
     protected _services: ServiceAbstract[];

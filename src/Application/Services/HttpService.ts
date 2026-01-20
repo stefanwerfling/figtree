@@ -1,8 +1,7 @@
+import {ConfigBackendOptions, SchemaConfigHttpServer} from 'figtree_schemas';
 import {v4 as uuid} from 'uuid';
 import {Config} from '../../Config/Config.js';
 import {Logger} from '../../Logger/Logger.js';
-import {ConfigBackendOptions} from '../../Schemas/Config/ConfigBackendOptions.js';
-import {SchemaConfigHttpServer} from '../../Schemas/Config/ConfigHttpServer.js';
 import {BaseHttpServerOptionCsrf, BaseHttpServerOptionProxy} from '../../Server/HttpServer/BaseHttpServer.js';
 import {HttpRouteLoaderType} from '../../Server/HttpServer/HttpRouteLoader.js';
 import {HttpServer} from '../../Server/HttpServer/HttpServer.js';

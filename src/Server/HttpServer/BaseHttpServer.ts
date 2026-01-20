@@ -1,4 +1,5 @@
 import csurf from 'csurf';
+import {DefaultReturn, StatusCodes} from 'figtree_schemas';
 import fs from 'fs';
 import https from 'https';
 import * as http from 'node:http';
@@ -8,8 +9,6 @@ import cookieParser from 'cookie-parser';
 import session, {Store} from 'express-session';
 import {PemHelper} from '../../Crypto/PemHelper.js';
 import {Logger} from '../../Logger/Logger.js';
-import {DefaultReturn} from '../../Schemas/Server/Routes/DefaultReturn.js';
-import {StatusCodes} from '../../Schemas/Server/Routes/StatusCodes.js';
 import {FileHelper} from '../../Utils/FileHelper.js';
 import {IDefaultRoute} from './Routes/IDefaultRoute.js';
 import {ITlsClientError} from './Tls/ITlsClientError.js';

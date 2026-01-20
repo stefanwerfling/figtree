@@ -32,8 +32,8 @@
                   }
                 },
                 "pos": {
-                  "x": 133,
-                  "y": 113
+                  "x": 273,
+                  "y": 111
                 },
                 "fields": [
                   {
@@ -1719,6 +1719,6 @@
     "enums": []
   },
   "editor": {
-    "controls_width": 359
+    "controls_width": 300
   }
 }

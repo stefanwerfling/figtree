@@ -27,7 +27,8 @@ export class MyACLRbac extends ACLRbac {
         ],
         ["user"]: [
             "users",
-            "service_status"
+            "service_status",
+            "service_stop"
         ]
     };
     constructor() {

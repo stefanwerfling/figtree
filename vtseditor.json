@@ -1,18 +1,26 @@
 {
   "projects": [
     {
-      "name": "Figtree",
-      "schemaPath": "./schemas.json",
-      "code": {
-        "schemaPrefix": "Schema",
-        "createTypes": true,
-        "createIndex": false,
-        "codeComment": true,
-        "codeIndent": "    "
-      },
       "autoGenerate": true,
-      "destinationPath": "./src/Schemas",
-      "destinationClear": true
+      "code": {
+        "codeComment": true,
+        "codeIndent": "    ",
+        "createIndex": true,
+        "createTypes": true,
+        "schemaPrefix": "Schema"
+      },
+      "destinationClear": true,
+      "destinationPath": "./schemas/src",
+      "name": "Figtree",
+      "scripts": {
+        "after_generate": [
+          {
+            "script": "npm run compile",
+            "path": "./schemas"
+          }
+        ]
+      },
+      "schemaPath": "./schemas/schemas.json"
     }
   ],
   "server": {

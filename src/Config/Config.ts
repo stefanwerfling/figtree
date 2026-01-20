@@ -1,6 +1,6 @@
+import {ConfigOptions, SchemaConfigOptions} from 'figtree_schemas';
 import path from 'path';
 import {ObjectSchema, SchemaErrors} from 'vts';
-import {ConfigOptions, SchemaConfigOptions} from '../Schemas/Config/ConfigOptions.js';
 import {FileHelper} from '../Utils/FileHelper.js';
 
 /**

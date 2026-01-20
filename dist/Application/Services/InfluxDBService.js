@@ -1,7 +1,7 @@
+import { SchemaConfigDbOptionsInflux } from 'figtree_schemas';
 import { Config } from '../../Config/Config.js';
 import { InfluxDbHelper } from '../../Db/InfluxDb/InfluxDbHelper.js';
 import { Logger } from '../../Logger/Logger.js';
-import { SchemaConfigDbOptionsInflux } from '../../Schemas/Config/ConfigDb.js';
 import { ServiceAbstract, ServiceImportance, ServiceStatus } from '../../Service/ServiceAbstract.js';
 import { ServiceError } from '../../Service/ServiceError.js';
 import { StringHelper } from '../../Utils/StringHelper.js';

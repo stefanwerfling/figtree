@@ -1,6 +1,6 @@
+import { SchemaConfigBackendOptions } from 'figtree_schemas';
 import { Config } from '../../Config/Config.js';
 import { ConfigBackend } from '../../Config/ConfigBackend.js';
-import { SchemaConfigBackendOptions } from '../../Schemas/Config/ConfigBackendOptions.js';
 export class ExampleConfig extends ConfigBackend {
     static getInstance() {
         if (!Config._instance) {

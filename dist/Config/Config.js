@@ -1,6 +1,6 @@
+import { SchemaConfigOptions } from 'figtree_schemas';
 import path from 'path';
 import { ObjectSchema } from 'vts';
-import { SchemaConfigOptions } from '../Schemas/Config/ConfigOptions.js';
 import { FileHelper } from '../Utils/FileHelper.js';
 export class Config {
     static DEFAULT_CONFIG_FILE = 'config.json';

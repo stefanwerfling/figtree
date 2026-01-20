@@ -1,4 +1,4 @@
-import { ConfigBackendOptions } from '../Schemas/Config/ConfigBackendOptions.js';
+import { ConfigBackendOptions } from 'figtree_schemas';
 import { Config } from './Config.js';
 export declare enum ENV_OPTIONAL {
     HTTPSERVER_PORT = "HTTPSERVER_PORT",

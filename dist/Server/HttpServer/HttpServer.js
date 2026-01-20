@@ -1,9 +1,9 @@
 import rateLimit from 'express-rate-limit';
+import { SchemaRequestData } from 'figtree_schemas';
 import helmet from 'helmet';
 import { Config } from '../../Config/Config.js';
 import { CertificateHelper } from '../../Crypto/CertificateHelper.js';
 import { Logger } from '../../Logger/Logger.js';
-import { SchemaRequestData } from '../../Schemas/Server/RequestData.js';
 import { DirHelper } from '../../Utils/DirHelper.js';
 import { BaseHttpServer } from './BaseHttpServer.js';
 import { Session } from './Session.js';

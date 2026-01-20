@@ -1,6 +1,4 @@
-import { SchemaSessionData } from '../../../Schemas/Server/RequestData.js';
-import { SchemaDefaultReturn } from '../../../Schemas/Server/Routes/DefaultReturn.js';
-import { StatusCodes } from '../../../Schemas/Server/Routes/StatusCodes.js';
+import { SchemaDefaultReturn, SchemaSessionData, StatusCodes } from 'figtree_schemas';
 import { DefaultRoute } from '../../../Server/HttpServer/Routes/DefaultRoute.js';
 import { DefaultRouteCheckUserIsLogin } from '../../../Server/HttpServer/Routes/DefaultRouteCheckUser.js';
 import { SchemaIsLogin, SchemaIsLoginParameter, SchemaIsLoginParameterPath, SchemaLoginRequest } from '../../Schemas/Routes/Login/Login.js';

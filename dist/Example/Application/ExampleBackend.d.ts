@@ -1,7 +1,6 @@
+import { ConfigOptions, DefaultArgs } from 'figtree_schemas';
 import { Schema } from 'vts';
 import { BackendApp } from '../../Application/BackendApp.js';
-import { DefaultArgs } from '../../Schemas/Args/DefaultArgs.js';
-import { ConfigOptions } from '../../Schemas/Config/ConfigOptions.js';
 import { ExampleConfig } from '../Config/ExampleConfig.js';
 export declare class ExampleBackend extends BackendApp<DefaultArgs, ConfigOptions> {
     static NAME: string;

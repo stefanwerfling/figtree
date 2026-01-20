@@ -6,7 +6,7 @@ export declare const SchemaTest: import("vts").ObjectSchema<{
     }>>;
 }>;
 export declare const SchemaIsLogin: import("vts").ObjectSchema<{
-    statusCode: import("vts").OrSchema<import("vts").StringSchema<import("vts").StringSchemaOptions> | import("vts").EnumSchema<import("../../../../index.js").StatusCodes>>;
+    statusCode: import("vts").OrSchema<import("vts").StringSchema<import("vts").StringSchemaOptions> | import("vts").EnumSchema<import("figtree_schemas").StatusCodes>>;
     msg: import("vts").OptionalSchema<import("vts").StringSchema<import("vts").StringSchemaOptions>>;
 } & {
     status: import("vts").BooleanSchema;

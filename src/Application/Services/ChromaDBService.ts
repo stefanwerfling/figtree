@@ -1,8 +1,7 @@
+import {ConfigBackendOptions, SchemaConfigDbOptionsChroma} from 'figtree_schemas';
 import {Config} from '../../Config/Config.js';
 import {ChromaDbClient} from '../../Db/ChromaDb/ChromaDbClient.js';
 import {Logger} from '../../Logger/Logger.js';
-import {ConfigBackendOptions} from '../../Schemas/Config/ConfigBackendOptions.js';
-import {SchemaConfigDbOptionsChroma} from '../../Schemas/Config/ConfigDb.js';
 import {ServiceAbstract, ServiceImportance, ServiceStatus} from '../../Service/ServiceAbstract.js';
 import {ServiceError} from '../../Service/ServiceError.js';
 import {StringHelper} from '../../Utils/StringHelper.js';

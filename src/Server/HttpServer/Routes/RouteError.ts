@@ -1,4 +1,4 @@
-import {DefaultReturn} from '../../../Schemas/Server/Routes/DefaultReturn.js';
+import {DefaultReturn} from 'figtree_schemas';
 
 /**
  * Route Error

@@ -1,3 +1,4 @@
+import {ConfigOptions, DefaultArgs, SchemaDefaultArgs} from 'figtree_schemas';
 import {Schema} from 'vts';
 import {ACL} from '../../ACL/ACL.js';
 import {BackendApp} from '../../Application/BackendApp.js';
@@ -6,8 +7,6 @@ import {MariaDBService} from '../../Application/Services/MariaDBService.js';
 import {PluginService} from '../../Application/Services/PluginService.js';
 import {Config} from '../../Config/Config.js';
 import {DBLoader} from '../../Db/MariaDb/DBLoader.js';
-import {DefaultArgs, SchemaDefaultArgs} from '../../Schemas/Args/DefaultArgs.js';
-import {ConfigOptions} from '../../Schemas/Config/ConfigOptions.js';
 import {MyACLRbac} from '../ACL/MyACLRbac.js';
 import {ExampleConfig} from '../Config/ExampleConfig.js';
 import {ExampleRouteLoader} from '../Routes/ExampleRouteLoader.js';

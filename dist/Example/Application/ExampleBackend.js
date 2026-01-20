@@ -1,8 +1,8 @@
+import { SchemaDefaultArgs } from 'figtree_schemas';
 import { ACL } from '../../ACL/ACL.js';
 import { BackendApp } from '../../Application/BackendApp.js';
 import { HttpService } from '../../Application/Services/HttpService.js';
 import { PluginService } from '../../Application/Services/PluginService.js';
-import { SchemaDefaultArgs } from '../../Schemas/Args/DefaultArgs.js';
 import { MyACLRbac } from '../ACL/MyACLRbac.js';
 import { ExampleConfig } from '../Config/ExampleConfig.js';
 import { ExampleRouteLoader } from '../Routes/ExampleRouteLoader.js';

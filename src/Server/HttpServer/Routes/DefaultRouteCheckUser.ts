@@ -1,7 +1,6 @@
 import {Request, Response} from 'express';
+import {RequestData, SchemaRequestData, StatusCodes} from 'figtree_schemas';
 import {ACL} from '../../../ACL/ACL.js';
-import {RequestData, SchemaRequestData} from '../../../Schemas/Server/RequestData.js';
-import {StatusCodes} from '../../../Schemas/Server/Routes/StatusCodes.js';
 import {Session} from '../Session.js';
 import {RequestContext} from './RequestContext.js';
 import {RouteError} from './RouteError.js';

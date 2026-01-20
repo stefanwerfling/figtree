@@ -1,5 +1,5 @@
+import {ServiceInfoEntry} from 'figtree_schemas';
 import {Logger} from '../Logger/Logger.js';
-import {ServiceInfoEntry} from '../Schemas/Service/ServiceInfoEntry.js';
 import {ServiceAbstract, ServiceImportance, ServiceStatus} from './ServiceAbstract.js';
 
 /**

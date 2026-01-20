@@ -1,4 +1,4 @@
-import {ProviderEntry} from '../Schemas/Provider/ProviderEntry.js';
+import {ProviderEntry} from 'figtree_schemas';
 
 /**
  * Interface for a Provider

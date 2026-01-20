@@ -1,5 +1,5 @@
+import {ProviderEntry} from 'figtree_schemas';
 import {IProvider} from '../../Provider/IProvider.js';
-import {ProviderEntry} from '../../Schemas/Provider/ProviderEntry.js';
 import {HttpRouteLoaderType} from './HttpRouteLoader.js';
 
 /**

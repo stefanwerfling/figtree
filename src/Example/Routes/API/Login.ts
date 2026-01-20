@@ -1,7 +1,5 @@
 import {Router} from 'express';
-import {SchemaSessionData} from '../../../Schemas/Server/RequestData.js';
-import {DefaultReturn, SchemaDefaultReturn} from '../../../Schemas/Server/Routes/DefaultReturn.js';
-import {StatusCodes} from '../../../Schemas/Server/Routes/StatusCodes.js';
+import {DefaultReturn, SchemaDefaultReturn, SchemaSessionData, StatusCodes} from 'figtree_schemas';
 import {DefaultRoute} from '../../../Server/HttpServer/Routes/DefaultRoute.js';
 import {DefaultRouteCheckUserIsLogin} from '../../../Server/HttpServer/Routes/DefaultRouteCheckUser.js';
 import {Role} from '../../ACL/MyACLRbac.js';

@@ -1,11 +1,10 @@
+import {ConfigOptions, DefaultArgs} from 'figtree_schemas';
 import path from 'path';
 import {Schema} from 'vts';
 import {Config} from '../Config/Config.js';
 import {ConfigBackend} from '../Config/ConfigBackend.js';
 import {Args} from '../Env/Args.js';
 import {Logger} from '../Logger/Logger.js';
-import {DefaultArgs} from '../Schemas/Args/DefaultArgs.js';
-import {ConfigOptions} from '../Schemas/Config/ConfigOptions.js';
 import {ServiceManager} from '../Service/ServiceManager.js';
 import {FileHelper} from '../Utils/FileHelper.js';
 import exitHook from 'async-exit-hook';

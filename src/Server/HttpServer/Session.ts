@@ -1,4 +1,4 @@
-import {RequestData, SessionData, SessionUserData} from '../../Schemas/Server/RequestData.js';
+import {SessionData, SessionUserData} from 'figtree_schemas';
 
 /**
  * Session

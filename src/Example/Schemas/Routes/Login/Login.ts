@@ -1,5 +1,5 @@
+import {SchemaDefaultReturn} from 'figtree_schemas';
 import {ExtractSchemaResultType, Vts} from 'vts';
-import {SchemaDefaultReturn} from '../../../../Schemas/Server/Routes/DefaultReturn.js';
 
 export const SchemaTest = Vts.object({
    test: Vts.or([

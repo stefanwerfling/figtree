@@ -1,0 +1,1 @@
+{"version":3,"file":"ProviderEntry.js","sourceRoot":"","sources":["../../src/Provider/ProviderEntry.ts"],"names":[],"mappings":"AAAA,OAAO,EAA0B,GAAG,EAAC,MAAM,KAAK,CAAC;AAKjD,MAAM,CAAC,MAAM,mBAAmB,GAAG,GAAG,CAAC,MAAM,CAAC;IAC1C,IAAI,EAAE,GAAG,CAAC,MAAM,EAAE;IAClB,KAAK,EAAE,GAAG,CAAC,MAAM,EAAE;CACtB,EAAE;IACC,WAAW,EAAE,EAAE;CAClB,CAAC,CAAC"}

@@ -1,7 +1,7 @@
 import { Ets } from 'ets';
+import { SchemaPluginDefinition } from 'figtree_schemas';
 import { MerkleTreeRootHash } from '../Crypto/MerkleTreeRootHash.js';
 import { Logger } from '../Logger/Logger.js';
-import { SchemaPluginDefinition } from '../Schemas/Plugin/PluginDefinition.js';
 import { DirHelper } from '../Utils/DirHelper.js';
 import { FileHelper } from '../Utils/FileHelper.js';
 import path from 'path';

@@ -1,13 +1,13 @@
 import {Router} from 'express';
-import {ACLRight} from '../../../ACL/ACLRight.js';
-import {BackendApp} from '../../../Application/BackendApp.js';
-import {DefaultReturn, SchemaDefaultReturn} from '../../../Schemas/Server/Routes/DefaultReturn.js';
 import {
+    DefaultReturn, SchemaDefaultReturn,
     SchemaServiceByNameRequest,
     SchemaServiceStatusResponse,
-    ServiceStatusResponse
-} from '../../../Schemas/Server/Routes/Service.js';
-import {StatusCodes} from '../../../Schemas/Server/Routes/StatusCodes.js';
+    ServiceStatusResponse,
+    StatusCodes
+} from 'figtree_schemas';
+import {ACLRight} from '../../../ACL/ACLRight.js';
+import {BackendApp} from '../../../Application/BackendApp.js';
 import {DefaultRoute} from './DefaultRoute.js';
 import {DefaultRouteCheckUserLogin} from './DefaultRouteCheckUser.js';
 

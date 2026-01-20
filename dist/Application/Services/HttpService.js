@@ -1,7 +1,7 @@
+import { SchemaConfigHttpServer } from 'figtree_schemas';
 import { v4 as uuid } from 'uuid';
 import { Config } from '../../Config/Config.js';
 import { Logger } from '../../Logger/Logger.js';
-import { SchemaConfigHttpServer } from '../../Schemas/Config/ConfigHttpServer.js';
 import { HttpServer } from '../../Server/HttpServer/HttpServer.js';
 import { ServiceAbstract, ServiceImportance, ServiceStatus } from '../../Service/ServiceAbstract.js';
 import { ServiceError } from '../../Service/ServiceError.js';

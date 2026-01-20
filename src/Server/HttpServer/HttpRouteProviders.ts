@@ -1,5 +1,5 @@
+import {ProviderEntry} from 'figtree_schemas';
 import {BaseProviders} from '../../Provider/BaseProviders.js';
-import {ProviderEntry} from '../../Schemas/Provider/ProviderEntry.js';
 import {HttpRouteProviderType} from './HttpRouteProviderType.js';
 import {IHttpRouteProvider} from './IHttpRouteProvider.js';
 import {IDefaultRoute} from './Routes/IDefaultRoute.js';

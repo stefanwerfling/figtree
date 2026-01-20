@@ -1,8 +1,8 @@
+import { SchemaConfigDbOptionsRedis } from 'figtree_schemas';
 import { Config } from '../../Config/Config.js';
 import { RedisClient } from '../../Db/RedisDb/RedisClient.js';
 import { RedisSubscribe } from '../../Db/RedisDb/RedisSubscribe.js';
 import { Logger } from '../../Logger/Logger.js';
-import { SchemaConfigDbOptionsRedis } from '../../Schemas/Config/ConfigDb.js';
 import { ServiceAbstract, ServiceImportance, ServiceStatus } from '../../Service/ServiceAbstract.js';
 import { ServiceError } from '../../Service/ServiceError.js';
 import { StringHelper } from '../../Utils/StringHelper.js';

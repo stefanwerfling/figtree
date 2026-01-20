@@ -20,7 +20,7 @@ export type ConfigHttpServerSession = ExtractSchemaResultType<typeof SchemaConfi
  * Schema of ConfigHttpServerProxy
  */
 export const SchemaConfigHttpServerProxy = Vts.object({
-    trust: Vts.or([Vts.string(), Vts.boolean(), Vts.array(Vts.string())]),
+    trust: Vts.or([Vts.string(), Vts.boolean(), Vts.array(Vts.string())], {}),
 }, {
     description: '',
 });

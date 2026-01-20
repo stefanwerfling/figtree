@@ -1,47 +1,6 @@
 // FigTree Server/Core Code
 // ---------------------------------------------------------------------------------------------------------------------
 
-// Schemas -------------------------------------------------------------------------------------------------------------
-export {SchemaArgsBase} from './Schemas/Args/ArgsBase.js';
-export {SchemaDefaultArgs, DefaultArgs} from './Schemas/Args/DefaultArgs.js';
-export {SchemaConfigOptions, ConfigOptions} from './Schemas/Config/ConfigOptions.js';
-export {
-    ENV_DB,
-    SchemaConfigDbOptionsInflux,
-    SchemaConfigDbOptionsMySql,
-    SchemaConfigDbOptionsRedis,
-    SchemaConfigDbOptionsChroma,
-    SchemaConfigDbOptions,
-    ConfigDbOptions
-} from './Schemas/Config/ConfigDb.js';
-export {
-    SchemaConfigHttpServerSession,
-    SchemaConfigHttpServerProxy,
-    SchemaConfigHttpServerCsrf,
-    SchemaConfigHttpServer
-} from './Schemas/Config/ConfigHttpServer.js';
-export {SchemaConfigBackendOptions, ConfigBackendOptions} from './Schemas/Config/ConfigBackendOptions.js';
-export {SchemaLoggerConfig, LoggerConfig} from './Schemas/Logger/LoggerConfig.js';
-export {StatusCodes} from './Schemas/Server/Routes/StatusCodes.js';
-export {SchemaDefaultReturn, DefaultReturn} from './Schemas/Server/Routes/DefaultReturn.js';
-export {SchemaServiceInfoEntry, ServiceInfoEntry} from './Schemas/Service/ServiceInfoEntry.js';
-export {
-    SchemaServiceStatusResponse,
-    ServiceStatusResponse,
-    SchemaServiceByNameRequest,
-    ServiceByNameRequest
-} from './Schemas/Server/Routes/Service.js';
-export {
-    SchemaSessionUserData,
-    SessionUserData,
-    SchemaSessionData,
-    SessionData,
-    SchemaRequestData,
-    RequestData
-} from './Schemas/Server/RequestData.js';
-export {SchemaProviderEntry, ProviderEntry} from './Schemas/Provider/ProviderEntry.js';
-export {SchemaPluginDefinition, PluginDefinition} from './Schemas/Plugin/PluginDefinition.js';
-
 // Env -----------------------------------------------------------------------------------------------------------------
 export {Args} from './Env/Args.js';
 
