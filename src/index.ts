@@ -69,7 +69,8 @@ export {RouteError} from './Server/HttpServer/Routes/RouteError.js';
 export {RequestContextData, RequestContext} from './Server/HttpServer/Routes/RequestContext.js';
 export {
     DefaultRouteCheckUserLogin,
-    DefaultRouteCheckUserIsLogin
+    DefaultRouteCheckUserIsLogin,
+    DefaultRouteCheckUserIsLoginACL
 } from './Server/HttpServer/Routes/DefaultRouteCheckUser.js';
 export {
     DefaultRouteHandler,
