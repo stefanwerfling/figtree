@@ -46,8 +46,8 @@ export class MariaDBService extends ServiceAbstract {
                 database: tConfig.db.mysql.database,
                 entities: await this._loader.loadEntities(),
                 migrations: this._loader.loadMigrations(),
-                migrationsRun: true,
-                synchronize: true
+                migrationsRun: this._options.migrationsRun !== undefined ? this._options.migrationsRun : true,
+                synchronize: this._options.synchronize !== undefined ? this._options.synchronize : true,
             });
         }
         catch (error) {
