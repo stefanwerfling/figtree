@@ -9,9 +9,19 @@ export class MariaDBService extends ServiceAbstract {
     static NAME = 'mariadb';
     _importance = ServiceImportance.Important;
     _loader;
-    constructor(loader, serviceName, serviceDependencies) {
+    _options;
+    constructor(loader, serviceName, serviceDependencies, options) {
         super(serviceName ?? MariaDBService.NAME, serviceDependencies);
         this._loader = loader;
+        if (options) {
+            this._options = options;
+        }
+        else {
+            this._options = {
+                migrationsRun: true,
+                synchronize: true
+            };
+        }
     }
     async start() {
         this._inProcess = true;

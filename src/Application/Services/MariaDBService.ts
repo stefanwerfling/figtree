@@ -8,6 +8,14 @@ import {ServiceError} from '../../Service/ServiceError.js';
 import {StringHelper} from '../../Utils/StringHelper.js';
 
 /**
+ * Maria DB Service Options
+ */
+export type MariaDBServiceOptions = {
+    migrationsRun?: boolean;
+    synchronize?: boolean;
+};
+
+/**
  * Maria DB Service
  */
 export class MariaDBService extends ServiceAbstract {
@@ -29,14 +37,30 @@ export class MariaDBService extends ServiceAbstract {
     protected _loader: DBLoaderType;
 
     /**
+     * options
+     * @protected
+     */
+    protected _options: MariaDBServiceOptions;
+
+    /**
      * Constructor
      * @param {DBLoaderType} loader
      * @param {[string]} serviceName
      * @param {[string[]]} serviceDependencies
+     * @param {MariaDBServiceOptions} options
      */
-    public constructor(loader: DBLoaderType, serviceName?: string, serviceDependencies?: string[]) {
+    public constructor(loader: DBLoaderType, serviceName?: string, serviceDependencies?: string[], options?: MariaDBServiceOptions) {
         super(serviceName ?? MariaDBService.NAME, serviceDependencies);
         this._loader = loader;
+
+        if (options) {
+            this._options = options;
+        } else {
+            this._options = {
+                migrationsRun: true,
+                synchronize: true
+            };
+        }
     }
 
     /**

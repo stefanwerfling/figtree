@@ -76,7 +76,7 @@ export { ACLRbac } from './ACL/ACLRbac.js';
 export { ACL } from './ACL/ACL.js';
 export { BackendApp } from './Application/BackendApp.js';
 export { PluginService } from './Application/Services/PluginService.js';
-export { MariaDBService } from './Application/Services/MariaDBService.js';
+export { MariaDBServiceOptions, MariaDBService } from './Application/Services/MariaDBService.js';
 export { InfluxDBService } from './Application/Services/InfluxDBService.js';
 export { RedisDBService } from './Application/Services/RedisDBService.js';
 export { ChromaDBService } from './Application/Services/ChromaDBService.js';
