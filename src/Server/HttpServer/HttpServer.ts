@@ -1,4 +1,4 @@
-import rateLimit from 'express-rate-limit';
+import rateLimit, {RateLimitRequestHandler} from 'express-rate-limit';
 import {SchemaRequestData} from 'figtree-schemas';
 import helmet from 'helmet';
 import {Request, Response} from 'express';
@@ -13,6 +13,12 @@ import {Session} from './Session.js';
  * HttpServer
  */
 export class HttpServer extends BaseHttpServer {
+
+    /**
+     * Limiter
+     * @protected
+     */
+    protected _limiter: RateLimitRequestHandler|null = null;
 
     /**
      * _initServer
@@ -55,7 +61,7 @@ export class HttpServer extends BaseHttpServer {
             }
         }));
 
-        const limiter = rateLimit({
+        this._limiter = rateLimit({
             windowMs: 15 * 60 * 1000,
             legacyHeaders: false,
             standardHeaders: 'draft-8',
@@ -70,7 +76,7 @@ export class HttpServer extends BaseHttpServer {
             }
         });
 
-        this._express.use(limiter);
+        this._express.use(this._limiter);
     }
 
     /**
@@ -81,8 +87,14 @@ export class HttpServer extends BaseHttpServer {
      */
     protected async _limiterSkip(request: Request): Promise<boolean> {
         if (request.url.indexOf('/json/') === 0) {
-            if (SchemaRequestData.validate(request, []) && Session.isUserLogin(request.session)) {
-                return true;
+            if (SchemaRequestData.validate(request, [])) {
+                if (Session.isUserLogin(request.session)) {
+                    return true;
+                } else {
+                    Logger.getLogger().warn('HttpServer::_limiterSkip: request session isnt isUserLogin');
+                }
+            } else {
+                Logger.getLogger().error('HttpServer::_limiterSkip: request isnt SchemaRequestData');
             }
         }
 
@@ -238,4 +250,13 @@ export class HttpServer extends BaseHttpServer {
 
         return ck;
     }
+
+    /**
+     * Return the Limiter
+     * @return {}
+     */
+    public getLimiter(): RateLimitRequestHandler|null {
+        return this._limiter;
+    }
+
 }

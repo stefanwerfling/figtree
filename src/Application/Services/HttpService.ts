@@ -48,6 +48,13 @@ export class HttpService extends ServiceAbstract {
     }
 
     /**
+     * Return the server
+     */
+    public getServer(): HttpServer|null {
+        return this._server;
+    }
+
+    /**
      * Start the service
      */
     public override async start(): Promise<void> {

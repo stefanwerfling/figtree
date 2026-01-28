@@ -8,6 +8,7 @@ import { DirHelper } from '../../Utils/DirHelper.js';
 import { BaseHttpServer } from './BaseHttpServer.js';
 import { Session } from './Session.js';
 export class HttpServer extends BaseHttpServer {
+    _limiter = null;
     _initExpressUsePre() {
         if (this._express === undefined) {
             throw new Error('Express isnt init!');
@@ -42,7 +43,7 @@ export class HttpServer extends BaseHttpServer {
                 baseUri: ['\'self\'']
             }
         }));
-        const limiter = rateLimit({
+        this._limiter = rateLimit({
             windowMs: 15 * 60 * 1000,
             legacyHeaders: false,
             standardHeaders: 'draft-8',
@@ -56,12 +57,20 @@ export class HttpServer extends BaseHttpServer {
                 return this._limiterHandler(req, res);
             }
         });
-        this._express.use(limiter);
+        this._express.use(this._limiter);
     }
     async _limiterSkip(request) {
         if (request.url.indexOf('/json/') === 0) {
-            if (SchemaRequestData.validate(request, []) && Session.isUserLogin(request.session)) {
-                return true;
+            if (SchemaRequestData.validate(request, [])) {
+                if (Session.isUserLogin(request.session)) {
+                    return true;
+                }
+                else {
+                    Logger.getLogger().warn('HttpServer::_limiterSkip: request session isnt isUserLogin');
+                }
+            }
+            else {
+                Logger.getLogger().error('HttpServer::_limiterSkip: request isnt SchemaRequestData');
             }
         }
         return false;
@@ -170,6 +179,9 @@ export class HttpServer extends BaseHttpServer {
             ck = await this._generateCertAndKey();
         }
         return ck;
+    }
+    getLimiter() {
+        return this._limiter;
     }
 }
 //# sourceMappingURL=HttpServer.js.map

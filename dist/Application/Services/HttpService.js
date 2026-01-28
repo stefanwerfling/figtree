@@ -15,6 +15,9 @@ export class HttpService extends ServiceAbstract {
         super(serviceName ?? HttpService.NAME, serviceDependencies);
         this._loader = loader;
     }
+    getServer() {
+        return this._server;
+    }
     async start() {
         this._inProcess = true;
         this._status = ServiceStatus.Progress;
