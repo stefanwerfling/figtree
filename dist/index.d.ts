@@ -18,6 +18,7 @@ export { DecimalTransformer } from './Db/MariaDb/Transformers/DecimalTransformer
 export { IntTransformer } from './Db/MariaDb/Transformers/IntTransformer.js';
 export { DBBaseEntityId } from './Db/MariaDb/DBBaseEntityId.js';
 export { DBBaseEntityUnid } from './Db/MariaDb/DBBaseEntityUnid.js';
+export { DBRepositoryBase } from './Db/MariaDb/DBRepositoryBase.js';
 export { DBRepository } from './Db/MariaDb/DBRepository.js';
 export { DBRepositoryUnid } from './Db/MariaDb/DBRepositoryUnid.js';
 export { DBSaveListIdOnGetId, DBSaveListIdOnFindAllInDb, DBSaveListIdOnFillData, DBSaveListId } from './Db/MariaDb/DBSaveListId.js';
