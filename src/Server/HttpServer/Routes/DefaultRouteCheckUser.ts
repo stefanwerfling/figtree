@@ -1,5 +1,6 @@
 import {Request, Response} from 'express';
 import {RequestData, SchemaRequestData, StatusCodes} from 'figtree-schemas';
+import {ObjectSchema, ObjectSchemaItems, Schema} from 'vts';
 import {ACL} from '../../../ACL/ACL.js';
 import {Session} from '../Session.js';
 import {RequestContext} from './RequestContext.js';
@@ -48,14 +49,16 @@ export const DefaultRouteCheckUserIsLoginACL = async (
  * Default function for check is a user logged in
  * @param {unknown} req
  * @param {boolean} sendAutoResoonse
+ * @param schemaRequestData
  * @constructor
  * @throws RouteError
  */
 export const DefaultRouteCheckUserIsLogin = (
     req: unknown,
-    sendAutoResoonse: boolean = true
+    sendAutoResoonse: boolean = true,
+    schemaRequestData = SchemaRequestData
 ): req is RequestData =>  {
-    if (SchemaRequestData.validate(req, [])) {
+    if (schemaRequestData.validate(req, [])) {
         if (RequestContext.hasInstance()) {
             RequestContext.getInstance().set(RequestContext.SESSIONID, req.session.id);
             RequestContext.getInstance().set(RequestContext.USERID, '');

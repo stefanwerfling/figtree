@@ -15,8 +15,8 @@ export const DefaultRouteCheckUserIsLoginACL = async (req, res, aclRight) => {
     }
     throw new RouteError(StatusCodes.FORBIDDEN, 'User has no access!');
 };
-export const DefaultRouteCheckUserIsLogin = (req, sendAutoResoonse = true) => {
-    if (SchemaRequestData.validate(req, [])) {
+export const DefaultRouteCheckUserIsLogin = (req, sendAutoResoonse = true, schemaRequestData = SchemaRequestData) => {
+    if (schemaRequestData.validate(req, [])) {
         if (RequestContext.hasInstance()) {
             RequestContext.getInstance().set(RequestContext.SESSIONID, req.session.id);
             RequestContext.getInstance().set(RequestContext.USERID, '');
