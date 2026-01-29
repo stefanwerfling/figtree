@@ -43,11 +43,12 @@ export class ACL {
      * Check the access
      * @param {ACLRole} role
      * @param {ACLRight} right
+     * @param {ACLRight[]} userRightList
      * @return {boolean}
      */
-    public async checkAccess(role: ACLRole, right: ACLRight): Promise<boolean> {
+    public async checkAccess(role: ACLRole, right: ACLRight, userRightList?: ACLRight[]): Promise<boolean> {
         for (const controller of this._controllers) {
-            if (await controller.checkAccess(role, right)) {
+            if (await controller.checkAccess(role, right, userRightList)) {
                 return true;
             }
         }

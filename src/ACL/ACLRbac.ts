@@ -18,8 +18,9 @@ export abstract class ACLRbac<Role extends string, Right extends string> impleme
      * Check access
      * @param {ACLRole} role
      * @param {ACLRight} right
+     * @param {ACLRight[]} userRightList
      */
-    public async checkAccess(role: ACLRole, right: ACLRight): Promise<boolean> {
+    public async checkAccess(role: ACLRole, right: ACLRight, userRightList?: ACLRight[]): Promise<boolean> {
         if (this._rbac) {
             return this._rbac.checkAccess(role as Role, right as Right);
         }

@@ -6,5 +6,5 @@ export declare class ACL {
     static getInstance(): ACL;
     protected _controllers: IACLController[];
     addController(controller: IACLController): void;
-    checkAccess(role: ACLRole, right: ACLRight): Promise<boolean>;
+    checkAccess(role: ACLRole, right: ACLRight, userRightList?: ACLRight[]): Promise<boolean>;
 }
