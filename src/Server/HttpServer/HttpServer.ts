@@ -1,5 +1,4 @@
 import rateLimit, {RateLimitRequestHandler} from 'express-rate-limit';
-import {SchemaRequestData} from 'figtree-schemas';
 import helmet from 'helmet';
 import {Request, Response} from 'express';
 import {Config} from '../../Config/Config.js';
