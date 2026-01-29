@@ -10,4 +10,5 @@ export declare class HttpServer extends BaseHttpServer {
     protected _generateCertAndKey(): Promise<BaseHttpCertKey>;
     protected _getCertAndKey(options: BaseHttpServerOptionCrypt): Promise<BaseHttpCertKey | null>;
     getLimiter(): RateLimitRequestHandler | null;
+    resetLimiterIP(ip: string): boolean;
 }

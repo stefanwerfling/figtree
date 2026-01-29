@@ -1,5 +1,4 @@
 import rateLimit from 'express-rate-limit';
-import { SchemaRequestData } from 'figtree-schemas';
 import helmet from 'helmet';
 import { Config } from '../../Config/Config.js';
 import { CertificateHelper } from '../../Crypto/CertificateHelper.js';
@@ -60,18 +59,14 @@ export class HttpServer extends BaseHttpServer {
         this._express.use(this._limiter);
     }
     async _limiterSkip(request) {
-        if (request.url.indexOf('/json/') === 0) {
-            if (SchemaRequestData.validate(request, [])) {
-                if (Session.isUserLogin(request.session)) {
-                    return true;
-                }
-                else {
-                    Logger.getLogger().warn('HttpServer::_limiterSkip: request session isnt isUserLogin');
-                }
-            }
-            else {
-                Logger.getLogger().error('HttpServer::_limiterSkip: request isnt SchemaRequestData');
-            }
+        if (!request.url.startsWith('/json/')) {
+            return true;
+        }
+        if (Session.isUserLogin(request.session)) {
+            return true;
+        }
+        else {
+            Logger.getLogger().warn('HttpServer::_limiterSkip: request session isnt isUserLogin');
         }
         return false;
     }
@@ -142,6 +137,10 @@ export class HttpServer extends BaseHttpServer {
                         ip: '127.0.0.1'
                     },
                     {
+                        type: 7,
+                        ip: '::1'
+                    },
+                    {
                         type: 2,
                         value: 'localhost'
                     },
@@ -182,6 +181,13 @@ export class HttpServer extends BaseHttpServer {
     }
     getLimiter() {
         return this._limiter;
+    }
+    resetLimiterIP(ip) {
+        if (this._limiter) {
+            this._limiter.resetKey(ip);
+            return true;
+        }
+        return false;
     }
 }
 //# sourceMappingURL=HttpServer.js.map

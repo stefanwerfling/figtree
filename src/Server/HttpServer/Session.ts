@@ -11,11 +11,7 @@ export class Session {
      * @return {boolean}
      */
     public static isUserLogin(session: SessionData): boolean {
-        if (session.user) {
-            return session.user.isLogin;
-        }
-
-        return false;
+        return session.user?.isLogin === true;
     }
 
     /**

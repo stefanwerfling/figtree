@@ -86,16 +86,15 @@ export class HttpServer extends BaseHttpServer {
      * @return {boolean}
      */
     protected async _limiterSkip(request: Request): Promise<boolean> {
-        if (request.url.indexOf('/json/') === 0) {
-            if (SchemaRequestData.validate(request, [])) {
-                if (Session.isUserLogin(request.session)) {
-                    return true;
-                } else {
-                    Logger.getLogger().warn('HttpServer::_limiterSkip: request session isnt isUserLogin');
-                }
-            } else {
-                Logger.getLogger().error('HttpServer::_limiterSkip: request isnt SchemaRequestData');
-            }
+        // allow all outsite session
+        if (!request.url.startsWith('/json/')) {
+            return true;
+        }
+
+        if (Session.isUserLogin(request.session as any)) {
+            return true;
+        } else {
+            Logger.getLogger().warn('HttpServer::_limiterSkip: request session isnt isUserLogin');
         }
 
         return false;
@@ -195,6 +194,11 @@ export class HttpServer extends BaseHttpServer {
                             ip: '127.0.0.1'
                         },
                         {
+                            // IP6
+                            type: 7,
+                            ip: '::1'
+                        },
+                        {
                             // DNS
                             type: 2,
                             value: 'localhost'
@@ -259,4 +263,17 @@ export class HttpServer extends BaseHttpServer {
         return this._limiter;
     }
 
+    /**
+     * Reset the limiter for IP
+     * @param {string} ip
+     * @return {boolean}
+     */
+    public resetLimiterIP(ip: string): boolean {
+        if (this._limiter) {
+            this._limiter.resetKey(ip);
+            return true;
+        }
+
+        return false;
+    }
 }
