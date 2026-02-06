@@ -238,12 +238,12 @@ export class DefaultRoute implements IDefaultRoute {
     }
 
     /**
-     *
-     * @param method
-     * @param uriPath
-     * @param checkUserLogin
-     * @param handler
-     * @param description
+     * All methodes
+     * @param {string} method
+     * @param {string|string[]} uriPath
+     * @param {boolean|DefaultRouteCheckUserLogin}checkUserLogin
+     * @param {DefaultRouteHandler} handler
+     * @param {DefaultRouteMethodeDescription} description
      * @protected
      */
     protected _all<
@@ -388,6 +388,10 @@ export class DefaultRoute implements IDefaultRoute {
                             )
                         );
                     }
+                } else {
+                    // no content
+                    res.sendStatus(204);
+                    return;
                 }
             } catch (ie) {
                 if (ie instanceof VtsSchemaError) {

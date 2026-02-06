@@ -122,6 +122,10 @@ export class DefaultRoute {
                         throw new Error(StringHelper.sprintf('The result have a error in: %s', description.responseBodySchema.describe().description));
                     }
                 }
+                else {
+                    res.sendStatus(204);
+                    return;
+                }
             }
             catch (ie) {
                 if (ie instanceof VtsSchemaError) {
