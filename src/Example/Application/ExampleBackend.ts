@@ -6,7 +6,7 @@ import {HttpService} from '../../Application/Services/HttpService.js';
 import {MariaDBService} from '../../Application/Services/MariaDBService.js';
 import {PluginService} from '../../Application/Services/PluginService.js';
 import {Config} from '../../Config/Config.js';
-import {DBLoader} from '../../Db/MariaDb/DBLoader.js';
+import {DBLoader} from '../../Application/Services/MariaDBService/DBLoader.js';
 import {MyACLRbac} from '../ACL/MyACLRbac.js';
 import {ExampleConfig} from '../Config/ExampleConfig.js';
 import {ExampleRouteLoader} from '../Routes/ExampleRouteLoader.js';
