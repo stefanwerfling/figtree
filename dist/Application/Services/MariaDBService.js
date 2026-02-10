@@ -1,6 +1,7 @@
 import { SchemaConfigDbOptionsMySql } from 'figtree-schemas';
 import { Config } from '../../Config/Config.js';
 import { DBHelper } from '../../Db/MariaDb/DBHelper.js';
+import { DbSetupStateRepository } from '../../Db/MariaDb/Defaults/Repository/DbSetupStateRepository.js';
 import { Logger } from '../../Logger/Logger.js';
 import { ServiceAbstract, ServiceImportance, ServiceStatus } from '../../Service/ServiceAbstract.js';
 import { ServiceError } from '../../Service/ServiceError.js';
@@ -9,18 +10,34 @@ export class MariaDBService extends ServiceAbstract {
     static NAME = 'mariadb';
     _importance = ServiceImportance.Important;
     _loader;
+    _setupHooks = [];
     _options;
-    constructor(loader, serviceName, serviceDependencies, options) {
+    constructor(loader, serviceName, serviceDependencies, options, setupHooks) {
         super(serviceName ?? MariaDBService.NAME, serviceDependencies);
         this._loader = loader;
-        if (options) {
-            this._options = options;
+        this._options = options ?? { migrationsRun: true, synchronize: true };
+        if (setupHooks) {
+            this._setupHooks = setupHooks;
         }
-        else {
-            this._options = {
-                migrationsRun: true,
-                synchronize: true
-            };
+    }
+    registerSetupHook(hook) {
+        this._setupHooks.push(hook);
+    }
+    async _runSetupHooks() {
+        const repo = DbSetupStateRepository.getInstance();
+        for (const hook of this._setupHooks) {
+            if (hook.mode === 'once') {
+                const applied = await repo.isApplied(hook.id);
+                if (applied)
+                    continue;
+                Logger.getLogger().info(`Running once-hook: ${hook.id}`, { class: 'MariaDBService' });
+                await hook.run();
+                await repo.markApplied(hook.id);
+            }
+            else if (hook.mode === 'always') {
+                Logger.getLogger().info(`Running always-hook: ${hook.id}`, { class: 'MariaDBService' });
+                await hook.run();
+            }
         }
     }
     async start() {
@@ -49,6 +66,7 @@ export class MariaDBService extends ServiceAbstract {
                 migrationsRun: this._options.migrationsRun !== undefined ? this._options.migrationsRun : true,
                 synchronize: this._options.synchronize !== undefined ? this._options.synchronize : true,
             });
+            await this._runSetupHooks();
         }
         catch (error) {
             this._status = ServiceStatus.Error;
