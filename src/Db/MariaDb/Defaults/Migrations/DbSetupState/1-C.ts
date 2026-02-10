@@ -20,7 +20,7 @@ export class CreateTableDbSetupState0000000000001 implements MigrationInterface 
                 name: 'db_setup_state',
                 columns: [
                     {
-                        name: 'id',
+                        name: 'unid',
                         type: 'varchar',
                         length: '36',   // UUID
                         isPrimary: true,

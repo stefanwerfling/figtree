@@ -6,7 +6,7 @@ export class CreateTableDbSetupState0000000000001 {
             name: 'db_setup_state',
             columns: [
                 {
-                    name: 'id',
+                    name: 'unid',
                     type: 'varchar',
                     length: '36',
                     isPrimary: true,
