@@ -1,4 +1,4 @@
-import { BaseEntity, EntityTarget, Repository } from 'typeorm';
+import { BaseEntity, DeepPartial, EntityTarget, Repository } from 'typeorm';
 export declare abstract class DBRepositoryBase<T extends BaseEntity> {
     protected static _instance: Map<string, DBRepositoryBase<any>>;
     protected readonly _repository: Repository<T>;
@@ -11,4 +11,6 @@ export declare abstract class DBRepositoryBase<T extends BaseEntity> {
     findAll(): Promise<T[]>;
     getRepository(): Repository<T>;
     getTableName(): string;
+    createEntity(entityLike: DeepPartial<T>): Promise<T>;
+    save(entity: T): Promise<T>;
 }

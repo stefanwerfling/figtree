@@ -1,4 +1,4 @@
-import {BaseEntity, EntityTarget, Repository} from 'typeorm';
+import {BaseEntity, DeepPartial, EntityTarget, Repository} from 'typeorm';
 import {DBHelper} from './DBHelper.js';
 
 /**
@@ -21,8 +21,8 @@ export abstract class DBRepositoryBase<T extends BaseEntity> {
 
     /**
      * Get Single Instance
-     * @template S extends DBRepositoryUnid
-     * @template TEntity extends DBBaseEntityUnid
+     * @template S extends BaseEntity
+     * @template TEntity extends BaseEntity
      * @return {S}
      */
     protected static getSingleInstance<S extends DBRepositoryBase<any>, TEntity extends BaseEntity>(
@@ -62,7 +62,7 @@ export abstract class DBRepositoryBase<T extends BaseEntity> {
 
     /**
      * Get access to repository for cross-query building and more.
-     * @returns {Repository<DBBaseEntityUnid>}
+     * @returns {Repository<BaseEntity>}
      */
     public getRepository(): Repository<T> {
         return this._repository;
@@ -76,4 +76,21 @@ export abstract class DBRepositoryBase<T extends BaseEntity> {
         return this._repository.metadata.name;
     }
 
+    /**
+     * Create an entity (only create an instance)
+     * @param {DeepPartial<T>} entityLike
+     * @return {T}
+     */
+    public async createEntity(entityLike: DeepPartial<T>): Promise<T> {
+        return this._repository.create(entityLike);
+    }
+
+    /**
+     * Save an entry object extend from BaseEntity.
+     * @param {T} entity
+     * @returns {T}
+     */
+    public async save(entity: T): Promise<T> {
+        return this._repository.save(entity);
+    }
 }

@@ -83,7 +83,7 @@ export abstract class DBRepositoryUnid<T extends DBBaseEntityUnid> {
     }
 
     /**
-     * Create a entity (only create an instance)
+     * Create an entity (only create an instance)
      * @param {DeepPartial<T>} entityLike
      * @return {T}
      */
@@ -102,7 +102,7 @@ export abstract class DBRepositoryUnid<T extends DBBaseEntityUnid> {
 
     /**
      * Save an entry object extend from DBBaseEntityId.
-     * @param {T extend DBBaseEntityUnid} entity
+     * @param {T} entity
      * @returns {T extend DBBaseEntityUnid}
      */
     public async save(entity: T): Promise<T> {

@@ -23,5 +23,11 @@ export class DBRepositoryBase {
     getTableName() {
         return this._repository.metadata.name;
     }
+    async createEntity(entityLike) {
+        return this._repository.create(entityLike);
+    }
+    async save(entity) {
+        return this._repository.save(entity);
+    }
 }
 //# sourceMappingURL=DBRepositoryBase.js.map
