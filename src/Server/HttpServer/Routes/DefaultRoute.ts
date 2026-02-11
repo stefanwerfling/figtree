@@ -4,7 +4,6 @@ import {
     DefaultReturn,
     HandlerResultType,
     SchemaDefaultHandlerReturn,
-    SchemaDefaultReturn,
     StatusCodes
 } from 'figtree-schemas';
 import {ACLRight} from '../../../ACL/ACLRight.js';
