@@ -1,4 +1,5 @@
 import { Request, RequestHandler, Response, Router } from 'express';
+import { DefaultHandlerReturn } from 'figtree-schemas';
 import { ACLRight } from '../../../ACL/ACLRight.js';
 import { Schema } from 'vts';
 import { DefaultRouteCheckUserLogin } from './DefaultRouteCheckUser.js';
@@ -10,7 +11,7 @@ export type DefaultRouteHandler<Header, Query, Path, Cookies, Body, Result, Sess
     cookies: Cookies | undefined;
     session: Session | undefined;
     body: Body | undefined;
-}) => Promise<Result>;
+}) => Promise<Result | DefaultHandlerReturn>;
 export type DefaultRouteSessionInitHandler<SessionUser> = () => Promise<SessionUser>;
 export type DefaultRouteMethodeDescription<Header, Query, Path, Cookies, Body, ResponseBody, ResponseHeader, Session, SessionUser> = {
     description?: string;

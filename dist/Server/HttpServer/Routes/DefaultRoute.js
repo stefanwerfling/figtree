@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { StatusCodes } from 'figtree-schemas';
+import { HandlerResultType, SchemaDefaultHandlerReturn, StatusCodes } from 'figtree-schemas';
 import { Logger } from '../../../Logger/Logger.js';
 import { StringHelper } from '../../../Utils/StringHelper.js';
 import { VtsSchemaError } from '../../../VtsExtend/VtsSchemaError.js';
@@ -114,9 +114,22 @@ export class DefaultRoute {
                     session: session,
                     body: body
                 });
+                let resultBody = result;
+                if (SchemaDefaultHandlerReturn.validate(result, [])) {
+                    switch (result.type) {
+                        case HandlerResultType.empty:
+                            res.sendStatus(204);
+                            return;
+                        case HandlerResultType.handled:
+                            return;
+                        case HandlerResultType.json:
+                            resultBody = result.body;
+                            break;
+                    }
+                }
                 if (description.responseBodySchema) {
-                    if (description.responseBodySchema.validate(result, [])) {
-                        res.status(200).json(result);
+                    if (description.responseBodySchema.validate(resultBody, [])) {
+                        res.status(200).json(resultBody);
                     }
                     else {
                         throw new Error(StringHelper.sprintf('The result have a error in: %s', description.responseBodySchema.describe().description));

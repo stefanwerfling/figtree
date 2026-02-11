@@ -1,5 +1,12 @@
 import {Request, RequestHandler, Response, Router} from 'express';
-import {DefaultReturn, StatusCodes} from 'figtree-schemas';
+import {
+    DefaultHandlerReturn,
+    DefaultReturn,
+    HandlerResultType,
+    SchemaDefaultHandlerReturn,
+    SchemaDefaultReturn,
+    StatusCodes
+} from 'figtree-schemas';
 import {ACLRight} from '../../../ACL/ACLRight.js';
 import {Logger} from '../../../Logger/Logger.js';
 import {StringHelper} from '../../../Utils/StringHelper.js';
@@ -36,7 +43,7 @@ export type DefaultRouteHandler<
         session: Session|undefined,
         body: Body|undefined
     }
-) => Promise<Result>;
+) => Promise<Result|DefaultHandlerReturn>;
 
 /**
  * Default route session init Handler
@@ -72,8 +79,6 @@ export type DefaultRouteMethodeDescription<
     useLocalStorage?: boolean;
     aclRight?: ACLRight;
 };
-
-
 
 /**
  * DefaultRoute
@@ -376,10 +381,26 @@ export class DefaultRoute implements IDefaultRoute {
                 );
 
                 // check response --------------------------------------------------------------------------------------
+                let resultBody: unknown = result;
+
+                if (SchemaDefaultHandlerReturn.validate(result, [])) {
+                    switch(result.type) {
+                        case HandlerResultType.empty:
+                            res.sendStatus(204);
+                            return;
+
+                        case HandlerResultType.handled:
+                            return;
+
+                        case HandlerResultType.json:
+                            resultBody = result.body;
+                            break;
+                    }
+                }
 
                 if (description.responseBodySchema) {
-                    if (description.responseBodySchema.validate(result, [])) {
-                        res.status(200).json(result);
+                    if (description.responseBodySchema.validate(resultBody, [])) {
+                        res.status(200).json(resultBody);
                     } else {
                         throw new Error(
                             StringHelper.sprintf(
