@@ -6,27 +6,18 @@ export class ServiceManager {
         this._services.push(service);
     }
     getByName(name) {
-        for (const service of this._services) {
-            if (service.getServiceName() === name) {
-                return service;
-            }
-        }
-        return null;
+        return this._services.find(s => s.getServiceName() === name) || null;
     }
     getInfoList() {
-        const list = [];
-        for (const service of this._services) {
-            list.push({
-                type: service.getType(),
-                name: service.getServiceName(),
-                status: service.getStatus(),
-                statusMsg: service.getStatusMsg(),
-                importance: service.getImportance(),
-                inProcess: service.isProcess(),
-                dependencies: service.getServiceDependencies()
-            });
-        }
-        return list;
+        return this._services.map(service => ({
+            type: service.getType(),
+            name: service.getServiceName(),
+            status: service.getStatus(),
+            statusMsg: service.getStatusMsg(),
+            importance: service.getImportance(),
+            inProcess: service.isProcess(),
+            dependencies: service.getServiceDependencies()
+        }));
     }
     async _startService(service) {
         const name = service.constructor.name;
@@ -47,7 +38,29 @@ export class ServiceManager {
             }
         }
     }
+    _checkForCycles(service, visited = new Set(), stack = new Set()) {
+        const name = service.getServiceName();
+        if (stack.has(name)) {
+            throw new Error(`Dependency cycle detected: ${[...stack, name].join(' -> ')}`);
+        }
+        if (visited.has(name)) {
+            return;
+        }
+        visited.add(name);
+        stack.add(name);
+        for (const depName of service.getServiceDependencies()) {
+            const depService = this.getByName(depName);
+            if (!depService) {
+                continue;
+            }
+            this._checkForCycles(depService, visited, stack);
+        }
+        stack.delete(name);
+    }
     async startAll() {
+        for (const service of this._services) {
+            this._checkForCycles(service);
+        }
         let waitingServices = [];
         for await (const service of this._services) {
             const deps = service.getServiceDependencies();
@@ -77,7 +90,7 @@ export class ServiceManager {
         }
         while (waitingServices.length > 0) {
             await new Promise(resolve => setTimeout(resolve, 1000));
-            for (const waitService of waitingServices) {
+            for (const waitService of [...waitingServices]) {
                 const mService = this.getByName(waitService);
                 if (mService === null) {
                     waitingServices = waitingServices.filter(service => service !== waitService);
@@ -112,7 +125,7 @@ export class ServiceManager {
         const services = [...this._services].reverse();
         for await (const service of services) {
             try {
-                await service.stop();
+                await this._stopRecursive(service.getServiceName());
                 Logger.getLogger().info(`Service stopped: ${service.constructor.name}`);
             }
             catch (error) {
@@ -144,14 +157,32 @@ export class ServiceManager {
         await this._startService(service);
     }
     async stop(name) {
+        await this._stopRecursive(name);
+    }
+    async _stopRecursive(name, visited = new Set()) {
+        if (visited.has(name)) {
+            throw new Error(`Circular dependency detected while stopping: ${name}`);
+        }
+        visited.add(name);
+        const dependents = this._services.filter(s => s.getServiceDependencies().includes(name));
+        for (const dependent of dependents) {
+            if (dependent.getStatus() === ServiceStatus.Success) {
+                await this._stopRecursive(dependent.getServiceName(), visited);
+            }
+        }
         const service = this.getByName(name);
-        if (service === null) {
-            throw new Error(`Service not found by name: ${name}`);
+        if (service && service.getStatus() === ServiceStatus.Success) {
+            await service.stop();
+            Logger.getLogger().info(`Service stopped: ${service.getServiceName()}`);
         }
-        if (service.getStatus() !== ServiceStatus.Success) {
-            throw new Error(`The service has not successfully started to stop: ${name}`);
+        else {
+            if (service === null) {
+                throw new Error(`Service not found by name: ${name}`);
+            }
+            if (service.getStatus() !== ServiceStatus.Success) {
+                throw new Error(`The service has not successfully started to stop: ${name}`);
+            }
         }
-        await service.stop();
     }
 }
 //# sourceMappingURL=ServiceManager.js.map

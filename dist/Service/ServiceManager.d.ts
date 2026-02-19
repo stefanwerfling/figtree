@@ -6,8 +6,10 @@ export declare class ServiceManager {
     getByName(name: string): ServiceAbstract | null;
     getInfoList(): ServiceInfoEntry[];
     protected _startService(service: ServiceAbstract): Promise<void>;
+    private _checkForCycles;
     startAll(): Promise<void>;
     stopAll(): Promise<void>;
     start(name: string): Promise<void>;
     stop(name: string): Promise<void>;
+    private _stopRecursive;
 }

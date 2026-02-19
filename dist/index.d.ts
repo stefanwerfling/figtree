@@ -60,6 +60,7 @@ export { ServiceRoute } from './Server/HttpServer/Routes/ServiceRoute.js';
 export { ProcessAwait } from './Process/ProcessAwait.js';
 export { ServiceError } from './Service/ServiceError.js';
 export { ServiceStatus, ServiceType, ServiceAbstract, ServiceImportance } from './Service/ServiceAbstract.js';
+export { ServiceJobAbstract } from './Service/ServiceJobAbstract.js';
 export { ServiceManager } from './Service/ServiceManager.js';
 export { PluginInformation } from './Plugins/PluginInformation.js';
 export { APlugin } from './Plugins/APlugin.js';
