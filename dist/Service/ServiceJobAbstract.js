@@ -1,4 +1,5 @@
 import { scheduleJob } from 'node-schedule';
+import { Logger } from '../Logger/Logger.js';
 import { ServiceAbstract, ServiceStatus, ServiceType } from './ServiceAbstract.js';
 export class ServiceJobAbstract extends ServiceAbstract {
     _scheduler = null;
@@ -69,6 +70,12 @@ export class ServiceJobAbstract extends ServiceAbstract {
     }
     static buildCron({ minute = '*', hour = '*', day = '*' }) {
         return `${minute} ${hour} ${day} * *`;
+    }
+    async invoke() {
+        if (this._scheduler !== null) {
+            Logger.getLogger().info(`Job ${this.getServiceName()} invoked manually`);
+            this._scheduler.invoke();
+        }
     }
 }
 //# sourceMappingURL=ServiceJobAbstract.js.map

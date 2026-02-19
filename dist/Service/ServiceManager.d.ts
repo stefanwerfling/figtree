@@ -12,4 +12,5 @@ export declare class ServiceManager {
     start(name: string): Promise<void>;
     stop(name: string): Promise<void>;
     private _stopRecursive;
+    invokeService(name: string): Promise<void>;
 }

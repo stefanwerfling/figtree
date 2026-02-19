@@ -1,4 +1,5 @@
 import {Job, scheduleJob} from 'node-schedule';
+import {Logger} from '../Logger/Logger.js';
 import {ServiceAbstract, ServiceStatus, ServiceType} from './ServiceAbstract.js';
 
 /**
@@ -167,6 +168,16 @@ export abstract class ServiceJobAbstract extends ServiceAbstract {
         day?: string | number
     }): string {
         return `${minute} ${hour} ${day} * *`;
+    }
+
+    /**
+     * invoke the scheduler
+     */
+    public override async invoke(): Promise<void> {
+        if (this._scheduler !== null) {
+            Logger.getLogger().info(`Job ${this.getServiceName()} invoked manually`);
+            this._scheduler.invoke();
+        }
     }
 
 }

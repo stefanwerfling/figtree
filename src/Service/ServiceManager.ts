@@ -295,4 +295,24 @@ export class ServiceManager {
         }
     }
 
+    /**
+     * invoke a service by name
+     * @param {string} name
+     */
+    public async invokeService(name: string): Promise<void> {
+        const service = this.getByName(name);
+
+        if (!service) {
+            throw new Error(`Service not found: ${name}`);
+        }
+
+        if (service.isProcess()) {
+            Logger.getLogger().warn(`Service ${name} is already running`);
+            return;
+        }
+
+        await service.invoke();
+        Logger.getLogger().info(`Service ${name} invoked manually`);
+    }
+
 }

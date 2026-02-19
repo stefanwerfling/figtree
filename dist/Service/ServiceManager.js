@@ -184,5 +184,17 @@ export class ServiceManager {
             }
         }
     }
+    async invokeService(name) {
+        const service = this.getByName(name);
+        if (!service) {
+            throw new Error(`Service not found: ${name}`);
+        }
+        if (service.isProcess()) {
+            Logger.getLogger().warn(`Service ${name} is already running`);
+            return;
+        }
+        await service.invoke();
+        Logger.getLogger().info(`Service ${name} invoked manually`);
+    }
 }
 //# sourceMappingURL=ServiceManager.js.map

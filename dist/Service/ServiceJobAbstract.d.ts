@@ -21,4 +21,5 @@ export declare abstract class ServiceJobAbstract extends ServiceAbstract {
         hour?: string | number;
         day?: string | number;
     }): string;
+    invoke(): Promise<void>;
 }
