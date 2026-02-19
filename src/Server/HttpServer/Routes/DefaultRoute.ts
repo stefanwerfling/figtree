@@ -398,7 +398,7 @@ export class DefaultRoute implements IDefaultRoute {
                 }
 
                 if (description.responseBodySchema) {
-                    if (description.responseBodySchema.validate(resultBody, [])) {
+                    if (this.isSchemaValidate(description.responseBodySchema, resultBody, 'responseBodySchema')) {
                         res.status(200).json(resultBody);
                     } else {
                         throw new Error(

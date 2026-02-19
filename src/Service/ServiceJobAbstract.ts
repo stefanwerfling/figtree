@@ -1,6 +1,7 @@
+import {ServiceStatus, ServiceType} from 'figtree-schemas';
 import {Job, scheduleJob} from 'node-schedule';
 import {Logger} from '../Logger/Logger.js';
-import {ServiceAbstract, ServiceStatus, ServiceType} from './ServiceAbstract.js';
+import {ServiceAbstract} from './ServiceAbstract.js';
 
 /**
  * Service job abstract
@@ -61,9 +62,9 @@ export abstract class ServiceJobAbstract extends ServiceAbstract {
 
     /**
      * Return the scheduler status
-     * @return {string|ServiceStatus}
+     * @return {ServiceStatus}
      */
-    public getStatusScheduler(): string|ServiceStatus {
+    public getStatusScheduler(): ServiceStatus {
         return this._statusScheduler;
     }
 
@@ -150,6 +151,14 @@ export abstract class ServiceJobAbstract extends ServiceAbstract {
      */
     public getLastRun(): Date|null {
         return this._lastRun;
+    }
+
+    /**
+     * Return the cron string
+     * @return {string}
+     */
+    public getCron(): string {
+        return this._cron;
     }
 
     /**

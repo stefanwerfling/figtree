@@ -25,4 +25,13 @@ export class DateHelper {
         return diffTime > secHours;
     }
 
+    /**
+     * to string or null
+     * @param {Date|null} date
+     * @return {string|null}
+     */
+    public static toStrOrNull(date: Date|null): string|null {
+        return date ? date.toISOString() : null;
+    }
+
 }

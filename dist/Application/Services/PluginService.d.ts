@@ -1,5 +1,6 @@
+import { ServiceImportance } from 'figtree-schemas';
 import { PluginManager, PluginManagerOptions } from '../../Plugins/PluginManager.js';
-import { ServiceAbstract, ServiceImportance } from '../../Service/ServiceAbstract.js';
+import { ServiceAbstract } from '../../Service/ServiceAbstract.js';
 export declare class PluginService extends ServiceAbstract {
     static NAME: string;
     protected readonly _importance: ServiceImportance;

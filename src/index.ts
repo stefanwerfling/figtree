@@ -105,7 +105,7 @@ export {ProcessAwait} from './Process/ProcessAwait.js';
 
 // Service -------------------------------------------------------------------------------------------------------------
 export {ServiceError} from './Service/ServiceError.js';
-export {ServiceStatus, ServiceType, ServiceAbstract, ServiceImportance} from './Service/ServiceAbstract.js';
+export {ServiceAbstract} from './Service/ServiceAbstract.js';
 export {ServiceJobAbstract} from './Service/ServiceJobAbstract.js';
 export {ServiceManager} from './Service/ServiceManager.js';
 

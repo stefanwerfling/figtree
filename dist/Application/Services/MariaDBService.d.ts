@@ -1,5 +1,6 @@
+import { ServiceImportance } from 'figtree-schemas';
 import { DBLoaderType } from './MariaDBService/DBLoader.js';
-import { ServiceAbstract, ServiceImportance } from '../../Service/ServiceAbstract.js';
+import { ServiceAbstract } from '../../Service/ServiceAbstract.js';
 import { DBSetupHook } from './MariaDBService/DBSetupHook.js';
 export type MariaDBServiceOptions = {
     migrationsRun?: boolean;

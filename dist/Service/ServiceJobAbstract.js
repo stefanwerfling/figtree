@@ -1,6 +1,7 @@
+import { ServiceStatus, ServiceType } from 'figtree-schemas';
 import { scheduleJob } from 'node-schedule';
 import { Logger } from '../Logger/Logger.js';
-import { ServiceAbstract, ServiceStatus, ServiceType } from './ServiceAbstract.js';
+import { ServiceAbstract } from './ServiceAbstract.js';
 export class ServiceJobAbstract extends ServiceAbstract {
     _scheduler = null;
     _lastRun = null;
@@ -67,6 +68,9 @@ export class ServiceJobAbstract extends ServiceAbstract {
     }
     getLastRun() {
         return this._lastRun;
+    }
+    getCron() {
+        return this._cron;
     }
     static buildCron({ minute = '*', hour = '*', day = '*' }) {
         return `${minute} ${hour} ${day} * *`;

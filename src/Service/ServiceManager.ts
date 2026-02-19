@@ -1,6 +1,8 @@
-import {ServiceInfoEntry} from 'figtree-schemas';
+import {ServiceImportance, ServiceInfoEntry, ServiceInfoScheduler, ServiceStatus} from 'figtree-schemas';
 import {Logger} from '../Logger/Logger.js';
-import {ServiceAbstract, ServiceImportance, ServiceStatus} from './ServiceAbstract.js';
+import {DateHelper} from '../Utils/DateHelper.js';
+import {ServiceAbstract} from './ServiceAbstract.js';
+import {ServiceJobAbstract} from './ServiceJobAbstract.js';
 
 /**
  * Service Manager
@@ -35,15 +37,29 @@ export class ServiceManager {
      * @return {ServiceInfoEntry[]}
      */
     public getInfoList(): ServiceInfoEntry[] {
-        return this._services.map(service => ({
-            type: service.getType(),
-            name: service.getServiceName(),
-            status: service.getStatus(),
-            statusMsg: service.getStatusMsg(),
-            importance: service.getImportance(),
-            inProcess: service.isProcess(),
-            dependencies: service.getServiceDependencies()
-        }));
+        return this._services.map(service => {
+            let schedulerInfo: ServiceInfoScheduler|undefined = undefined;
+
+            if (service instanceof ServiceJobAbstract) {
+                schedulerInfo = {
+                    status: service.getStatusScheduler(),
+                    inProcess: service.isProcessScheduler(),
+                    lastRun: DateHelper.toStrOrNull(service.getLastRun()),
+                    cron: service.getCron()
+                };
+            }
+
+            return {
+                type: service.getType(),
+                name: service.getServiceName(),
+                status: service.getStatus(),
+                statusMsg: service.getStatusMsg(),
+                importance: service.getImportance(),
+                inProcess: service.isProcess(),
+                dependencies: service.getServiceDependencies(),
+                scheduler: schedulerInfo
+            };
+        });
     }
 
     /**

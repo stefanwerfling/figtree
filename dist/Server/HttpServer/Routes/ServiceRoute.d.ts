@@ -6,6 +6,7 @@ export type ServiceRouteACLRights = {
     status: ACLRight;
     start: ACLRight;
     stop: ACLRight;
+    invoke: ACLRight;
 };
 export declare class ServiceRoute extends DefaultRoute {
     protected _backendInstanceName: string;

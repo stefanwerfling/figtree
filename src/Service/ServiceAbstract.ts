@@ -1,29 +1,4 @@
-/**
- * Service Type
- */
-export enum ServiceType {
-    runner,
-    scheduler
-}
-
-/**
- * Service Status
- */
-export enum ServiceStatus {
-    None = 'none',
-    Progress = 'progress',
-    Success = 'success',
-    Error = 'error'
-}
-
-/**
- * Service Importance
- */
-export enum ServiceImportance {
-    Optional,
-    Important,
-    Critical
-}
+import {ServiceImportance, ServiceStatus, ServiceType} from 'figtree-schemas';
 
 /**
  * Service Abstract
@@ -148,9 +123,9 @@ export class ServiceAbstract {
 
     /**
      * Return the service status
-     * @return {string|ServiceStatus}
+     * @return {ServiceStatus}
      */
-    public getStatus(): string|ServiceStatus {
+    public getStatus(): ServiceStatus {
         return this._status;
     }
 

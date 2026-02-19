@@ -1,4 +1,5 @@
-import { ServiceAbstract, ServiceImportance } from '../../Service/ServiceAbstract.js';
+import { ServiceImportance } from 'figtree-schemas';
+import { ServiceAbstract } from '../../Service/ServiceAbstract.js';
 export declare class InfluxDBService extends ServiceAbstract {
     static NAME: string;
     protected readonly _importance: ServiceImportance;

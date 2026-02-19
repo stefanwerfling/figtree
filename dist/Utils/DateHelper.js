@@ -8,5 +8,8 @@ export class DateHelper {
         const secHours = hours * 60 * 60;
         return diffTime > secHours;
     }
+    static toStrOrNull(date) {
+        return date ? date.toISOString() : null;
+    }
 }
 //# sourceMappingURL=DateHelper.js.map

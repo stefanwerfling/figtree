@@ -1,18 +1,4 @@
-export declare enum ServiceType {
-    runner = 0,
-    scheduler = 1
-}
-export declare enum ServiceStatus {
-    None = "none",
-    Progress = "progress",
-    Success = "success",
-    Error = "error"
-}
-export declare enum ServiceImportance {
-    Optional = 0,
-    Important = 1,
-    Critical = 2
-}
+import { ServiceImportance, ServiceStatus, ServiceType } from 'figtree-schemas';
 export declare class ServiceAbstract {
     protected _type: ServiceType;
     protected readonly _importance: ServiceImportance;
@@ -29,7 +15,7 @@ export declare class ServiceAbstract {
     getType(): ServiceType;
     getImportance(): ServiceImportance;
     isProcess(): boolean;
-    getStatus(): string | ServiceStatus;
+    getStatus(): ServiceStatus;
     getStatusMsg(): string;
     start(): Promise<void>;
     invoke(): Promise<void>;

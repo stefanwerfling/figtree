@@ -1,7 +1,8 @@
+import {ServiceImportance, ServiceStatus} from 'figtree-schemas';
 import path from 'path';
 import {Logger} from '../../Logger/Logger.js';
 import {PluginManager, PluginManagerOptions} from '../../Plugins/PluginManager.js';
-import {ServiceAbstract, ServiceImportance, ServiceStatus} from '../../Service/ServiceAbstract.js';
+import {ServiceAbstract} from '../../Service/ServiceAbstract.js';
 import {StringHelper} from '../../Utils/StringHelper.js';
 
 /**

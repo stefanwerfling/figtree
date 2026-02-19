@@ -11,10 +11,14 @@ import {BackendApp} from '../../../Application/BackendApp.js';
 import {DefaultRoute} from './DefaultRoute.js';
 import {DefaultRouteCheckUserLogin} from './DefaultRouteCheckUser.js';
 
+/**
+ * Service ACLRights
+ */
 export type ServiceRouteACLRights = {
     status: ACLRight
     start: ACLRight,
-    stop: ACLRight
+    stop: ACLRight,
+    invoke: ACLRight
 };
 
 /**
@@ -154,6 +158,41 @@ export class ServiceRoute extends DefaultRoute {
             },
             {
                 description: 'Service stop by service name',
+                tags: ['service'],
+                bodySchema: SchemaServiceByNameRequest,
+                responseBodySchema: SchemaDefaultReturn,
+                aclRight: this._accessRights?.stop
+            }
+        );
+
+        this._post(
+            this._getUrl('v1', 'service', 'invoke'),
+            this._onlyUserAccess,
+            async (_request, _response, data): Promise<DefaultReturn> => {
+                const backend = BackendApp.getInstance(this._backendInstanceName);
+
+                if (backend) {
+                    try {
+                        await backend.getServiceManager().invokeService(data.body!.name);
+
+                        return {
+                            statusCode: StatusCodes.OK,
+                        };
+                    } catch (e) {
+                        return {
+                            statusCode: StatusCodes.INTERNAL_ERROR,
+                            msg: e instanceof Error ? e.message : String(e),
+                        };
+                    }
+                }
+
+                return {
+                    statusCode: StatusCodes.INTERNAL_ERROR,
+                    msg: 'Backend not found, no information for services',
+                };
+            },
+            {
+                description: 'Service invoke by service name',
                 tags: ['service'],
                 bodySchema: SchemaServiceByNameRequest,
                 responseBodySchema: SchemaDefaultReturn,

@@ -27,7 +27,8 @@ export class ExampleRouteLoader extends HttpRouteLoader {
             new ServiceRoute(ExampleBackend.NAME, DefaultRouteCheckUserIsLoginACL, {
                 status: Right.service_status,
                 start: Right.service_start,
-                stop: Right.service_stop
+                stop: Right.service_stop,
+                invoke: Right.service_start
             }),
             SwaggerUIRoute.getInstance(),
             ...await routeProviders.getProvidersRoutes()

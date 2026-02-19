@@ -86,6 +86,33 @@ export class ServiceRoute extends DefaultRoute {
             responseBodySchema: SchemaDefaultReturn,
             aclRight: this._accessRights?.stop
         });
+        this._post(this._getUrl('v1', 'service', 'invoke'), this._onlyUserAccess, async (_request, _response, data) => {
+            const backend = BackendApp.getInstance(this._backendInstanceName);
+            if (backend) {
+                try {
+                    await backend.getServiceManager().invokeService(data.body.name);
+                    return {
+                        statusCode: StatusCodes.OK,
+                    };
+                }
+                catch (e) {
+                    return {
+                        statusCode: StatusCodes.INTERNAL_ERROR,
+                        msg: e instanceof Error ? e.message : String(e),
+                    };
+                }
+            }
+            return {
+                statusCode: StatusCodes.INTERNAL_ERROR,
+                msg: 'Backend not found, no information for services',
+            };
+        }, {
+            description: 'Service invoke by service name',
+            tags: ['service'],
+            bodySchema: SchemaServiceByNameRequest,
+            responseBodySchema: SchemaDefaultReturn,
+            aclRight: this._accessRights?.stop
+        });
         return super.getExpressRouter();
     }
 }

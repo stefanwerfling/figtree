@@ -1,5 +1,6 @@
+import { ServiceStatus, ServiceType } from 'figtree-schemas';
 import { Job } from 'node-schedule';
-import { ServiceAbstract, ServiceStatus, ServiceType } from './ServiceAbstract.js';
+import { ServiceAbstract } from './ServiceAbstract.js';
 export declare abstract class ServiceJobAbstract extends ServiceAbstract {
     protected _scheduler: Job | null;
     protected _lastRun: Date | null;
@@ -9,13 +10,14 @@ export declare abstract class ServiceJobAbstract extends ServiceAbstract {
     protected _inProcessScheduler: boolean;
     constructor(serviceName?: string, serviceDependencies?: string[]);
     isProcessScheduler(): boolean;
-    getStatusScheduler(): string | ServiceStatus;
+    getStatusScheduler(): ServiceStatus;
     protected abstract _execute(): Promise<void>;
     start(): Promise<void>;
     stop(forced?: boolean): Promise<void>;
     reload(): Promise<void>;
     changeSchedule(cronExpression: string): Promise<void>;
     getLastRun(): Date | null;
+    getCron(): string;
     static buildCron({ minute, hour, day }: {
         minute?: string | number;
         hour?: string | number;

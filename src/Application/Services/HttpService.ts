@@ -1,11 +1,11 @@
-import {ConfigBackendOptions, SchemaConfigHttpServer} from 'figtree-schemas';
+import {ConfigBackendOptions, SchemaConfigHttpServer, ServiceImportance, ServiceStatus} from 'figtree-schemas';
 import {v4 as uuid} from 'uuid';
 import {Config} from '../../Config/Config.js';
 import {Logger} from '../../Logger/Logger.js';
 import {BaseHttpServerOptionCsrf, BaseHttpServerOptionProxy} from '../../Server/HttpServer/BaseHttpServer.js';
 import {HttpRouteLoaderType} from '../../Server/HttpServer/HttpRouteLoader.js';
 import {HttpServer} from '../../Server/HttpServer/HttpServer.js';
-import {ServiceAbstract, ServiceImportance, ServiceStatus} from '../../Service/ServiceAbstract.js';
+import {ServiceAbstract} from '../../Service/ServiceAbstract.js';
 import {ServiceError} from '../../Service/ServiceError.js';
 import {StringHelper} from '../../Utils/StringHelper.js';
 

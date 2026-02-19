@@ -1,5 +1,7 @@
+import { ServiceImportance, ServiceStatus } from 'figtree-schemas';
 import { Logger } from '../Logger/Logger.js';
-import { ServiceImportance, ServiceStatus } from './ServiceAbstract.js';
+import { DateHelper } from '../Utils/DateHelper.js';
+import { ServiceJobAbstract } from './ServiceJobAbstract.js';
 export class ServiceManager {
     _services = [];
     add(service) {
@@ -9,15 +11,27 @@ export class ServiceManager {
         return this._services.find(s => s.getServiceName() === name) || null;
     }
     getInfoList() {
-        return this._services.map(service => ({
-            type: service.getType(),
-            name: service.getServiceName(),
-            status: service.getStatus(),
-            statusMsg: service.getStatusMsg(),
-            importance: service.getImportance(),
-            inProcess: service.isProcess(),
-            dependencies: service.getServiceDependencies()
-        }));
+        return this._services.map(service => {
+            let schedulerInfo = undefined;
+            if (service instanceof ServiceJobAbstract) {
+                schedulerInfo = {
+                    status: service.getStatusScheduler(),
+                    inProcess: service.isProcessScheduler(),
+                    lastRun: DateHelper.toStrOrNull(service.getLastRun()),
+                    cron: service.getCron()
+                };
+            }
+            return {
+                type: service.getType(),
+                name: service.getServiceName(),
+                status: service.getStatus(),
+                statusMsg: service.getStatusMsg(),
+                importance: service.getImportance(),
+                inProcess: service.isProcess(),
+                dependencies: service.getServiceDependencies(),
+                scheduler: schedulerInfo
+            };
+        });
     }
     async _startService(service) {
         const name = service.constructor.name;
