@@ -24,7 +24,8 @@ export class DbSetupStateRepository extends DBRepositoryUnid<DbSetupState> {
      * @param {string} hookId
      */
     public async isApplied(hookId: string): Promise<boolean> {
-        const existing = await this._repository.findOne({
+        const repository = await this._repository;
+        const existing = await repository.findOne({
             where: {
                 unid: hookId
             }
@@ -48,7 +49,8 @@ export class DbSetupStateRepository extends DBRepositoryUnid<DbSetupState> {
      * @return {string[]}
      */
     public async getAllApplied(): Promise<string[]> {
-        const rows = await this._repository.find();
+        const repository = await this._repository;
+        const rows = await repository.find();
         return rows.map(r => r.unid);
     }
 
@@ -57,7 +59,8 @@ export class DbSetupStateRepository extends DBRepositoryUnid<DbSetupState> {
      * @param {string} hookId
      */
     public async removeApplied(hookId: string): Promise<void> {
-        await this._repository.delete({ unid: hookId });
+        const repository = await this._repository;
+        await repository.delete({ unid: hookId });
     }
 
 }

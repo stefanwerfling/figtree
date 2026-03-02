@@ -18,6 +18,12 @@ export class DBHelper {
     protected static _sources: Map<string, DataSource> = new Map();
 
     /**
+     * options (for reconnect)
+     * @protected
+     */
+    protected static _options: Map<string, DataSourceOptions> = new Map();
+
+    /**
      * Use DB History
      */
     public static _useHistory: boolean = true;
@@ -30,16 +36,59 @@ export class DBHelper {
     public static async init(options: DataSourceOptions, useHistory: boolean = true): Promise<void> {
         this._useHistory = useHistory;
 
-        const dataSource = new DataSource(options);
-        await dataSource.initialize();
-
         let name = 'default';
 
         if (options.name) {
             name = options.name;
         }
 
+        DBHelper._options.set(name, options);
+
+        const dataSource = new DataSource(options);
+        await dataSource.initialize();
+
         DBHelper._sources.set(name, dataSource);
+    }
+
+    private static async ensureInitialized(
+        name: string,
+        retries = 5,
+        delayMs = 3000
+    ): Promise<DataSource> {
+        let dataSource = DBHelper._sources.get(name);
+
+        if (!dataSource) {
+            const options = DBHelper._options.get(name);
+
+            if (!options) {
+                throw new Error(`No DataSourceOptions found for '${name}'`);
+            }
+
+            dataSource = new DataSource(options);
+            DBHelper._sources.set(name, dataSource);
+        }
+
+        if (!dataSource.isInitialized) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    await dataSource.initialize();
+
+                    console.log(`✅ DataSource '${name}' re-initialized`);
+
+                    return dataSource;
+                } catch (err) {
+                    console.warn(`⚠️ Reconnect attempt ${i + 1}/${retries} failed for '${name}'`);
+
+                    if (i === retries - 1) {
+                        throw err;
+                    }
+
+                    await new Promise(r => setTimeout(r, delayMs));
+                }
+            }
+        }
+
+        return dataSource;
     }
 
     /**
@@ -47,20 +96,9 @@ export class DBHelper {
      * @param {string} sourceName
      * @returns {DataSource}
      */
-    public static getDataSource(sourceName?: string): DataSource {
-        let name = 'default';
-
-        if (sourceName) {
-            name = sourceName;
-        }
-
-        const dataSource = DBHelper._sources.get(name);
-
-        if (!dataSource) {
-            throw new Error('Datasource is empty');
-        }
-
-        return dataSource;
+    public static async getDataSource(sourceName?: string): Promise<DataSource> {
+        const name = sourceName || 'default';
+        return await DBHelper.ensureInitialized(name);
     }
 
     /**
@@ -68,8 +106,8 @@ export class DBHelper {
      * @param {EntityTarget} target
      * @param {string} sourceName
      */
-    public static getRepository<Entity extends ObjectLiteral>(target: EntityTarget<Entity>, sourceName?: string): Repository<Entity> {
-        const dataSource = DBHelper.getDataSource(sourceName);
+    public static async getRepository<Entity extends ObjectLiteral>(target: EntityTarget<Entity>, sourceName?: string): Promise<Repository<Entity>> {
+        const dataSource = await DBHelper.getDataSource(sourceName);
         return dataSource.getRepository(target);
     }
 

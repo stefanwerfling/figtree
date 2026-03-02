@@ -1,7 +1,7 @@
 import { BaseEntity, DeepPartial, EntityTarget, Repository } from 'typeorm';
 export declare abstract class DBRepositoryBase<T extends BaseEntity> {
     protected static _instance: Map<string, DBRepositoryBase<any>>;
-    protected readonly _repository: Repository<T>;
+    protected readonly _repository: Promise<Repository<T>>;
     protected static getSingleInstance<S extends DBRepositoryBase<any>, TEntity extends BaseEntity>(this: {
         new (target: EntityTarget<TEntity>): S;
         REGISTER_NAME: string;
@@ -9,8 +9,8 @@ export declare abstract class DBRepositoryBase<T extends BaseEntity> {
     protected constructor(target: EntityTarget<T>);
     countAll(): Promise<number>;
     findAll(): Promise<T[]>;
-    getRepository(): Repository<T>;
-    getTableName(): string;
+    getRepository(): Promise<Repository<T>>;
+    getTableName(): Promise<string>;
     createEntity(entityLike: DeepPartial<T>): Promise<T>;
     save(entity: T): Promise<T>;
 }

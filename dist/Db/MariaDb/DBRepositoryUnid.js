@@ -12,13 +12,15 @@ export class DBRepositoryUnid {
         this._repository = DBHelper.getRepository(target);
     }
     async countAll() {
-        return this._repository.count();
+        const repository = await this._repository;
+        return repository.count();
     }
     async findAll() {
-        return this._repository.find();
+        const repository = await this._repository;
+        return repository.find();
     }
     async findOne(unid) {
-        const repository = this._repository;
+        const repository = await this._repository;
         const result = await repository.findOne({
             where: {
                 unid: unid
@@ -30,19 +32,23 @@ export class DBRepositoryUnid {
         return null;
     }
     async createEntity(entityLike) {
-        return this._repository.create(entityLike);
+        const repository = await this._repository;
+        return repository.create(entityLike);
     }
     async remove(unid) {
-        return this._repository.delete(unid);
+        const repository = await this._repository;
+        return repository.delete(unid);
     }
     async save(entity) {
-        return this._repository.save(entity);
+        const repository = await this._repository;
+        return repository.save(entity);
     }
-    getRepository() {
+    async getRepository() {
         return this._repository;
     }
-    getTableName() {
-        return this._repository.metadata.name;
+    async getTableName() {
+        const repository = await this._repository;
+        return repository.metadata.name;
     }
 }
 //# sourceMappingURL=DBRepositoryUnid.js.map

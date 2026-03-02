@@ -17,7 +17,7 @@ export abstract class DBRepositoryBase<T extends BaseEntity> {
      * repository for T
      * @private
      */
-    protected readonly _repository: Repository<T>;
+    protected readonly _repository: Promise<Repository<T>>;
 
     /**
      * Get Single Instance
@@ -49,7 +49,8 @@ export abstract class DBRepositoryBase<T extends BaseEntity> {
      * @return number
      */
     public async countAll(): Promise<number> {
-        return this._repository.count();
+        const repository = await this._repository;
+        return repository.count();
     }
 
     /**
@@ -57,14 +58,15 @@ export abstract class DBRepositoryBase<T extends BaseEntity> {
      * @return {T[]}
      */
     public async findAll(): Promise<T[]> {
-        return this._repository.find();
+        const repository = await this._repository;
+        return repository.find();
     }
 
     /**
      * Get access to repository for cross-query building and more.
      * @returns {Repository<BaseEntity>}
      */
-    public getRepository(): Repository<T> {
+    public async getRepository(): Promise<Repository<T>> {
         return this._repository;
     }
 
@@ -72,8 +74,9 @@ export abstract class DBRepositoryBase<T extends BaseEntity> {
      * Return the table name.
      * @returns {string}
      */
-    public getTableName(): string {
-        return this._repository.metadata.name;
+    public async getTableName(): Promise<string> {
+        const repository = await this._repository;
+        return repository.metadata.name;
     }
 
     /**
@@ -82,7 +85,8 @@ export abstract class DBRepositoryBase<T extends BaseEntity> {
      * @return {T}
      */
     public async createEntity(entityLike: DeepPartial<T>): Promise<T> {
-        return this._repository.create(entityLike);
+        const repository = await this._repository;
+        return repository.create(entityLike);
     }
 
     /**
@@ -91,6 +95,7 @@ export abstract class DBRepositoryBase<T extends BaseEntity> {
      * @returns {T}
      */
     public async save(entity: T): Promise<T> {
-        return this._repository.save(entity);
+        const repository = await this._repository;
+        return repository.save(entity);
     }
 }

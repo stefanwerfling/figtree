@@ -18,7 +18,7 @@ export abstract class DBRepository<T extends DBBaseEntityId> {
      * repository for T
      * @private
      */
-    protected readonly _repository: Repository<T>;
+    protected readonly _repository: Promise<Repository<T>>;
 
     /**
      * Get Single Instance
@@ -50,7 +50,8 @@ export abstract class DBRepository<T extends DBBaseEntityId> {
      * @return number
      */
     public async countAll(): Promise<number> {
-        return this._repository.count();
+        const repository = await this._repository;
+        return repository.count();
     }
 
     /**
@@ -58,7 +59,8 @@ export abstract class DBRepository<T extends DBBaseEntityId> {
      * @return {T[]}
      */
     public async findAll(): Promise<T[]> {
-        return this._repository.find();
+        const repository = await this._repository;
+        return repository.find();
     }
 
     /**
@@ -67,7 +69,7 @@ export abstract class DBRepository<T extends DBBaseEntityId> {
      * @return {T|null}
      */
     public async findOne(id: number): Promise<T | null> {
-        const repository = this._repository as Repository<DBBaseEntityId>;
+        const repository = await this._repository as Repository<DBBaseEntityId>;
 
         const result = await repository.findOne({
             where: {
@@ -88,7 +90,8 @@ export abstract class DBRepository<T extends DBBaseEntityId> {
      * @return {T}
      */
     public async createEntity(entityLike: DeepPartial<T>): Promise<T> {
-        return this._repository.create(entityLike);
+        const repository = await this._repository;
+        return repository.create(entityLike);
     }
 
     /**
@@ -97,7 +100,8 @@ export abstract class DBRepository<T extends DBBaseEntityId> {
      * @returns {DeleteResult}
      */
     public async remove(id: number): Promise<DeleteResult> {
-        return this._repository.delete(id);
+        const repository = await this._repository;
+        return repository.delete(id);
     }
 
     /**
@@ -106,7 +110,8 @@ export abstract class DBRepository<T extends DBBaseEntityId> {
      * @returns {T}
      */
     public async save(entity: T): Promise<T> {
-        return this._repository.save(entity);
+        const repository = await this._repository;
+        return repository.save(entity);
         //return this._repository.insert(entity);
     }
 
@@ -114,7 +119,7 @@ export abstract class DBRepository<T extends DBBaseEntityId> {
      * Get access to repository for cross-query building and more.
      * @returns {Repository<T>}
      */
-    public getRepository(): Repository<T> {
+    public async getRepository(): Promise<Repository<T>> {
         return this._repository;
     }
 
@@ -122,8 +127,9 @@ export abstract class DBRepository<T extends DBBaseEntityId> {
      * Return the table name.
      * @returns {string}
      */
-    public getTableName(): string {
-        return this._repository.metadata.name;
+    public async getTableName(): Promise<string> {
+        const repository = await this._repository;
+        return repository.metadata.name;
     }
 
 }

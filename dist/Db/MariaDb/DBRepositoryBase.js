@@ -12,22 +12,27 @@ export class DBRepositoryBase {
         this._repository = DBHelper.getRepository(target);
     }
     async countAll() {
-        return this._repository.count();
+        const repository = await this._repository;
+        return repository.count();
     }
     async findAll() {
-        return this._repository.find();
+        const repository = await this._repository;
+        return repository.find();
     }
-    getRepository() {
+    async getRepository() {
         return this._repository;
     }
-    getTableName() {
-        return this._repository.metadata.name;
+    async getTableName() {
+        const repository = await this._repository;
+        return repository.metadata.name;
     }
     async createEntity(entityLike) {
-        return this._repository.create(entityLike);
+        const repository = await this._repository;
+        return repository.create(entityLike);
     }
     async save(entity) {
-        return this._repository.save(entity);
+        const repository = await this._repository;
+        return repository.save(entity);
     }
 }
 //# sourceMappingURL=DBRepositoryBase.js.map

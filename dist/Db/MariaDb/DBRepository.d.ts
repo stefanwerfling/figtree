@@ -2,7 +2,7 @@ import { DeepPartial, DeleteResult, EntityTarget, Repository } from 'typeorm';
 import { DBBaseEntityId } from './DBBaseEntityId.js';
 export declare abstract class DBRepository<T extends DBBaseEntityId> {
     protected static _instance: Map<string, DBRepository<any>>;
-    protected readonly _repository: Repository<T>;
+    protected readonly _repository: Promise<Repository<T>>;
     protected static getSingleInstance<S extends DBRepository<any>, TEntity extends DBBaseEntityId>(this: {
         new (target: EntityTarget<TEntity>): S;
         REGISTER_NAME: string;
@@ -14,6 +14,6 @@ export declare abstract class DBRepository<T extends DBBaseEntityId> {
     createEntity(entityLike: DeepPartial<T>): Promise<T>;
     remove(id: number): Promise<DeleteResult>;
     save(entity: T): Promise<T>;
-    getRepository(): Repository<T>;
-    getTableName(): string;
+    getRepository(): Promise<Repository<T>>;
+    getTableName(): Promise<string>;
 }
