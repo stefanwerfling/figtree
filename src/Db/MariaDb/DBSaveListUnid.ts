@@ -7,7 +7,7 @@ import {DBRepositoryUnid} from './DBRepositoryUnid.js';
 export type DBSaveListUnidOnFindAllInDb<
     S extends DBRepositoryUnid<E>,
     E extends DBBaseEntityUnid,
-    MT extends string | number
+    MT extends string | number | DBBaseEntityUnid
 > = (
     instance: S,
     mainId: MT
@@ -26,7 +26,7 @@ export type DBSaveListUnidOnGetId<
 export type DBSaveListUnidOnFillData<
     T extends any,
     E extends DBBaseEntityUnid,
-    MT extends string | number
+    MT extends string | number | DBBaseEntityUnid
 > = (
     mainId: MT,
     entry: E|null,
@@ -39,7 +39,7 @@ export class DBSaveListUnid {
         D extends any,
         S extends DBRepositoryUnid<E>,
         E extends DBBaseEntityUnid,
-        MT extends string | number
+        MT extends string | number | DBBaseEntityUnid
     >(
         mainId: MT,
         saveList: D[],
