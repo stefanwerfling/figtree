@@ -36,6 +36,7 @@ export {
 export {BoolTransformer} from './Db/MariaDb/Transformers/BoolTransformer.js';
 export {DecimalTransformer} from './Db/MariaDb/Transformers/DecimalTransformer.js';
 export {IntTransformer} from './Db/MariaDb/Transformers/IntTransformer.js';
+export {ZeroPadding15Transformer} from './Db/MariaDb/Transformers/ZeroPaddingTransformer.js';
 export {DBBaseEntityId} from './Db/MariaDb/DBBaseEntityId.js';
 export {DBBaseEntityUnid} from './Db/MariaDb/DBBaseEntityUnid.js';
 export {DBRepositoryBase} from './Db/MariaDb/DBRepositoryBase.js';
