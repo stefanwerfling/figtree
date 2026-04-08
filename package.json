@@ -96,6 +96,9 @@
     },
     "vite": {
       "optional": true
+    },
+    "dotenv": {
+      "optional": true
     }
   },
   "scripts": {
@@ -105,5 +108,5 @@
   },
   "type": "module",
   "types": "dist/index.d.ts",
-  "version": "1.0.20"
+  "version": "1.0.21"
 }

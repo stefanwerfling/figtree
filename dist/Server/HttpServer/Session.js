@@ -1,6 +1,6 @@
 export class Session {
     static isUserLogin(session) {
-        return session.user?.isLogin === true;
+        return session.user?.isLogin;
     }
     static defaultInitSession() {
         return {

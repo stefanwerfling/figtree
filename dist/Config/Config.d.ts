@@ -16,6 +16,7 @@ export declare class Config<T extends ConfigOptions = ConfigOptions> {
     getAppTitle(): string;
     set(aConfig: T | null): void;
     get(): T | null;
+    protected _loadEnvFile(envfile?: string): Promise<void>;
     load(configFile?: string | null, useEnv?: boolean): Promise<T | null>;
     protected _loadEnv(config: T | null): T | null;
     protected _setDefaults(config: T | null): T | null;

@@ -115,6 +115,26 @@ export class Config<T extends ConfigOptions = ConfigOptions> {
     }
 
     /**
+     * Load an env file and map all to process.env
+     * @param {string} envfile
+     * @protected
+     */
+    protected async _loadEnvFile(envfile = '.env'): Promise<void> {
+        try {
+            const dotenv = require('dotenv');
+
+            if (await FileHelper.fileExist(envfile)) {
+                dotenv.config({ path: envfile });
+                console.log('Config::_loadEnv: .env loaded into process.env');
+            } else {
+                console.log('Config::_loadEnv: .env file not found, skipping');
+            }
+        } catch (err) {
+            console.log('Config::_loadEnv: dotenv not installed, skipping .env');
+        }
+    }
+
+    /**
      * Load a config by config file
      * @param {string} configFile
      * @param {boolean} useEnv

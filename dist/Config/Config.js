@@ -37,6 +37,21 @@ export class Config {
     get() {
         return this._config;
     }
+    async _loadEnvFile(envfile = '.env') {
+        try {
+            const dotenv = require('dotenv');
+            if (await FileHelper.fileExist(envfile)) {
+                dotenv.config({ path: envfile });
+                console.log('Config::_loadEnv: .env loaded into process.env');
+            }
+            else {
+                console.log('Config::_loadEnv: .env file not found, skipping');
+            }
+        }
+        catch (err) {
+            console.log('Config::_loadEnv: dotenv not installed, skipping .env');
+        }
+    }
     async load(configFile = null, useEnv = false) {
         let config = null;
         if (configFile) {
