@@ -1,5 +1,6 @@
 import { SchemaConfigOptions } from 'figtree-schemas';
 import path from 'path';
+import dotenv from 'dotenv';
 import { ObjectSchema } from 'vts';
 import { FileHelper } from '../Utils/FileHelper.js';
 export class Config {
@@ -39,7 +40,6 @@ export class Config {
     }
     async _loadEnvFile(envfile = '.env') {
         try {
-            const dotenv = require('dotenv');
             if (await FileHelper.fileExist(envfile)) {
                 dotenv.config({ path: envfile });
                 console.log('Config::_loadEnv: .env loaded into process.env');
