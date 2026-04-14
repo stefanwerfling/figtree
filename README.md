@@ -5,49 +5,59 @@
 <p align="center">
 <img src="/doc/images/logo.png" width="300px" style="border-radius: 15px;transition: transform .2s;object-fit: cover;">
 <br><br>
-FigTree is a comprehensive Node.js backend framework designed for rapid development of server applications. It provides a complete foundation with integrated database support, HTTP server capabilities, plugin architecture, schema validation, and service management. This framework abstracts common backend development patterns into reusable, well-structured components.
+FigTree is a Node.js backend framework for rapid development of server applications. It provides an integrated foundation with HTTP server, database support, plugin architecture, schema validation, and service lifecycle management.
 </p>
 
-## Implementation
+---
 
-- [x] Schemas declaration && validation (VTS)
-- [x] Load environment variables (example for use over docker compose)
-- [x] Config loading (json file)
-- [x] Logging (Winston)
-- [x] DB loading and handling (MariaDB, InfluxDB, Redis)
-  - [ ] History (For data change)
-  - [ ] Add ChromaDB
-- [x] Process handling
-- [x] Server TCP Raw
-- [x] HTTP/s Server and handling (Express.js, rateLimit, helmet, cookieParser, session parser, self-temporary cert generation)
-  - [x] Swagger UI Route and auto generation description from the schemas
-  - [x] Unix HTTP Server (for intern communication)
-  - [x] File Upload helper
-  - [x] AsyncLocalStorage for Context
-  - [ ] Websocket Server
-- [x] Service Manager (for initialized services or schedule)
-- [x] Backend Main
-- [x] Provider handler
-- [x] Plugin Manager/Loader
-  - [x] Plugin Merkle-Hash Validation (Protection)
-  - [ ] Plugin Signing the hash (CA)
-- [ ] Crypto Managment
-  - [x] Pem Helper/Parser
-  - [x] Certificate generator (node-forge)
-- [ ] Access Control List 
-- [ ] Cluster
-  - [x] SharedStore (IPC/Redis)
+## Table of Contents
+
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Configuration](#configuration)
+- [Services](#services)
+- [HTTP Server & Routes](#http-server--routes)
+- [Database](#database)
+- [Plugin System](#plugin-system)
+- [Cluster Support](#cluster-support)
+- [CLI Tool](#cli-tool)
+- [Features](#features)
+- [Used By](#used-by)
+
+---
 
 ## Installation
-
-You can install FigTree via npm:
 
 ```bash
 npm install git+https://github.com/stefanwerfling/figtree.git
 ```
 
-### TypeScript Users
-If you're using TypeScript, it is highly recommended to install the necessary types. 
+Install peer dependencies for the features you use:
+
+```bash
+# Core (always required)
+npm install express express-rate-limit express-session helmet cookie-parser csurf async-exit-hook winston winston-daily-rotate-file uuid ets vts
+
+# MariaDB
+npm install typeorm mysql2
+
+# Redis
+npm install redis
+
+# InfluxDB
+npm install @influxdata/influxdb-client
+
+# ChromaDB
+npm install chromadb
+
+# Vite integration
+npm install vite
+
+# Plugins / Crypto
+npm install node-forge node-schedule rbac-simple
+```
+
+**TypeScript types:**
 
 ```bash
 npm install --save-dev \
@@ -55,72 +65,416 @@ npm install --save-dev \
   @types/express-session \
   @types/async-exit-hook \
   @types/cookie-parser \
-  @types/uuid \
   @types/node \
+  @types/uuid \
   git+https://github.com/stefanwerfling/node-forge-types.git
 ```
 
-## Used
+---
 
-### Appropriate user interface
-To build a suitable interface for the API, the framework [Bambooo](https://github.com/stefanwerfling/bambooo) can be used.
+## Quick Start
 
-### Routes and Swagger
-Using schemas as route registered on the HTTP server can be automatically generated (for OpenAPI) for the Swagger UI API. The process consists of defining the schema, registering the route, and its types. Generics ensure that all types are correct in the route handle. Data that does not match the schema is automatically returned with an error. This reduces the development process and allows the focus to be on functionality.
+### 1. Define your config schema and type
 
-<table>
-    <tr>
-        <td>
-            <img src="doc/images/route_schema_body.png" alt="Login page" width="150px" />
-        </td>
-        <td>
-⟶
-        </td>
-        <td>
-            <img src="doc/images/route_register.png" alt="Login page" width="150px" />
-        </td>
-        <td>
-⟶
-        </td>
-        <td>
-            <img src="doc/images/route_handle.png" alt="Login page" width="150px" />
-        </td>
-        <td>
-⟶
-        </td>
-        <td>
-            <img src="doc/images/route_swagger_api.png" alt="Login page" width="150px" />
-        </td>
-    </tr>
-</table>
+```typescript
+import { ConfigBackend, ConfigBackendOptions } from 'figtree';
+import { SchemaConfigBackendOptions } from 'figtree-schemas';
 
-### Reverse proxy
-The framework is designed to be used in production behind a reverse proxy. For local development (some functions require HTTPS in the browser), a local certificate for HTTPS is already issued.
-
-It's best to use [FlyingFish](https://github.com/stefanwerfling/flyingfish), NPM, or Nginx directly.
-
-### Plugin Hash
-For creating the plugin hash, FigTree now has a CLI tool that can be called in your own project (plugin project) with:
-
-```bash
-npm run figtree -create-plugin-hash
+// Use the built-in ConfigBackendOptions or extend it
+type MyConfig = ConfigBackendOptions;
 ```
 
-The CLI tool goes into the "dist" directory based on the current directory and creates a merkle hash of all files.
+### 2. Define CLI arguments
 
+```typescript
+import { DefaultArgs } from 'figtree-schemas';
 
-## Where is the framework already used
+type MyArgs = DefaultArgs;
+```
 
-* [PuppeteerCast](https://github.com/stefanwerfling/puppeteercast)
-  * PuppeteerCast is a system that converts web browser content into live video streams accessible via HTTP endpoints. The system uses headless browser automation to navigate and interact with web pages, captures the visual and audio output, encodes it into streaming formats, and serves it through multiple API interfaces compatible with various client applications.
-  * The core transformation process involves running a web browser in a virtual display environment, capturing both screen content and audio output, and encoding this media into transport streams that can be consumed by streaming clients, TV applications, and media players.
+### 3. Create your backend
 
-<hr>
+```typescript
+import { BackendApp } from 'figtree';
+import { HttpService } from 'figtree';
 
-* Coming soon [FlyingFish](https://github.com/stefanwerfling/flyingfish)
-  * FlyingFish is a reverse proxy manager with own WebUI, DNS server, SSH server, DynDNS, UPNP support, Lets Encrypt and much more.
+export class MyBackend extends BackendApp<MyArgs, MyConfig> {
 
-<hr>
+    protected override _getConfigInstance() {
+        return new ConfigBackend<MyConfig>(SchemaConfigBackendOptions);
+    }
 
-* Coming soon [MWPA](https://github.com/M-E-E-R-e-V/mwpa)
-  * MWPA provides the acquisition of scientific observational data, an easy-to-use user interface for viewing, confirming and reviewing the data. This includes the backend for data collection, the frontend and a mobile phone app for snycronization. The recorded ones relate to mammals and their observations. The aim is to record the observations cleanly and quickly. For this purpose, the old data is processed again and imported.
+    protected override async _initServices(): Promise<void> {
+        this._serviceManager.add(new HttpService());
+    }
+}
+```
+
+### 4. Start
+
+```typescript
+const backend = new MyBackend();
+await backend.start();
+```
+
+### 5. Config file (`config.json`)
+
+```json
+{
+    "server": {
+        "port": 3000
+    },
+    "logging": {
+        "dirname": "./logs"
+    }
+}
+```
+
+A full working example is available in [`src/Example/`](src/Example/).
+
+---
+
+## Configuration
+
+FigTree loads configuration from a JSON file (default: `config.json`) and validates it against a VTS schema.
+
+```typescript
+const backend = new MyBackend();
+await backend.start('path/to/config.json');
+```
+
+**Environment variables** can be loaded from a `.env` file:
+
+```typescript
+await backend.start('config.json', true); // second param enables env loading
+```
+
+`ConfigBackend` maps env variables to config fields — override `_loadEnv()` to implement your own mapping.
+
+---
+
+## Services
+
+Services are the building blocks of a FigTree application. Each service has a lifecycle: `init → start → stop`.
+
+### Built-in services
+
+| Service | Description |
+|---|---|
+| `HttpService` | Starts the HTTP/HTTPS server |
+| `MariaDBService` | Connects to MariaDB via TypeORM |
+| `RedisDBService` | Connects to Redis |
+| `InfluxDBService` | Connects to InfluxDB |
+| `ChromaDBService` | Connects to ChromaDB |
+| `PluginService` | Loads and manages plugins |
+
+### Registering services
+
+```typescript
+protected override async _initServices(): Promise<void> {
+    this._serviceManager.add(new MariaDBService());
+    this._serviceManager.add(new HttpService(['mariadb'])); // depends on mariadb
+}
+```
+
+Services with dependencies are started in the correct order automatically.
+
+### Custom service
+
+```typescript
+import { ServiceAbstract, ServiceStatus } from 'figtree';
+
+export class MyService extends ServiceAbstract {
+    public static NAME = 'myservice';
+
+    public constructor() {
+        super(MyService.NAME);
+    }
+
+    public override async start(): Promise<void> {
+        this._status = ServiceStatus.Progress;
+        // your init logic
+        this._status = ServiceStatus.Success;
+    }
+
+    public override async stop(): Promise<void> {
+        // your cleanup logic
+        this._status = ServiceStatus.None;
+    }
+}
+```
+
+### Scheduled jobs
+
+```typescript
+import { ServiceJobAbstract } from 'figtree';
+
+export class MyJob extends ServiceJobAbstract {
+    public static NAME = 'myjob';
+
+    public constructor() {
+        super(MyJob.NAME, '*/5 * * * *'); // every 5 minutes (cron syntax)
+    }
+
+    protected override async _onJob(): Promise<void> {
+        // runs on schedule
+    }
+}
+```
+
+---
+
+## HTTP Server & Routes
+
+### Defining a route
+
+```typescript
+import { DefaultRoute } from 'figtree';
+import { Router } from 'express';
+
+export class MyRoute extends DefaultRoute {
+
+    public getExpressRouter(): Router {
+        this._get(
+            this._getUrl('v1', 'example', 'hello'),
+            false, // no login required
+            async (_req, _res, _data) => {
+                return { statusCode: 200, msg: 'Hello World' };
+            },
+            {
+                description: 'Hello World endpoint',
+                responseBodySchema: SchemaMyResponse
+            }
+        );
+
+        return super.getExpressRouter();
+    }
+}
+```
+
+### Route options
+
+| Field | Description |
+|---|---|
+| `bodySchema` | Validate request body |
+| `querySchema` | Validate query parameters |
+| `pathSchema` | Validate path parameters |
+| `headerSchema` | Validate request headers |
+| `cookieSchema` | Validate cookies |
+| `sessionSchema` | Validate and initialize session |
+| `responseBodySchema` | Validate response body (also generates Swagger docs) |
+| `parser` | Middleware(s) — `RequestHandler \| RequestHandler[]` |
+| `aclRight` | Required ACL right for this route |
+| `useLocalStorage` | Enable `AsyncLocalStorage` request context |
+
+### Protecting against brute force
+
+```typescript
+import { createBruteForceProtection } from 'figtree';
+
+this._post(
+    this._getUrl('v1', 'auth', 'login'),
+    false,
+    loginHandler,
+    {
+        parser: createBruteForceProtection({ limit: 10, windowMs: 15 * 60 * 1000 }),
+        bodySchema: SchemaLoginRequest,
+        responseBodySchema: SchemaDefaultReturn,
+        sessionSchema: SchemaSessionData
+    }
+);
+```
+
+### Global route middleware
+
+```typescript
+export class MyRoute extends DefaultRoute {
+    public constructor() {
+        super();
+        this._defaultParser = createBruteForceProtection({ limit: 20 });
+    }
+}
+```
+
+### Registering routes
+
+```typescript
+import { HttpRouteLoader } from 'figtree';
+
+const loader = new HttpRouteLoader();
+loader.add(new MyRoute());
+// pass loader to HttpService
+```
+
+### Swagger UI
+
+Swagger UI is automatically generated from your route schemas. It is available at `/swagger` when `SwaggerUIRoute` is registered.
+
+### Customizing the CSP policy
+
+Override `_getCspDirectives()` in your `HttpServer` subclass:
+
+```typescript
+import { HttpServer } from 'figtree';
+
+export class MyHttpServer extends HttpServer {
+    protected override _getCspDirectives(): Record<string, string[]> {
+        return {
+            ...super._getCspDirectives(),
+            fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+            scriptSrc: ["'self'", "'unsafe-inline'", 'https://cdn.example.com']
+        };
+    }
+}
+```
+
+### Persistent session store
+
+Override `_getSessionStore()` in your `HttpServer` subclass to replace the default in-memory store:
+
+```typescript
+protected override _getSessionStore(): Store {
+    const RedisStore = RedisStoreFactory(session);
+    return new RedisStore({ client: RedisClient.getInstance().getClient() });
+}
+```
+
+### Reverse proxy
+
+FigTree is designed to run behind a reverse proxy in production. For local development, a temporary self-signed certificate is generated automatically when no cert/key is configured. Use [FlyingFish](https://github.com/stefanwerfling/flyingfish), Nginx, or similar in production.
+
+---
+
+## Database
+
+### MariaDB
+
+Extend `DBRepository` or `DBRepositoryUnid` for your entities:
+
+```typescript
+import { DBRepository, DBBaseEntityId } from 'figtree';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+
+@Entity()
+export class UserEntity extends DBBaseEntityId {
+    @Column()
+    public name!: string;
+}
+
+export class UserRepository extends DBRepository<UserEntity> {
+    public constructor() {
+        super(UserEntity);
+    }
+}
+```
+
+**Available transformers** for TypeORM columns: `BoolTransformer`, `IntTransformer`, `DecimalTransformer`, `EncryptionTransformer`, `ZeroPaddingTransformer`.
+
+### Redis
+
+```typescript
+import { RedisClient } from 'figtree';
+
+const client = RedisClient.getInstance();
+await client.set('key', { foo: 'bar' });
+const value = await client.get<{ foo: string }>('key');
+```
+
+### InfluxDB
+
+```typescript
+import { InfluxDbHelper } from 'figtree';
+
+const point = new Point('temperature').floatField('value', 23.5);
+InfluxDbHelper.addPoint(point);
+```
+
+---
+
+## Plugin System
+
+### Creating a plugin
+
+```typescript
+import { APlugin } from 'figtree';
+
+export default class MyPlugin extends APlugin {
+    public override async onEnable(): Promise<void> {
+        // plugin loaded
+    }
+}
+```
+
+Each plugin requires a `plugin.json` definition file:
+
+```json
+{
+    "name": "my-plugin",
+    "version": "1.0.0",
+    "main": "dist/index.js"
+}
+```
+
+### Generating a plugin hash
+
+Run in your plugin project directory after building:
+
+```bash
+npx figtree -create-plugin-hash
+```
+
+This generates a Merkle hash of all files in `dist/`. The hash is used by `PluginManager` to verify plugin integrity at load time.
+
+---
+
+## Cluster Support
+
+FigTree supports multi-process clustering via `BackendCluster`. Workers share state via `IPCSharedStore` (single host) or `RedisSharedStore` (distributed).
+
+```typescript
+import { BackendCluster } from 'figtree';
+
+const cluster = new BackendCluster(MyBackend, 4); // 4 workers
+await cluster.start();
+```
+
+---
+
+## Features
+
+- [x] Schema declaration & validation (VTS)
+- [x] Environment variable loading (dotenv)
+- [x] JSON config loading with schema validation
+- [x] Logging (Winston with daily rotation)
+- [x] MariaDB (TypeORM), Redis, InfluxDB, ChromaDB
+- [x] HTTP/HTTPS server (Express, rate limiting, helmet, session, CSRF)
+  - [x] Swagger UI with auto-generated docs from schemas
+  - [x] Unix socket HTTP server
+  - [x] File upload helper
+  - [x] AsyncLocalStorage request context
+  - [x] Vite integration for frontend dev
+  - [ ] WebSocket server
+- [x] Service manager with dependency resolution and scheduling
+- [x] Provider system
+- [x] Plugin manager with Merkle-hash validation
+  - [ ] Plugin signing (CA)
+- [x] Crypto: PEM helper, certificate generator
+- [x] ACL / RBAC
+- [x] Cluster support with shared state (IPC / Redis)
+  - [ ] DB history (change tracking)
+
+---
+
+## Used By
+
+* **[PuppeteerCast](https://github.com/stefanwerfling/puppeteercast)** — Converts web browser content into live video streams via HTTP endpoints.
+
+* **[FlyingFish](https://github.com/stefanwerfling/flyingfish)** *(coming soon)* — Reverse proxy manager with WebUI, DNS server, SSH server, DynDNS, UPNP, Let's Encrypt and more.
+
+* **[MWPA](https://github.com/M-E-E-R-e-V/mwpa)** *(coming soon)* — Scientific observational data acquisition for marine mammal research.
+
+---
+
+## UI Framework
+
+To build a frontend for your FigTree API, the companion framework [Bambooo](https://github.com/stefanwerfling/bambooo) can be used.
