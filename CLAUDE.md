@@ -5,14 +5,35 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-npm run build      # Clean dist + full TypeScript compile (rm -rf dist && tsc)
-npm run compile    # Incremental TypeScript compile (tsc --project tsconfig.json)
-npm run clean      # Remove dist directory
+npm run build        # Clean dist + full TypeScript compile (rm -rf dist && tsc)
+npm run compile      # Incremental TypeScript compile (tsc --project tsconfig.json)
+npm run clean        # Remove dist directory
+npm test             # Run all tests once (vitest run)
+npm run test:watch   # Run tests in watch mode
 ```
 
-There is no test suite. TypeScript strict mode is enabled — `npm run compile` is the primary correctness check.
+TypeScript strict mode is enabled — `npm run compile` is the primary correctness check.
 
 The CLI binary is exposed after build at `./dist/Cli/index.js` (registered as `figtree` in package.json `bin`).
+
+## Tests
+
+Tests use **Vitest** (ESM-compatible) and **supertest** for HTTP integration tests.
+
+```
+tests/
+  unit/
+    Config/          # Config.load() — file-based tests using /tmp
+    Crypto/          # CertificateHelper RSA keygen
+    Server/          # BruteForceProtection factory
+    Utils/           # StringHelper, IPHelper, DateHelper, BufferHelper
+  integration/
+    Routes/          # DefaultRoute + BruteForceProtection via supertest
+```
+
+- Unit tests run without a database or network.
+- Integration route tests spin up a minimal Express app in `beforeAll` with `express-session` middleware — required because `DefaultRoute` accesses `req.session.id` in its catch block.
+- To run a single test file: `npx vitest run tests/unit/Utils/StringHelper.test.ts`
 
 ## Architecture
 

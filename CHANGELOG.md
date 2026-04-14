@@ -4,6 +4,16 @@ All notable changes to this project are documented in this file.
 
 ---
 
+## [1.0.21] - 2026-04-14 (updated)
+
+### Added (tests & docs)
+- `tests/unit/Server/RouteError.test.ts`: 7 unit tests covering constructor, message format, `getStatus`, `getRawMsg`, `defaultReturn`, `asJson`
+- `tests/unit/Server/RequestContext.test.ts`: 7 unit tests covering singleton lifecycle, `get`/`set` inside and outside async context, `runWithContext`
+- `tests/unit/Db/Transformers.test.ts`: 33 unit tests for all four MariaDB column transformers (`ZeroPadding15`, `Bool`, `Decimal`, `Int`)
+- `CLAUDE.md`: Added test commands (`npm test`, `npm run test:watch`), test directory structure, and note on `express-session` requirement in integration tests
+
+---
+
 ## [1.0.21] - 2026-04-14
 
 ### Added
