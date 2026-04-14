@@ -47,6 +47,7 @@ export { RouteError } from './Server/HttpServer/Routes/RouteError.js';
 export { RequestContextData, RequestContext } from './Server/HttpServer/Routes/RequestContext.js';
 export { DefaultRouteCheckUserLogin, DefaultRouteCheckUserIsLogin, DefaultRouteCheckUserIsLoginACL } from './Server/HttpServer/Routes/DefaultRouteCheckUser.js';
 export { DefaultRouteHandler, DefaultRouteMethodeDescription, DefaultRoute } from './Server/HttpServer/Routes/DefaultRoute.js';
+export { BruteForceProtectionOptions, createBruteForceProtection } from './Server/HttpServer/Routes/BruteForceProtection.js';
 export { ITlsClientError } from './Server/HttpServer/Tls/ITlsClientError.js';
 export { ITlsSocket } from './Server/HttpServer/Tls/ITlsSocket.js';
 export { Session } from './Server/HttpServer/Session.js';

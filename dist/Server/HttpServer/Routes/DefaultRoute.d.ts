@@ -25,18 +25,19 @@ export type DefaultRouteMethodeDescription<Header, Query, Path, Cookies, Body, R
     responseHeaderSchema?: Schema<ResponseHeader>;
     sessionSchema?: Schema<Session>;
     sessionInit?: DefaultRouteSessionInitHandler<SessionUser>;
-    parser?: RequestHandler;
+    parser?: RequestHandler | RequestHandler[];
     useLocalStorage?: boolean;
     aclRight?: ACLRight;
 };
 export declare class DefaultRoute implements IDefaultRoute {
     protected _routes: Router;
     protected _uriBase: string;
+    protected _defaultParser: RequestHandler | RequestHandler[] | null;
     constructor();
     protected _getUrl(version: string, base: string, controller: string): string;
     isSchemaValidate<T>(schema: Schema<T>, data: unknown, descriptionName: string, throwError?: boolean): data is T;
     getExpressRouter(): Router;
     protected _get<Header, Query, Path, Cookies, Body, ResponseBody, ResponseHeader, Session, SessionUser>(uriPath: string | string[], checkUserLogin: boolean | DefaultRouteCheckUserLogin, handler: DefaultRouteHandler<Header, Query, Path, Cookies, Body, ResponseBody, Session>, description: DefaultRouteMethodeDescription<Header, Query, Path, Cookies, Body, ResponseBody, ResponseHeader, Session, SessionUser>): void;
     protected _post<Header, Query, Path, Cookies, Body, ResponseBody, ResponseHeader, Session, SessionUser>(uriPath: string | string[], checkUserLogin: boolean | DefaultRouteCheckUserLogin, handler: DefaultRouteHandler<Header, Query, Path, Cookies, Body, ResponseBody, Session>, description: DefaultRouteMethodeDescription<Header, Query, Path, Cookies, Body, ResponseBody, ResponseHeader, Session, SessionUser>): void;
-    protected _all<Header, Query, Path, Cookies, Body, ResponseBody, ResponseHeader, Session, SessionUser>(method: string, uriPath: string | string[], checkUserLogin: boolean | DefaultRouteCheckUserLogin, handler: DefaultRouteHandler<Header, Query, Path, Cookies, Body, ResponseBody, Session>, description: DefaultRouteMethodeDescription<Header, Query, Path, Cookies, Body, ResponseBody, ResponseHeader, Session, SessionUser>): void;
+    protected _all<Header, Query, Path, Cookies, Body, ResponseBody, ResponseHeader, Session, SessionUser>(method: 'get' | 'post', uriPath: string | string[], checkUserLogin: boolean | DefaultRouteCheckUserLogin, handler: DefaultRouteHandler<Header, Query, Path, Cookies, Body, ResponseBody, Session>, description: DefaultRouteMethodeDescription<Header, Query, Path, Cookies, Body, ResponseBody, ResponseHeader, Session, SessionUser>): void;
 }

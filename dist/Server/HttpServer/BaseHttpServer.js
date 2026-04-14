@@ -1,6 +1,6 @@
 import csurf from 'csurf';
 import { StatusCodes } from 'figtree-schemas';
-import fs from 'fs';
+import fs from 'node:fs/promises';
 import https from 'https';
 import * as http from 'node:http';
 import express from 'express';
@@ -95,8 +95,9 @@ export class BaseHttpServer {
             throw new Error('Express isnt init!');
         }
         this._express.use((error, _request, response, _next) => {
-            if (error instanceof SyntaxError && 'body' in error) {
-                Logger.getLogger().warn('Invalid JSON received:', error.message);
+            const err = error instanceof Error ? error : new Error(String(error));
+            if (err instanceof SyntaxError && 'body' in err) {
+                Logger.getLogger().warn('Invalid JSON received:', err.message);
                 const resulte = {
                     statusCode: StatusCodes.INTERNAL_ERROR,
                     msg: 'Invalid JSON payload'
@@ -104,7 +105,7 @@ export class BaseHttpServer {
                 response.status(400).json(resulte);
                 return;
             }
-            Logger.getLogger().error(error.stack || error.message);
+            Logger.getLogger().error(err.stack || err.message);
             response.status(500).send('Internal Server Error');
         });
     }
@@ -180,7 +181,7 @@ export class BaseHttpServer {
             let strKey;
             let strCrt;
             if (await FileHelper.fileExist(options.key)) {
-                strKey = fs.readFileSync(options.key).toString();
+                strKey = (await fs.readFile(options.key)).toString();
             }
             else if (PemHelper.isPemStr(options.key)) {
                 strKey = options.key;
@@ -189,7 +190,7 @@ export class BaseHttpServer {
                 return null;
             }
             if (await FileHelper.fileExist(options.crt)) {
-                strCrt = fs.readFileSync(options.crt).toString();
+                strCrt = (await fs.readFile(options.crt)).toString();
             }
             else if (PemHelper.isPemStr(options.crt)) {
                 strCrt = options.crt;

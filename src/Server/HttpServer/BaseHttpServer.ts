@@ -1,6 +1,6 @@
 import csurf from 'csurf';
 import {DefaultReturn, StatusCodes} from 'figtree-schemas';
-import fs from 'fs';
+import fs from 'node:fs/promises';
 import https from 'https';
 import * as http from 'node:http';
 import express, {Application, NextFunction, Request, Response} from 'express';
@@ -270,9 +270,12 @@ export class BaseHttpServer {
         }
 
         // add error handling
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this._express.use((error: any, _request: Request, response: Response, _next: NextFunction): void => {
-            if (error instanceof SyntaxError && 'body' in error) {
-                Logger.getLogger().warn('Invalid JSON received:', error.message);
+            const err = error instanceof Error ? error : new Error(String(error));
+
+            if (err instanceof SyntaxError && 'body' in err) {
+                Logger.getLogger().warn('Invalid JSON received:', err.message);
 
                 const resulte: DefaultReturn = {
                     statusCode: StatusCodes.INTERNAL_ERROR,
@@ -283,7 +286,7 @@ export class BaseHttpServer {
                 return;
             }
 
-            Logger.getLogger().error(error.stack || error.message);
+            Logger.getLogger().error(err.stack || err.message);
             response.status(500).send('Internal Server Error');
         });
     }
@@ -303,7 +306,16 @@ export class BaseHttpServer {
     }
 
     /**
-     * Return the session store, default is Memory Store
+     * Return the session store.
+     * Default is MemoryStore — sessions are lost on restart and memory grows unbounded in long-running servers.
+     * Override in a subclass to use a persistent store (e.g. Redis via connect-redis, or connect-pg-simple for PostgreSQL).
+     *
+     * @example
+     * protected _getSessionStore(): Store {
+     *     const RedisStore = RedisStoreFactory(session);
+     *     return new RedisStore({ client: RedisClient.getInstance().getClient() });
+     * }
+     *
      * @protected
      * @return {Store}
      */
@@ -419,7 +431,7 @@ export class BaseHttpServer {
             let strCrt: string;
 
             if (await FileHelper.fileExist(options.key)) {
-                strKey = fs.readFileSync(options.key).toString();
+                strKey = (await fs.readFile(options.key)).toString();
             } else if (PemHelper.isPemStr(options.key)) {
                 strKey = options.key;
             } else {
@@ -427,7 +439,7 @@ export class BaseHttpServer {
             }
 
             if (await FileHelper.fileExist(options.crt)) {
-                strCrt = fs.readFileSync(options.crt).toString();
+                strCrt = (await fs.readFile(options.crt)).toString();
             } else if (PemHelper.isPemStr(options.crt)) {
                 strCrt = options.crt;
             } else {

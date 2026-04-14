@@ -77,7 +77,7 @@ export class PluginManager {
      * @return {boolean}
      */
     public static hasInstance(): boolean {
-        return PluginManager._instance === null;
+        return PluginManager._instance !== null;
     }
 
     /**
@@ -241,7 +241,6 @@ export class PluginManager {
 
             const oPlugin = await import(importFile);
 
-            console.log(oPlugin);
 
             const object = new oPlugin.default(plugin, this) as APlugin;
 

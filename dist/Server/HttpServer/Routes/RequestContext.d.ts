@@ -1,4 +1,4 @@
-export type RequestContextData = Map<string, any>;
+export type RequestContextData = Map<string, unknown>;
 export declare class RequestContext {
     static SESSIONID: string;
     static USERID: string;

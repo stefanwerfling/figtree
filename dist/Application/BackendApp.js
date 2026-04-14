@@ -85,9 +85,13 @@ export class BackendApp {
             Logger.getLogger().error(promise);
         });
         exitHook(async (callback) => {
+            const timeout = new Promise((resolve) => setTimeout(() => {
+                Logger.getLogger().warn('BackendApp::start::exitHook: Shutdown timeout reached, forcing exit.');
+                resolve();
+            }, 10_000));
             try {
                 Logger.getLogger().info('Stop %s Service ...', Config.getInstance().getAppName());
-                await this._serviceManager.stopAll();
+                await Promise.race([this._serviceManager.stopAll(), timeout]);
                 Logger.getLogger().info('... End.');
             }
             catch (e) {

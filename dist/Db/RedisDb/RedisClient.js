@@ -35,9 +35,8 @@ export class RedisClient {
         });
     }
     async connect() {
-        if (await this._client.connect()) {
-            this._isConnect = true;
-        }
+        await this._client.connect();
+        this._isConnect = true;
     }
     async disconnect() {
         if (!this._isConnect) {

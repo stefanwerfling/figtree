@@ -88,9 +88,8 @@ export class RedisClient {
      * Connect to server
      */
     public async connect(): Promise<void> {
-        if (await this._client.connect()) {
-            this._isConnect = true;
-        }
+        await this._client.connect();
+        this._isConnect = true;
     }
 
     /**

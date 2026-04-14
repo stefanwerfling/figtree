@@ -17,14 +17,14 @@ export type DBSaveListUnidOnFindAllInDb<
  * On get id
  */
 export type DBSaveListUnidOnGetId<
-    T extends any
+    T
 > = (data: T) => string;
 
 /**
  * On fill data
  */
 export type DBSaveListUnidOnFillData<
-    T extends any,
+    T,
     E extends DBBaseEntityUnid,
     MT extends string | number | DBBaseEntityUnid
 > = (
@@ -36,7 +36,7 @@ export type DBSaveListUnidOnFillData<
 export class DBSaveListUnid {
 
     public static async save<
-        D extends any,
+        D,
         S extends DBRepositoryUnid<E>,
         E extends DBBaseEntityUnid,
         MT extends string | number | DBBaseEntityUnid

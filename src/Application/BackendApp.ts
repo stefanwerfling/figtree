@@ -168,10 +168,15 @@ export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions>
         });
 
         exitHook(async(callback): Promise<void> => {
+            const timeout = new Promise<void>((resolve) => setTimeout(() => {
+                Logger.getLogger().warn('BackendApp::start::exitHook: Shutdown timeout reached, forcing exit.');
+                resolve();
+            }, 10_000));
+
             try {
                 Logger.getLogger().info('Stop %s Service ...', Config.getInstance().getAppName());
 
-                await this._serviceManager.stopAll();
+                await Promise.race([this._serviceManager.stopAll(), timeout]);
 
                 Logger.getLogger().info('... End.');
             } catch (e) {

@@ -1,8 +1,8 @@
 import { DBBaseEntityId } from './DBBaseEntityId.js';
 import { DBRepository } from './DBRepository.js';
 export type DBSaveListIdOnFindAllInDb<S extends DBRepository<E>, E extends DBBaseEntityId, MT extends string | number | DBBaseEntityId> = (instance: S, mainId: MT) => Promise<E[]>;
-export type DBSaveListIdOnGetId<T extends any> = (data: T) => number;
-export type DBSaveListIdOnFillData<T extends any, E extends DBBaseEntityId, MT extends string | number | DBBaseEntityId> = (mainId: MT, entry: E | null, data: T) => E;
+export type DBSaveListIdOnGetId<T> = (data: T) => number;
+export type DBSaveListIdOnFillData<T, E extends DBBaseEntityId, MT extends string | number | DBBaseEntityId> = (mainId: MT, entry: E | null, data: T) => E;
 export declare class DBSaveListId {
-    static save<D extends any, S extends DBRepository<E>, E extends DBBaseEntityId, MT extends string | number | DBBaseEntityId>(mainId: MT, saveList: D[], instance: S, onFindAll: DBSaveListIdOnFindAllInDb<S, E, MT>, onGetId: DBSaveListIdOnGetId<D>, onFillData: DBSaveListIdOnFillData<D, E, MT>): Promise<void>;
+    static save<D, S extends DBRepository<E>, E extends DBBaseEntityId, MT extends string | number | DBBaseEntityId>(mainId: MT, saveList: D[], instance: S, onFindAll: DBSaveListIdOnFindAllInDb<S, E, MT>, onGetId: DBSaveListIdOnGetId<D>, onFillData: DBSaveListIdOnFillData<D, E, MT>): Promise<void>;
 }

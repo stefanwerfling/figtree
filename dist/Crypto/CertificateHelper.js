@@ -26,10 +26,12 @@ export class CertificateHelper {
             case CertificateHelperKeyType.dsa:
                 keys = crypto.generateKeyPairSync('dsa', options);
                 break;
+            default:
+                throw new Error(`CertificateHelper::generateKeyPair: Unsupported key type: ${type}`);
         }
         return {
-            public: keys ? keys.publicKey : '',
-            private: keys ? keys.privateKey : ''
+            public: keys.publicKey,
+            private: keys.privateKey
         };
     }
     static async generateSshKeyPair(modulusLength = 4096, type = CertificateHelperKeyType.rsa, passphrase = '') {

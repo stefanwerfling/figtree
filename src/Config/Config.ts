@@ -155,16 +155,18 @@ export class Config<T extends ConfigOptions = ConfigOptions> {
 
                 if (this._schema instanceof ObjectSchema) {
                     if (!this._schema.validate(fileConfig, errors)) {
-                        console.log('Config::load: Config file error:');
-                        console.log(JSON.stringify(errors, null, 2));
+                        console.error('Config::load: Config file error:');
+                        console.error(JSON.stringify(errors, null, 2));
 
                         return null;
                     }
                 } else {
-                    console.log('Config::load: Config schema is not set!');
+                    console.error('Config::load: Config schema is not set!');
+
+                    return null;
                 }
 
-                config = fileConfig;
+                config = fileConfig as T;
             } catch (err) {
                 console.error(err);
                 return null;

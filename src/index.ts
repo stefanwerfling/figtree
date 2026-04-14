@@ -81,6 +81,7 @@ export {
     DefaultRouteMethodeDescription,
     DefaultRoute
 } from './Server/HttpServer/Routes/DefaultRoute.js';
+export {BruteForceProtectionOptions, createBruteForceProtection} from './Server/HttpServer/Routes/BruteForceProtection.js';
 export {ITlsClientError} from './Server/HttpServer/Tls/ITlsClientError.js';
 export {ITlsSocket} from './Server/HttpServer/Tls/ITlsSocket.js';
 export {Session} from './Server/HttpServer/Session.js';

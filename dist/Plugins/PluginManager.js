@@ -19,7 +19,7 @@ export class PluginManager {
         return PluginManager._instance;
     }
     static hasInstance() {
-        return PluginManager._instance === null;
+        return PluginManager._instance !== null;
     }
     constructor(serviceName, options = {}) {
         this._appPath = path.join(path.resolve());
@@ -125,7 +125,6 @@ export class PluginManager {
             }
             Logger.getLogger().silly('PluginManager::load: file plugin: %s (%s)', importFile, plugin.definition.name);
             const oPlugin = await import(importFile);
-            console.log(oPlugin);
             const object = new oPlugin.default(plugin, this);
             if (object) {
                 this._plugins.push(object);

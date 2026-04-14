@@ -74,7 +74,7 @@ export type DefaultRouteMethodeDescription<
     responseHeaderSchema?: Schema<ResponseHeader>;
     sessionSchema?: Schema<Session>;
     sessionInit?: DefaultRouteSessionInitHandler<SessionUser>;
-    parser?: RequestHandler,
+    parser?: RequestHandler | RequestHandler[],
     useLocalStorage?: boolean;
     aclRight?: ACLRight;
 };
@@ -95,6 +95,14 @@ export class DefaultRoute implements IDefaultRoute {
      * @protected
      */
     protected _uriBase: string = '/json/';
+
+    /**
+     * Default middleware applied to all routes in this instance.
+     * Override in subclass or set in constructor to protect all routes globally.
+     * Individual routes can override this via the `parser` field in DefaultRouteMethodeDescription.
+     * @protected
+     */
+    protected _defaultParser: RequestHandler | RequestHandler[] | null = null;
 
     /**
      * constructor
@@ -261,7 +269,7 @@ export class DefaultRoute implements IDefaultRoute {
         Session,
         SessionUser
     >(
-        method: string,
+        method: 'get' | 'post',
         uriPath: string|string[],
         checkUserLogin: boolean|DefaultRouteCheckUserLogin,
         handler: DefaultRouteHandler<
@@ -285,7 +293,7 @@ export class DefaultRoute implements IDefaultRoute {
             SessionUser
         >
     ): void {
-        const cMethod = method.toLowerCase();
+        const cMethod = method.toLowerCase() as 'get' | 'post';
         const urls = Array.isArray(uriPath) ? uriPath : [uriPath];
         const routeHandle = async(req: Request, res: Response) => {
             try {
@@ -448,18 +456,17 @@ export class DefaultRoute implements IDefaultRoute {
         };
 
         for (const url of urls) {
-            const params = [];
-
-            params.push(url);
-
-            if (description.parser) {
-                params.push(description.parser);
-            }
-
-            params.push(routeHandle);
-
             try {
-                (this._routes as any)[cMethod](...params);
+                const active = description.parser ?? this._defaultParser;
+                const parsers = active
+                    ? (Array.isArray(active) ? active : [active])
+                    : [];
+
+                if (parsers.length > 0) {
+                    this._routes[cMethod](url, ...parsers, routeHandle);
+                } else {
+                    this._routes[cMethod](url, routeHandle);
+                }
 
                 if (SwaggerUIRoute.hasInstance()) {
                     switch (cMethod) {

@@ -4,8 +4,9 @@ import { BaseHttpCertKey, BaseHttpServer, BaseHttpServerOptionCrypt } from './Ba
 export declare class HttpServer extends BaseHttpServer {
     protected _limiter: RateLimitRequestHandler | null;
     protected _initExpressUsePre(): void;
+    protected _getCspDirectives(): Record<string, string[]>;
     protected _limiterSkip(request: Request): Promise<boolean>;
-    protected _limiterLimit(request: Request): Promise<number>;
+    protected _limiterLimit(_request: Request): Promise<number>;
     protected _limiterHandler(req: Request, res: Response): Promise<void>;
     protected _generateCertAndKey(): Promise<BaseHttpCertKey>;
     protected _getCertAndKey(options: BaseHttpServerOptionCrypt): Promise<BaseHttpCertKey | null>;

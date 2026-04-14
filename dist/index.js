@@ -45,6 +45,7 @@ export { RouteError } from './Server/HttpServer/Routes/RouteError.js';
 export { RequestContext } from './Server/HttpServer/Routes/RequestContext.js';
 export { DefaultRouteCheckUserIsLogin, DefaultRouteCheckUserIsLoginACL } from './Server/HttpServer/Routes/DefaultRouteCheckUser.js';
 export { DefaultRoute } from './Server/HttpServer/Routes/DefaultRoute.js';
+export { createBruteForceProtection } from './Server/HttpServer/Routes/BruteForceProtection.js';
 export { Session } from './Server/HttpServer/Session.js';
 export { HttpRouteLoader } from './Server/HttpServer/HttpRouteLoader.js';
 export { BaseHttpServer } from './Server/HttpServer/BaseHttpServer.js';

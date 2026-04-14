@@ -13,6 +13,7 @@ import { SwaggerUIRoute } from './SwaggerUIRoute.js';
 export class DefaultRoute {
     _routes;
     _uriBase = '/json/';
+    _defaultParser = null;
     constructor() {
         this._routes = Router();
     }
@@ -162,14 +163,17 @@ export class DefaultRoute {
             }
         };
         for (const url of urls) {
-            const params = [];
-            params.push(url);
-            if (description.parser) {
-                params.push(description.parser);
-            }
-            params.push(routeHandle);
             try {
-                this._routes[cMethod](...params);
+                const active = description.parser ?? this._defaultParser;
+                const parsers = active
+                    ? (Array.isArray(active) ? active : [active])
+                    : [];
+                if (parsers.length > 0) {
+                    this._routes[cMethod](url, ...parsers, routeHandle);
+                }
+                else {
+                    this._routes[cMethod](url, routeHandle);
+                }
                 if (SwaggerUIRoute.hasInstance()) {
                     switch (cMethod) {
                         case 'get':

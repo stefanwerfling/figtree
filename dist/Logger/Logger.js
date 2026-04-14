@@ -68,7 +68,9 @@ export class Logger {
                 }
             }
         }
-        Logger.cleanLogfiles(dirname, parseInt(maxFiles, 10)).then();
+        Logger.cleanLogfiles(dirname, parseInt(maxFiles, 10)).catch((e) => {
+            console.error('Logger::_createLogger: Failed to clean old log files:', e);
+        });
         const transports = [];
         try {
             const dRFtransport = new DailyRotateFile({

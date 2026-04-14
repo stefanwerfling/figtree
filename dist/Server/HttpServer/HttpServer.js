@@ -15,32 +15,7 @@ export class HttpServer extends BaseHttpServer {
         super._initExpressUsePre();
         this._express.use(helmet());
         this._express.use(helmet.contentSecurityPolicy({
-            directives: {
-                defaultSrc: ['\'self\''],
-                connectSrc: ['\'self\''],
-                frameSrc: ['\'self\''],
-                childSrc: ['\'self\''],
-                scriptSrc: [
-                    '\'self\'',
-                    '*',
-                    '\'unsafe-inline\''
-                ],
-                styleSrc: [
-                    '\'self\'',
-                    '*',
-                    '\'unsafe-inline\''
-                ],
-                fontSrc: [
-                    '\'self\'',
-                    '*',
-                    '\'unsafe-inline\''
-                ],
-                imgSrc: [
-                    '\'self\'',
-                    'https: data:'
-                ],
-                baseUri: ['\'self\'']
-            }
+            directives: this._getCspDirectives()
         }));
         this._limiter = rateLimit({
             windowMs: 15 * 60 * 1000,
@@ -56,25 +31,26 @@ export class HttpServer extends BaseHttpServer {
                 return this._limiterHandler(req, res);
             }
         });
-        this._express.use(this._limiter);
+        this._express.use('/json/', this._limiter);
+    }
+    _getCspDirectives() {
+        return {
+            defaultSrc: ['\'self\''],
+            connectSrc: ['\'self\''],
+            frameSrc: ['\'self\''],
+            childSrc: ['\'self\''],
+            scriptSrc: ['\'self\'', '\'unsafe-inline\''],
+            styleSrc: ['\'self\'', '\'unsafe-inline\''],
+            fontSrc: ['\'self\''],
+            imgSrc: ['\'self\'', 'https: data:'],
+            baseUri: ['\'self\'']
+        };
     }
     async _limiterSkip(request) {
-        if (!request.url.startsWith('/json/')) {
-            return true;
-        }
-        if (Session.isUserLogin(request.session)) {
-            return true;
-        }
-        else {
-            Logger.getLogger().warn('HttpServer::_limiterSkip: request session isnt isUserLogin');
-        }
-        return false;
+        return Session.isUserLogin(request.session);
     }
-    async _limiterLimit(request) {
-        if (request.url.indexOf('/json/') === 0) {
-            return 100;
-        }
-        return Number.MAX_SAFE_INTEGER;
+    async _limiterLimit(_request) {
+        return 100;
     }
     async _limiterHandler(req, res) {
         Logger.getLogger().warn('HttpServer::_limiterHandler: Too Many Requests: %s is blocked for %s.', req.ip, req.url);

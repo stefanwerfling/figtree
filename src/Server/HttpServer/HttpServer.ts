@@ -32,32 +32,7 @@ export class HttpServer extends BaseHttpServer {
 
         this._express.use(helmet());
         this._express.use(helmet.contentSecurityPolicy({
-            directives: {
-                defaultSrc: ['\'self\''],
-                connectSrc: ['\'self\''],
-                frameSrc: ['\'self\''],
-                childSrc: ['\'self\''],
-                scriptSrc: [
-                    '\'self\'',
-                    '*',
-                    '\'unsafe-inline\''
-                ],
-                styleSrc: [
-                    '\'self\'',
-                    '*',
-                    '\'unsafe-inline\''
-                ],
-                fontSrc: [
-                    '\'self\'',
-                    '*',
-                    '\'unsafe-inline\''
-                ],
-                imgSrc: [
-                    '\'self\'',
-                    'https: data:'
-                ],
-                baseUri: ['\'self\'']
-            }
+            directives: this._getCspDirectives()
         }));
 
         this._limiter = rateLimit({
@@ -75,7 +50,26 @@ export class HttpServer extends BaseHttpServer {
             }
         });
 
-        this._express.use(this._limiter);
+        this._express.use('/json/', this._limiter);
+    }
+
+    /**
+     * Return CSP directives for helmet.contentSecurityPolicy.
+     * Override in a subclass to extend or replace the default policy.
+     * @protected
+     */
+    protected _getCspDirectives(): Record<string, string[]> {
+        return {
+            defaultSrc: ['\'self\''],
+            connectSrc: ['\'self\''],
+            frameSrc:   ['\'self\''],
+            childSrc:   ['\'self\''],
+            scriptSrc:  ['\'self\'', '\'unsafe-inline\''],
+            styleSrc:   ['\'self\'', '\'unsafe-inline\''],
+            fontSrc:    ['\'self\''],
+            imgSrc:     ['\'self\'', 'https: data:'],
+            baseUri:    ['\'self\'']
+        };
     }
 
     /**
@@ -85,33 +79,17 @@ export class HttpServer extends BaseHttpServer {
      * @return {boolean}
      */
     protected async _limiterSkip(request: Request): Promise<boolean> {
-        // allow all outsite session
-        if (!request.url.startsWith('/json/')) {
-            return true;
-        }
-
-        if (Session.isUserLogin(request.session as any)) {
-            return true;
-        } else {
-            Logger.getLogger().warn('HttpServer::_limiterSkip: request session isnt isUserLogin');
-        }
-
-        return false;
+        return Session.isUserLogin(request.session as any);
     }
 
     /**
      * limiter limit
-     * @param {Request} request
+     * @param {Request} _request
      * @protected
      * @return {number}
      */
-    protected async _limiterLimit(request: Request): Promise<number> {
-        if (request.url.indexOf('/json/') === 0) {
-            return 100;
-        }
-
-        // File access for html/js/img etc. allow ever.
-        return Number.MAX_SAFE_INTEGER;
+    protected async _limiterLimit(_request: Request): Promise<number> {
+        return 100;
     }
 
     /**

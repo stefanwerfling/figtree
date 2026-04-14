@@ -1,5 +1,6 @@
 import {Router} from 'express';
 import {DefaultReturn, SchemaDefaultReturn, SchemaSessionData, StatusCodes} from 'figtree-schemas';
+import {createBruteForceProtection} from '../../../Server/HttpServer/Routes/BruteForceProtection.js';
 import {DefaultRoute} from '../../../Server/HttpServer/Routes/DefaultRoute.js';
 import {DefaultRouteCheckUserIsLogin} from '../../../Server/HttpServer/Routes/DefaultRouteCheckUser.js';
 import {Role} from '../../ACL/MyACLRbac.js';
@@ -101,6 +102,7 @@ export class Login extends DefaultRoute {
             },
             {
                 description: 'Login user and write session data',
+                parser: createBruteForceProtection({ limit: 10 }),
                 bodySchema: SchemaLoginRequest,
                 responseBodySchema: SchemaDefaultReturn,
                 sessionSchema: SchemaSessionData

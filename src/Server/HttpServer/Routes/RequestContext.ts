@@ -3,7 +3,7 @@ import { AsyncLocalStorage } from 'async_hooks';
 /**
  * Request context data
  */
-export type RequestContextData = Map<string, any>;
+export type RequestContextData = Map<string, unknown>;
 
 /**
  * Request Context
@@ -78,7 +78,7 @@ export class RequestContext {
      */
     public get<T>(key: string): T | undefined {
         const store = this._asyncLocalStorage.getStore();
-        return store?.get(key);
+        return store?.get(key) as T | undefined;
     }
 
     /**
