@@ -2,8 +2,12 @@ import { HttpError, InfluxDB } from '@influxdata/influxdb-client';
 import { hostname } from 'node:os';
 import { Logger } from '../../Logger/Logger.js';
 export class InfluxDbHelper {
-    static _options;
-    static _connection;
+    static _options = null;
+    static _connection = null;
+    static reset() {
+        this._connection = null;
+        this._options = null;
+    }
     static async init(options) {
         this._options = options;
         const url = this._options.url;
@@ -17,18 +21,30 @@ export class InfluxDbHelper {
         return Boolean(this._connection);
     }
     static getConnection() {
+        if (!this._connection) {
+            throw new Error('InfluxDbHelper: not initialized, call init() first');
+        }
         return this._connection;
     }
     static getBucket() {
+        if (!this._options) {
+            throw new Error('InfluxDbHelper: not initialized, call init() first');
+        }
         return this._options.bucket;
     }
     static _getWriter() {
-        const writeApi = InfluxDbHelper.getConnection().getWriteApi(InfluxDbHelper._options.org, InfluxDbHelper._options.bucket, 'ms');
+        if (!this._options) {
+            throw new Error('InfluxDbHelper: not initialized, call init() first');
+        }
+        const writeApi = InfluxDbHelper.getConnection().getWriteApi(this._options.org, this._options.bucket, 'ms');
         writeApi.useDefaultTags({ location: hostname() });
         return writeApi;
     }
     static _getQuery() {
-        return InfluxDbHelper.getConnection().getQueryApi(InfluxDbHelper._options.org);
+        if (!this._options) {
+            throw new Error('InfluxDbHelper: not initialized, call init() first');
+        }
+        return InfluxDbHelper.getConnection().getQueryApi(this._options.org);
     }
     static addPoint(apoint) {
         const writeApi = InfluxDbHelper._getWriter();

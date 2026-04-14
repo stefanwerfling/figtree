@@ -47,6 +47,7 @@ export class InfluxDBService extends ServiceAbstract {
     }
     async stop() {
         try {
+            InfluxDbHelper.reset();
         }
         catch (error) {
             this._status = ServiceStatus.Error;

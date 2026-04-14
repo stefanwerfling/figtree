@@ -21,13 +21,23 @@ export class InfluxDbHelper {
      * options
      * @private
      */
-    private static _options: InfluxDbHelperOptions;
+    private static _options: InfluxDbHelperOptions | null = null;
 
     /**
      * connection
      * @private
      */
-    private static _connection: InfluxDB;
+    private static _connection: InfluxDB | null = null;
+
+    /**
+     * Reset the connection and options.
+     * The InfluxDB client is HTTP-based and holds no persistent connection,
+     * so reset simply clears the static state.
+     */
+    public static reset(): void {
+        this._connection = null;
+        this._options = null;
+    }
 
     /**
      * init
@@ -58,6 +68,9 @@ export class InfluxDbHelper {
      * @return {InfluxDB}
      */
     public static getConnection(): InfluxDB {
+        if (!this._connection) {
+            throw new Error('InfluxDbHelper: not initialized, call init() first');
+        }
         return this._connection;
     }
 
@@ -66,6 +79,9 @@ export class InfluxDbHelper {
      * @return {string}
      */
     public static getBucket(): string {
+        if (!this._options) {
+            throw new Error('InfluxDbHelper: not initialized, call init() first');
+        }
         return this._options.bucket;
     }
 
@@ -75,9 +91,13 @@ export class InfluxDbHelper {
      * @return {WriteApi}
      */
     protected static _getWriter(): WriteApi {
+        if (!this._options) {
+            throw new Error('InfluxDbHelper: not initialized, call init() first');
+        }
+
         const writeApi = InfluxDbHelper.getConnection().getWriteApi(
-            InfluxDbHelper._options.org,
-            InfluxDbHelper._options.bucket,
+            this._options.org,
+            this._options.bucket,
             'ms'
         );
 
@@ -92,9 +112,11 @@ export class InfluxDbHelper {
      * @return {QueryApi}
      */
     protected static _getQuery(): QueryApi {
-        return InfluxDbHelper.getConnection().getQueryApi(
-            InfluxDbHelper._options.org
-        );
+        if (!this._options) {
+            throw new Error('InfluxDbHelper: not initialized, call init() first');
+        }
+
+        return InfluxDbHelper.getConnection().getQueryApi(this._options.org);
     }
 
     /**

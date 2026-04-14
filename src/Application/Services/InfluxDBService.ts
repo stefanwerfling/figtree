@@ -92,7 +92,7 @@ export class InfluxDBService extends ServiceAbstract {
      */
     public override async stop(): Promise<void> {
         try {
-            // TODO
+            InfluxDbHelper.reset();
         } catch (error) {
             this._status = ServiceStatus.Error;
             this._statusMsg = StringHelper.sprintf('InfluxDBService::stop: Error stopping the InfluxDB: %e', error);

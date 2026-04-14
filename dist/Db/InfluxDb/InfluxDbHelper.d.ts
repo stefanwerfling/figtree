@@ -8,6 +8,7 @@ export type InfluxDbHelperOptions = {
 export declare class InfluxDbHelper {
     private static _options;
     private static _connection;
+    static reset(): void;
     static init(options: InfluxDbHelperOptions): Promise<void>;
     static isConnected(): boolean;
     static getConnection(): InfluxDB;

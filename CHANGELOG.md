@@ -8,6 +8,7 @@ All notable changes to this project are documented in this file.
 
 ### Added
 - `BruteForceProtection`: New `createBruteForceProtection(options?)` utility — configurable via `limit`, `windowMs`, `message`, usable as `parser` on any route
+- `InfluxDbHelper`: Added `reset()` method to clear static connection state on service stop; properties `_connection` and `_options` are now nullable with guards in `getConnection()`, `getBucket()`, `_getWriter()`, `_getQuery()`
 - `DefaultRoute`: `_defaultParser` protected property for applying middleware globally to all routes in an instance
 - `DefaultRoute`: `parser` field now accepts `RequestHandler | RequestHandler[]` for middleware composition
 - `HttpServer`: `_getCspDirectives()` protected method — developers can override the CSP policy per subclass
@@ -34,6 +35,7 @@ All notable changes to this project are documented in this file.
 - `BaseHttpServer`: Documented `_getSessionStore()` override pattern for persistent session stores (e.g. Redis, PostgreSQL)
 - `PluginManager`: Removed debug `console.log` from production code
 - `Config`: Use `console.error` instead of `console.log` for validation errors
+- `InfluxDBService`: Implemented `stop()` — calls `InfluxDbHelper.reset()` to clear connection state
 
 ### Dependencies
 - Replaced deprecated peer dependency `mysql ^2.18.1` with `mysql2 ^3.0.0`
