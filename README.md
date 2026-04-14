@@ -136,20 +136,14 @@ A full working example is available in [`src/Example/`](src/Example/).
 
 ## Configuration
 
-FigTree loads configuration from a JSON file (default: `config.json`) and validates it against a VTS schema.
+FigTree loads configuration from a JSON file (default: `config.json`) and validates it against a VTS schema. The config path is read from the `--config` CLI argument or falls back to `config.json` in the working directory.
 
 ```typescript
 const backend = new MyBackend();
-await backend.start('path/to/config.json');
+await backend.start();
 ```
 
-**Environment variables** can be loaded from a `.env` file:
-
-```typescript
-await backend.start('config.json', true); // second param enables env loading
-```
-
-`ConfigBackend` maps env variables to config fields — override `_loadEnv()` to implement your own mapping.
+**Environment variables** can be loaded from a `.env` file by passing `--envargs 1` on the command line. `ConfigBackend` maps env variables to config fields — override `_loadEnv()` to implement your own mapping.
 
 ---
 
@@ -216,7 +210,7 @@ export class MyJob extends ServiceJobAbstract {
         super(MyJob.NAME, '*/5 * * * *'); // every 5 minutes (cron syntax)
     }
 
-    protected override async _onJob(): Promise<void> {
+    protected override async _execute(): Promise<void> {
         // runs on schedule
     }
 }
@@ -298,12 +292,16 @@ export class MyRoute extends DefaultRoute {
 
 ### Registering routes
 
-```typescript
-import { HttpRouteLoader } from 'figtree';
+Subclass `HttpRouteLoader` and override `loadRoutes()`, then pass the class to `HttpService`:
 
-const loader = new HttpRouteLoader();
-loader.add(new MyRoute());
-// pass loader to HttpService
+```typescript
+import { HttpRouteLoader, IDefaultRoute } from 'figtree';
+
+export class MyRouteLoader extends HttpRouteLoader {
+    public static override async loadRoutes(): Promise<IDefaultRoute[]> {
+        return [new MyRoute()];
+    }
+}
 ```
 
 ### Swagger UI
@@ -434,7 +432,10 @@ FigTree supports multi-process clustering via `BackendCluster`. Workers share st
 ```typescript
 import { BackendCluster } from 'figtree';
 
-const cluster = new BackendCluster(MyBackend, 4); // 4 workers
+const cluster = new BackendCluster({
+    appFactory: () => new MyBackend(),
+    workers: 4 // optional, defaults to os.cpus().length
+});
 await cluster.start();
 ```
 
