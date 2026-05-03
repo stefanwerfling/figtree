@@ -173,7 +173,6 @@ export class Logger {
 
         console.log(`Logger::_createLogger:   * Transports to: ${transStr}`);
 
-
         return logger;
     }
 

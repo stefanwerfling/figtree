@@ -24,16 +24,16 @@ export class IPCSharedStore extends SharedStore {
                 case 'get':
                     worker.send({
                         type: 'getResponse',
-                        requestId,
-                        key,
+                        requestId: requestId,
+                        key: key,
                         value: this._store.get(key)
                     });
                     break;
                 case 'has':
                     worker.send({
                         type: 'hasResponse',
-                        requestId,
-                        key,
+                        requestId: requestId,
+                        key: key,
                         value: this._store.has(key)
                     });
                     break;
@@ -50,7 +50,7 @@ export class IPCSharedStore extends SharedStore {
                 }
             };
             process.on('message', handler);
-            process.send?.({ type, key, value, requestId });
+            process.send?.({ type: type, key: key, value: value, requestId: requestId });
         });
     }
     async get(key) {
@@ -64,7 +64,7 @@ export class IPCSharedStore extends SharedStore {
             this._store.set(key, value);
         }
         else {
-            process.send?.({ type: 'set', key, value });
+            process.send?.({ type: 'set', key: key, value: value });
         }
     }
     async delete(key) {
@@ -72,7 +72,7 @@ export class IPCSharedStore extends SharedStore {
             this._store.delete(key);
         }
         else {
-            process.send?.({ type: 'delete', key });
+            process.send?.({ type: 'delete', key: key });
         }
     }
     async has(key) {

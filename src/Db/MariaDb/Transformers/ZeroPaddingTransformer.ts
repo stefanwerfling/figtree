@@ -28,7 +28,7 @@ export class ZeroPadding15Transformer implements ValueTransformer {
             return null;
         }
 
-        return value.replace(/^0+/, '');
+        return value.replace(/^0+/u, '');
     }
 
 }

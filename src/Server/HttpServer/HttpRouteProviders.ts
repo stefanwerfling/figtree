@@ -21,15 +21,12 @@ export class HttpRouteProviders extends BaseProviders<ProviderEntry, IHttpRouteP
      * @return {IDefaultRoute[]}
      */
     public async getProvidersRoutes(): Promise<IDefaultRoute[]> {
-        const list: IDefaultRoute[] = [];
         const providers = await this.getProviders();
+        const routeLists = await Promise.all(
+            providers.map((provider) => provider.getRouteLoader().loadRoutes())
+        );
 
-        for (const provider of providers) {
-            const routeLoader = provider.getRouteLoader();
-            list.push(...await routeLoader.loadRoutes());
-        }
-
-        return list;
+        return routeLists.flat();
     }
 
 }

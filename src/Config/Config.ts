@@ -128,7 +128,7 @@ export class Config<T extends ConfigOptions = ConfigOptions> {
             } else {
                 console.log('Config::_loadEnv: .env file not found, skipping');
             }
-        } catch (err) {
+        } catch (_err) {
             console.log('Config::_loadEnv: dotenv not installed, skipping .env');
         }
     }

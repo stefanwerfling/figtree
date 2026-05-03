@@ -113,4 +113,5 @@ export class ChromaDBService extends ServiceAbstract {
             this._inProcess = false;
         }
     }
+
 }

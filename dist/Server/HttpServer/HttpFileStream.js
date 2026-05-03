@@ -3,7 +3,7 @@ import { FileHelper } from '../../Utils/FileHelper.js';
 export class HttpFileStream {
     static responseStream(stream, contentType, response) {
         let success = true;
-        stream.on('error', (err) => {
+        stream.on('error', (_err) => {
             Logger.getLogger().error('HttpFileStream::responseStream::stream::error: file error!');
             success = false;
         });

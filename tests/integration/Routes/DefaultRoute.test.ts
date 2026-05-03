@@ -26,7 +26,8 @@ const SchemaQuery = Vts.object({
 // ---- Test Route -------------------------------------------------------------
 
 class TestRoute extends DefaultRoute {
-    public getExpressRouter() {
+
+    public getExpressRouter(): ReturnType<DefaultRoute['getExpressRouter']> {
 
         this._get(
             '/test/hello',
@@ -85,6 +86,7 @@ class TestRoute extends DefaultRoute {
 
         return super.getExpressRouter();
     }
+
 }
 
 // ---- App Setup --------------------------------------------------------------
@@ -115,9 +117,9 @@ describe('DefaultRoute POST /test/echo', () => {
 
     it('returns echoed body field', async() => {
         const res = await request(app)
-            .post('/test/echo')
-            .send({name: 'FigTree'})
-            .set('Content-Type', 'application/json');
+        .post('/test/echo')
+        .send({name: 'FigTree'})
+        .set('Content-Type', 'application/json');
 
         expect(res.status).toBe(200);
         expect(res.body.msg).toBe('FigTree');
@@ -125,9 +127,9 @@ describe('DefaultRoute POST /test/echo', () => {
 
     it('returns 200 with INTERNAL_ERROR on invalid body schema', async() => {
         const res = await request(app)
-            .post('/test/echo')
-            .send({wrong: 'field'})
-            .set('Content-Type', 'application/json');
+        .post('/test/echo')
+        .send({wrong: 'field'})
+        .set('Content-Type', 'application/json');
 
         expect(res.status).toBe(200);
         expect(res.body.statusCode).toBe(StatusCodes.INTERNAL_ERROR);

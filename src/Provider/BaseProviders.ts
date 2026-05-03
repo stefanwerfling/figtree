@@ -119,4 +119,5 @@ export class BaseProviders<E extends ProviderEntry, T extends IProvider<E>> impl
     public async getProvidersEntries(): Promise<E[]> {
         return this._getProvidersEntries(this._providerType);
     }
+
 }

@@ -34,4 +34,5 @@ export class ExampleRouteLoader extends HttpRouteLoader {
             ...await routeProviders.getProvidersRoutes()
         ];
     }
+
 }

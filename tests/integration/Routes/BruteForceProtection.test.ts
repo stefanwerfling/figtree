@@ -13,7 +13,8 @@ const SchemaResponse = Vts.object({
 });
 
 class ProtectedRoute extends DefaultRoute {
-    public getExpressRouter() {
+
+    public getExpressRouter(): ReturnType<DefaultRoute['getExpressRouter']> {
 
         this._post(
             '/protected/login',
@@ -29,6 +30,7 @@ class ProtectedRoute extends DefaultRoute {
 
         return super.getExpressRouter();
     }
+
 }
 
 let app: Application;
@@ -44,6 +46,8 @@ describe('BruteForceProtection on POST /protected/login', () => {
 
     it('allows requests within the limit', async() => {
         for (let i = 0; i < 3; i++) {
+            // sequential by design — testing rate-limit behavior requires ordered requests
+            // eslint-disable-next-line no-await-in-loop
             const res = await request(app).post('/protected/login');
             expect(res.status).toBe(200);
         }

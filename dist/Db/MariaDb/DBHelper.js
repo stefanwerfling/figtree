@@ -36,7 +36,9 @@ export class DBHelper {
                     if (i === retries - 1) {
                         throw err;
                     }
-                    await new Promise(r => setTimeout(r, delayMs));
+                    await new Promise((resolve) => {
+                        setTimeout(resolve, delayMs);
+                    });
                 }
             }
         }

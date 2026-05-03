@@ -1,8 +1,8 @@
 export class EncryptionTransformer {
-    to(value) {
+    to(_value) {
         return '';
     }
-    from(value) {
+    from(_value) {
         return '';
     }
 }

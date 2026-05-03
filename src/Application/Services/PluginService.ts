@@ -37,7 +37,7 @@ export class PluginService extends ServiceAbstract {
         super(serviceName ?? PluginService.NAME, serviceDependencies);
 
         if (options.appPath === undefined) {
-            options.appPath = path.resolve()
+            options.appPath = path.resolve();
         }
 
         this._pluginManager = new PluginManager(appName, options);
@@ -95,4 +95,5 @@ export class PluginService extends ServiceAbstract {
             this._inProcess = false;
         }
     }
+
 }

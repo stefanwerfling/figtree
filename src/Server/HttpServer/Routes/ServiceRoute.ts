@@ -15,10 +15,10 @@ import {DefaultRouteCheckUserLogin} from './DefaultRouteCheckUser.js';
  * Service ACLRights
  */
 export type ServiceRouteACLRights = {
-    status: ACLRight
-    start: ACLRight,
-    stop: ACLRight,
-    invoke: ACLRight
+    status: ACLRight;
+    start: ACLRight;
+    stop: ACLRight;
+    invoke: ACLRight;
 };
 
 /**
@@ -69,7 +69,7 @@ export class ServiceRoute extends DefaultRoute {
         this._get(
             this._getUrl('v1', 'service', 'status'),
             this._onlyUserAccess,
-            async (_request, _response, _data): Promise<ServiceStatusResponse> => {
+            async(_request, _response, _data): Promise<ServiceStatusResponse> => {
                 const backend = BackendApp.getInstance(this._backendInstanceName);
 
                 if (backend) {
@@ -98,7 +98,7 @@ export class ServiceRoute extends DefaultRoute {
         this._post(
             this._getUrl('v1', 'service', 'start'),
             this._onlyUserAccess,
-            async (_request, _response, data): Promise<DefaultReturn> => {
+            async(_request, _response, data): Promise<DefaultReturn> => {
                 const backend = BackendApp.getInstance(this._backendInstanceName);
 
                 if (backend) {
@@ -133,7 +133,7 @@ export class ServiceRoute extends DefaultRoute {
         this._post(
             this._getUrl('v1', 'service', 'stop'),
             this._onlyUserAccess,
-            async (_request, _response, data): Promise<DefaultReturn> => {
+            async(_request, _response, data): Promise<DefaultReturn> => {
                 const backend = BackendApp.getInstance(this._backendInstanceName);
 
                 if (backend) {
@@ -168,7 +168,7 @@ export class ServiceRoute extends DefaultRoute {
         this._post(
             this._getUrl('v1', 'service', 'invoke'),
             this._onlyUserAccess,
-            async (_request, _response, data): Promise<DefaultReturn> => {
+            async(_request, _response, data): Promise<DefaultReturn> => {
                 const backend = BackendApp.getInstance(this._backendInstanceName);
 
                 if (backend) {

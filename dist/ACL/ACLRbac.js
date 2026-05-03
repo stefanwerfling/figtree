@@ -1,6 +1,6 @@
 export class ACLRbac {
     _rbac;
-    async checkAccess(role, right, userRightList) {
+    async checkAccess(role, right, _userRightList) {
         if (this._rbac) {
             return this._rbac.checkAccess(role, right);
         }

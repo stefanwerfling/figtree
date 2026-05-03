@@ -26,7 +26,13 @@ export abstract class ChromaDbCollection {
      * @protected
      */
     protected constructor(name: string, metadata: Record<string, any>, client?: ChromaDbClient) {
-        const tclient = client ? client : (ChromaDbClient.hasInstance() ? ChromaDbClient.getInstance() : null);
+        let tclient: ChromaDbClient | null = null;
+
+        if (client) {
+            tclient = client;
+        } else if (ChromaDbClient.hasInstance()) {
+            tclient = ChromaDbClient.getInstance();
+        }
 
         if (tclient === null) {
             throw new Error('Please get a client instance from ChromaDbClient');
@@ -49,6 +55,5 @@ export abstract class ChromaDbCollection {
             metadata: metadata
         });
     }
-
 
 }

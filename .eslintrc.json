@@ -2,8 +2,7 @@
   "env": {
     "amd": true,
     "es6": true,
-    "node": true,
-    "jest": true
+    "node": true
   },
   "extends": [
     "eslint:all"
@@ -16,9 +15,13 @@
     "@stylistic/eslint-plugin-ts",
     "@typescript-eslint",
     "import",
-    "prefer-arrow",
-    "jest"
+    "prefer-arrow"
   ],
+  "globals": {
+    "NodeJS": "readonly",
+    "BufferEncoding": "readonly",
+    "NonSharedBuffer": "readonly"
+  },
   "rules": {
     // eslint typescript rules
     "@typescript-eslint/adjacent-overload-signatures": "error",
@@ -44,6 +47,9 @@
       "error",
       {
         "args": "after-used",
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_",
         "ignoreRestSiblings": false,
         "vars": "all"
       }

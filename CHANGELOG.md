@@ -4,6 +4,26 @@ All notable changes to this project are documented in this file.
 
 ---
 
+## [Unreleased] - 2026-05-03
+
+### Added
+- `BackendCluster`: Graceful shutdown — master propagates `SIGTERM`/`SIGINT` to workers, waits up to `shutdownTimeoutMs`, then `SIGKILL`s holdouts. Respawn is disabled during shutdown.
+- `BackendClusterOptions`: New `shutdownTimeoutMs` (default 15s) and `shutdownSignals` (default `['SIGTERM', 'SIGINT']`) options.
+- `doc/cluster.md`: Comprehensive cluster guide covering startup, crash respawn, graceful shutdown, shared state, and roadmap.
+- `CLAUDE.md`: ESLint commands and lint conventions documented.
+
+### Improved
+- ESLint: Project lint count reduced from 200 errors to 0.
+  - `.eslintrc.json`: Added `globals` for `NodeJS`, `BufferEncoding`, `NonSharedBuffer` (TypeScript ambient types), and `argsIgnorePattern`/`varsIgnorePattern`/`caughtErrorsIgnorePattern` (`^_`) to honor the existing `_`-prefix convention. Removed obsolete `jest` plugin reference (project uses Vitest).
+  - Replaced `Function` parameter types with concrete constructor signatures in `DBLoader` and `PluginManager`.
+  - `MerkleTreeRootHash.fromFolder` and `HttpRouteProviders.getProvidersRoutes`: Sequential `await` loops replaced with `Promise.all` (independent operations, order preserved).
+  - Sequential `await`-in-loop patterns annotated with `eslint-disable-next-line no-await-in-loop` plus a one-line reason where parallelism is not safe (retry loops, dependency-ordered start/stop, short-circuit access checks).
+- `MerkleTreeRootHash._buildMerkleRoot`: Replaced parameter reassignment with a local `level` variable.
+- `Crypto/MerkleTreeRootHash`, `HttpRouteProviders`: Folder hashing and provider route loading now run in parallel.
+- Various: Removed dead imports, prefixed unused parameters with `_`, added missing return types and accessibility modifiers, added `{ cause }` to wrapped errors in `ServiceManager._startService`, replaced negated conditions with `??` where applicable.
+
+---
+
 ## [1.0.21] - 2026-04-14 (updated)
 
 ### Added (tests & docs)

@@ -2,13 +2,13 @@ import {SchemaDefaultReturn} from 'figtree-schemas';
 import {ExtractSchemaResultType, Vts} from 'vts';
 
 export const SchemaTest = Vts.object({
-   test: Vts.or([
-       Vts.object({
-           test1: Vts.string(),
-           test2: Vts.string()
-       }),
-       Vts.string()
-   ])
+    test: Vts.or([
+        Vts.object({
+            test1: Vts.string(),
+            test2: Vts.string()
+        }),
+        Vts.string()
+    ])
 });
 
 /**
@@ -23,7 +23,6 @@ export const SchemaIsLogin = SchemaDefaultReturn.extend({
  * IsLogin
  */
 export type IsLogin = ExtractSchemaResultType<typeof SchemaIsLogin>;
-
 
 export const SchemaIsLoginParameter = Vts.object({
     username: Vts.optional(Vts.string()),

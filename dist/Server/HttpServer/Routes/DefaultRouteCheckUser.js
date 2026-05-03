@@ -3,18 +3,6 @@ import { ACL } from '../../../ACL/ACL.js';
 import { Session } from '../Session.js';
 import { RequestContext } from './RequestContext.js';
 import { RouteError } from './RouteError.js';
-export const DefaultRouteCheckUserIsLoginACL = async (req, res, aclRight) => {
-    if (!DefaultRouteCheckUserIsLogin(req, true)) {
-        return false;
-    }
-    if (aclRight && req.session.user && req.session.user.role) {
-        const role = req.session.user.role;
-        if (await ACL.getInstance().checkAccess(role, aclRight)) {
-            return true;
-        }
-    }
-    throw new RouteError(StatusCodes.FORBIDDEN, 'User has no access!');
-};
 export const DefaultRouteCheckUserIsLogin = (req, sendAutoResoonse = true, schemaRequestData = SchemaRequestData) => {
     if (schemaRequestData.validate(req, [])) {
         if (RequestContext.hasInstance()) {
@@ -36,5 +24,17 @@ export const DefaultRouteCheckUserIsLogin = (req, sendAutoResoonse = true, schem
         throw new RouteError(StatusCodes.UNAUTHORIZED, 'User is unauthorized!');
     }
     return false;
+};
+export const DefaultRouteCheckUserIsLoginACL = async (req, _res, aclRight) => {
+    if (!DefaultRouteCheckUserIsLogin(req, true)) {
+        return false;
+    }
+    if (aclRight && req.session.user && req.session.user.role) {
+        const role = req.session.user.role;
+        if (await ACL.getInstance().checkAccess(role, aclRight)) {
+            return true;
+        }
+    }
+    throw new RouteError(StatusCodes.FORBIDDEN, 'User has no access!');
 };
 //# sourceMappingURL=DefaultRouteCheckUser.js.map

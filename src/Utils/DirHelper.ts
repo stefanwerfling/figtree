@@ -21,9 +21,9 @@ export class DirHelper {
 
             if (entry.isDirectory() && recursive) {
                 return this.getFiles(fullPath, recursive, base);
-            } else {
-                return [path.relative(base, fullPath)];
-            }
+            } 
+            return [path.relative(base, fullPath)];
+            
         }));
 
         return files.flat();
@@ -37,7 +37,7 @@ export class DirHelper {
     public static async directoryExist(director: string): Promise<boolean> {
         try {
             return (await stat(director)).isDirectory();
-        } catch (e) {
+        } catch (_e) {
             return false;
         }
     }
@@ -53,7 +53,7 @@ export class DirHelper {
             await mkdir(director, {
                 recursive: recursive
             });
-        } catch (e) {
+        } catch (_e) {
             return false;
         }
 

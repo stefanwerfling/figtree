@@ -57,13 +57,13 @@ export class HttpService extends ServiceAbstract {
                     ssl_path = tConfig.httpserver.sslpath;
                 }
             }
-            let proxy = undefined;
+            let proxy;
             if (tConfig.httpserver.proxy) {
                 proxy = {
                     trust: tConfig.httpserver.proxy.trust
                 };
             }
-            let csrf = undefined;
+            let csrf;
             if (tConfig.httpserver.csrf) {
                 csrf = {
                     cookie: tConfig.httpserver.csrf.cookie

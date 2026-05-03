@@ -61,4 +61,5 @@ export class MyACLRbac extends ACLRbac<Role, Right> {
             MyACLRbac.ASSOCIATIONS
         );
     }
+
 }

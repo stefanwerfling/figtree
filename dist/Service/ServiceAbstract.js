@@ -46,9 +46,13 @@ export class ServiceAbstract {
     getStatusMsg() {
         return this._statusMsg;
     }
-    async start() { }
-    async invoke() { }
-    async stop(forced = false) { }
-    async reload() { }
+    async start() {
+    }
+    async invoke() {
+    }
+    async stop(_forced = false) {
+    }
+    async reload() {
+    }
 }
 //# sourceMappingURL=ServiceAbstract.js.map

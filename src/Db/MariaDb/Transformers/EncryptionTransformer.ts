@@ -7,19 +7,19 @@ export class EncryptionTransformer implements ValueTransformer {
 
     /**
      * From Backend to DB
-     * @param {string} value
+     * @param {string} _value
      * @return {string}
      */
-    public to(value: string): string {
+    public to(_value: string): string {
         return '';
     }
 
     /**
      * From DB to Backend
-     * @param {string} value
+     * @param {string} _value
      * @return {string}
      */
-    public from(value: string): string {
+    public from(_value: string): string {
         return '';
     }
 

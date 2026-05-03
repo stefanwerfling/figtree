@@ -128,6 +128,8 @@ export class PluginManager {
 
     public async stop(): Promise<void> {
         for (const plugin of this._plugins) {
+            // sequential by design — plugins disable in dependency order
+            // eslint-disable-next-line no-await-in-loop
             await plugin.onDisable();
         }
 
@@ -218,7 +220,7 @@ export class PluginManager {
 
             if (this._checkDistHash) {
                 if (plugin.definition.distHash === undefined) {
-                    throw new Error(`plugin dist hash is empty!`);
+                    throw new Error('plugin dist hash is empty!');
                 }
 
                 const distDir = path.dirname(importFile);
@@ -233,14 +235,13 @@ export class PluginManager {
                 if (pluginHash === plugin.definition.distHash) {
                     Logger.getLogger().silly('PluginManager::load: dist-hash check: OK');
                 } else {
-                    throw new Error(`plugin dist hash is not identical! code manipulated?`);
+                    throw new Error('plugin dist hash is not identical! code manipulated?');
                 }
             }
 
             Logger.getLogger().silly('PluginManager::load: file plugin: %s (%s)', importFile, plugin.definition.name);
 
             const oPlugin = await import(importFile);
-
 
             const object = new oPlugin.default(plugin, this) as APlugin;
 
@@ -304,11 +305,11 @@ export class PluginManager {
 
     /**
      * Return all Events
-     * @param {Function} aClass
+     * @param {abstract new (...args: any[]) => T} aClass
      * @template T
      * @returns {APluginEvent[]}
      */
-    public getAllEvents<T extends APluginEvent>(aClass: Function): T[] {
+    public getAllEvents<T extends APluginEvent>(aClass: abstract new (...args: any[]) => T): T[] {
         const eventList: T[] = [];
 
         for (const [, events] of this._events) {

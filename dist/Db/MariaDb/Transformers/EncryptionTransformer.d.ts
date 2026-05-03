@@ -1,5 +1,5 @@
 import { ValueTransformer } from 'typeorm';
 export declare class EncryptionTransformer implements ValueTransformer {
-    to(value: string): string;
-    from(value: string): string;
+    to(_value: string): string;
+    from(_value: string): string;
 }

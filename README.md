@@ -434,10 +434,26 @@ import { BackendCluster } from 'figtree';
 
 const cluster = new BackendCluster({
     appFactory: () => new MyBackend(),
-    workers: 4 // optional, defaults to os.cpus().length
+    workers: 4,                            // optional, defaults to os.cpus().length
+    shutdownTimeoutMs: 15_000,             // optional, default 15s
+    shutdownSignals: ['SIGTERM', 'SIGINT'] // optional
 });
 await cluster.start();
 ```
+
+### Graceful shutdown
+
+When the master receives a shutdown signal (`SIGTERM` / `SIGINT` by default):
+
+1. Respawn is disabled — workers that exit during shutdown are not replaced.
+2. Each worker receives `SIGTERM`, triggering `BackendApp`'s `async-exit-hook` which runs `ServiceManager.stopAll()` (HTTP draining, DB connections closed, etc.).
+3. The master waits up to `shutdownTimeoutMs` for all workers to exit voluntarily.
+4. Any worker still alive after the timeout is killed with `SIGKILL`.
+5. The master exits with code `0`.
+
+`shutdownTimeoutMs` should be larger than the worker-side timeout (10s in `BackendApp.start()`) so the worker has a chance to finish first.
+
+For more details see [`doc/cluster.md`](doc/cluster.md).
 
 ---
 

@@ -48,6 +48,8 @@ export class ACL {
      */
     public async checkAccess(role: ACLRole, right: ACLRight, userRightList?: ACLRight[]): Promise<boolean> {
         for (const controller of this._controllers) {
+            // sequential by design — short-circuits on first match to avoid unnecessary checks
+            // eslint-disable-next-line no-await-in-loop
             if (await controller.checkAccess(role, right, userRightList)) {
                 return true;
             }

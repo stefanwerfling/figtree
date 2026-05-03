@@ -1,4 +1,4 @@
-import { ChromaClient } from "chromadb";
+import { ChromaClient } from 'chromadb';
 export class ChromaDbClient {
     static _instance;
     static getInstance(options) {

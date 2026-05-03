@@ -11,9 +11,9 @@ import exitHook from 'async-exit-hook';
 
 /**
  * BackendApp
- * @template A, C
+ * @template A, _C
  */
-export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions> {
+export abstract class BackendApp<A extends DefaultArgs, _C extends ConfigOptions> {
 
     /**
      * Hold all instances
@@ -145,7 +145,9 @@ export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions>
      * Init the Services
      * @protected
      */
-    protected async _initServices(): Promise<void> {}
+    protected async _initServices(): Promise<void> {
+        // override in subclass to register services
+    }
 
     /**
      * Start backend app
@@ -168,10 +170,12 @@ export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions>
         });
 
         exitHook(async(callback): Promise<void> => {
-            const timeout = new Promise<void>((resolve) => setTimeout(() => {
-                Logger.getLogger().warn('BackendApp::start::exitHook: Shutdown timeout reached, forcing exit.');
-                resolve();
-            }, 10_000));
+            const timeout = new Promise<void>((resolve) => {
+                setTimeout(() => {
+                    Logger.getLogger().warn('BackendApp::start::exitHook: Shutdown timeout reached, forcing exit.');
+                    resolve();
+                }, 10_000);
+            });
 
             try {
                 Logger.getLogger().info('Stop %s Service ...', Config.getInstance().getAppName());
@@ -180,7 +184,7 @@ export abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions>
 
                 Logger.getLogger().info('... End.');
             } catch (e) {
-                Logger.getLogger().error("BackendApp::start::exitHook: Error during shutdown:", e);
+                Logger.getLogger().error('BackendApp::start::exitHook: Error during shutdown:', e);
                 console.trace();
             } finally {
                 callback();

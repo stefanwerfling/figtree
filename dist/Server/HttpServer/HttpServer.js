@@ -54,7 +54,7 @@ export class HttpServer extends BaseHttpServer {
     }
     async _limiterHandler(req, res) {
         Logger.getLogger().warn('HttpServer::_limiterHandler: Too Many Requests: %s is blocked for %s.', req.ip, req.url);
-        res.status(429).json({ message: "Too Many Requests" });
+        res.status(429).json({ message: 'Too Many Requests' });
     }
     async _generateCertAndKey() {
         const appTitle = Config.getInstance().getAppTitle();
@@ -145,7 +145,7 @@ export class HttpServer extends BaseHttpServer {
                 await DirHelper.mkdir(options.sslPath, true);
                 ck = await super._getCertAndKey(options);
             }
-            catch (e) {
+            catch (_e) {
                 Logger.getLogger().error(`HttpServer::_getCertAndKey: Can not create key and cert by ssl path: ${options.sslPath}`);
             }
         }

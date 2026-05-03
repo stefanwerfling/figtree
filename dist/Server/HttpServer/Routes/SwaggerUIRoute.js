@@ -28,7 +28,7 @@ export class SwaggerUIRoute {
         let swagUrl = url;
         const spec = {
             summary: description.description,
-            tags: description.tags !== undefined ? description.tags : undefined,
+            tags: description.tags === undefined ? undefined : description.tags,
             requestBody: undefined,
             responses: undefined,
             parameters: undefined
@@ -59,7 +59,7 @@ export class SwaggerUIRoute {
         if (description.responseBodySchema) {
             spec.responses = SchemaHelper.convertSchemaToSwaggerResponse('200', description.responseBodySchema);
         }
-        this._openApiSpec.paths[swagUrl] = this._openApiSpec.paths[swagUrl] || {};
+        this._openApiSpec.paths[swagUrl] ||= {};
         this._openApiSpec.paths[swagUrl][method] = spec;
     }
     registerPost(url, description) {

@@ -70,7 +70,8 @@ export class BackendApp {
     _initLogger() {
         Logger.getLogger();
     }
-    async _initServices() { }
+    async _initServices() {
+    }
     async start() {
         if (!await this._loadConfig()) {
             return;
@@ -85,17 +86,19 @@ export class BackendApp {
             Logger.getLogger().error(promise);
         });
         exitHook(async (callback) => {
-            const timeout = new Promise((resolve) => setTimeout(() => {
-                Logger.getLogger().warn('BackendApp::start::exitHook: Shutdown timeout reached, forcing exit.');
-                resolve();
-            }, 10_000));
+            const timeout = new Promise((resolve) => {
+                setTimeout(() => {
+                    Logger.getLogger().warn('BackendApp::start::exitHook: Shutdown timeout reached, forcing exit.');
+                    resolve();
+                }, 10_000);
+            });
             try {
                 Logger.getLogger().info('Stop %s Service ...', Config.getInstance().getAppName());
                 await Promise.race([this._serviceManager.stopAll(), timeout]);
                 Logger.getLogger().info('... End.');
             }
             catch (e) {
-                Logger.getLogger().error("BackendApp::start::exitHook: Error during shutdown:", e);
+                Logger.getLogger().error('BackendApp::start::exitHook: Error during shutdown:', e);
                 console.trace();
             }
             finally {

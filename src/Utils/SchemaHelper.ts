@@ -9,7 +9,7 @@ export type SchemaHelperSwaggerReturnParam = {
     description: string;
     schema: {
         type: string;
-    }
+    };
 };
 
 export class SchemaHelper {
@@ -93,7 +93,7 @@ export class SchemaHelper {
 
         if (('items' in descript) && (typeof descript.items === 'object') && (descript.items !== null)) {
             for (const [key, value] of Object.entries(descript.items)) {
-                let tObject: any = this._convertByType(value);
+                const tObject: any = this._convertByType(value);
 
                 if (tObject !== null) {
                     rObject.properties[key] = tObject;

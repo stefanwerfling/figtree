@@ -19,6 +19,6 @@ export declare class ServiceAbstract {
     getStatusMsg(): string;
     start(): Promise<void>;
     invoke(): Promise<void>;
-    stop(forced?: boolean): Promise<void>;
+    stop(_forced?: boolean): Promise<void>;
     reload(): Promise<void>;
 }

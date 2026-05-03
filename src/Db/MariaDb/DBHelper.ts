@@ -69,6 +69,8 @@ export class DBHelper {
         }
 
         if (!dataSource.isInitialized) {
+            // sequential by design — retry loop with backoff between attempts
+            /* eslint-disable no-await-in-loop */
             for (let i = 0; i < retries; i++) {
                 try {
                     await dataSource.initialize();
@@ -83,9 +85,12 @@ export class DBHelper {
                         throw err;
                     }
 
-                    await new Promise(r => setTimeout(r, delayMs));
+                    await new Promise<void>((resolve) => {
+                        setTimeout(resolve, delayMs);
+                    });
                 }
             }
+            /* eslint-enable no-await-in-loop */
         }
 
         return dataSource;
@@ -120,4 +125,5 @@ export class DBHelper {
             DBHelper._sources.delete(key);
         }
     }
+
 }

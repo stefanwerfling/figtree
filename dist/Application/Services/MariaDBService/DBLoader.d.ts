@@ -1,10 +1,12 @@
 import { EntitySchema, MixedList } from 'typeorm';
+type EntityClass = new (...args: any[]) => any;
 export declare class DBLoader {
-    static loadEntities(): Promise<MixedList<Function | string | EntitySchema>>;
-    static loadMigrations(): MixedList<Function | string> | undefined;
+    static loadEntities(): Promise<MixedList<EntityClass | string | EntitySchema>>;
+    static loadMigrations(): MixedList<EntityClass | string> | undefined;
 }
 export type DBLoaderType = {
     new (): DBLoader;
-    loadEntities(): Promise<MixedList<Function | string | EntitySchema>>;
-    loadMigrations(): MixedList<Function | string> | undefined;
+    loadEntities(): Promise<MixedList<EntityClass | string | EntitySchema>>;
+    loadMigrations(): MixedList<EntityClass | string> | undefined;
 };
+export {};

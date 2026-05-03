@@ -35,12 +35,12 @@ export type DefaultRouteHandler<
     request: Request,
     response: Response,
     data: {
-        headers: Header|undefined
-        params: Path|undefined,
-        query: Query|undefined,
-        cookies: Cookies|undefined,
-        session: Session|undefined,
-        body: Body|undefined
+        headers: Header|undefined;
+        params: Path|undefined;
+        query: Query|undefined;
+        cookies: Cookies|undefined;
+        session: Session|undefined;
+        body: Body|undefined;
     }
 ) => Promise<Result|DefaultHandlerReturn>;
 
@@ -74,7 +74,7 @@ export type DefaultRouteMethodeDescription<
     responseHeaderSchema?: Schema<ResponseHeader>;
     sessionSchema?: Schema<Session>;
     sessionInit?: DefaultRouteSessionInitHandler<SessionUser>;
-    parser?: RequestHandler | RequestHandler[],
+    parser?: RequestHandler | RequestHandler[];
     useLocalStorage?: boolean;
     aclRight?: ACLRight;
 };
@@ -295,7 +295,7 @@ export class DefaultRoute implements IDefaultRoute {
     ): void {
         const cMethod = method.toLowerCase() as 'get' | 'post';
         const urls = Array.isArray(uriPath) ? uriPath : [uriPath];
-        const routeHandle = async(req: Request, res: Response) => {
+        const routeHandle = async(req: Request, res: Response): Promise<void> => {
             try {
                 // check login -----------------------------------------------------------------------------------------
 
@@ -315,12 +315,12 @@ export class DefaultRoute implements IDefaultRoute {
 
                 // check schemas ---------------------------------------------------------------------------------------
 
-                let headers: undefined|Header = undefined;
-                let params: undefined|Path = undefined;
-                let query: undefined|Query = undefined;
-                let cookies: undefined|Cookies = undefined;
-                let session: undefined|Session = undefined;
-                let body: undefined|Body = undefined;
+                let headers: undefined|Header;
+                let params: undefined|Path;
+                let query: undefined|Query;
+                let cookies: undefined|Cookies;
+                let session: undefined|Session;
+                let body: undefined|Body;
 
                 if (description.headerSchema) {
                     if (this.isSchemaValidate(description.headerSchema, req.headers, 'Header')) {
@@ -349,19 +349,20 @@ export class DefaultRoute implements IDefaultRoute {
                 if (description.sessionSchema) {
                     if (this.isSchemaValidate(description.sessionSchema, req.session, 'Session', false)) {
                         session = req.session;
+                    } else if (description.sessionInit) {
+                        const initialUser = await description.sessionInit();
+                        // express req is per-request — not actually racy
+                        // eslint-disable-next-line require-atomic-updates
+                        req.session.user = initialUser;
+
+                        if (this.isSchemaValidate(description.sessionSchema, req.session, 'Session2')) {
+                            session = req.session;
+                        }
                     } else {
-                        if (description.sessionInit) {
-                            req.session.user = await description.sessionInit();
+                        req.session.user = Session.defaultInitSession();
 
-                            if (this.isSchemaValidate(description.sessionSchema, req.session, 'Session2')) {
-                                session = req.session;
-                            }
-                        } else {
-                            req.session.user = Session.defaultInitSession();
-
-                            if (this.isSchemaValidate(description.sessionSchema, req.session, 'Session3')) {
-                                session = req.session;
-                            }
+                        if (this.isSchemaValidate(description.sessionSchema, req.session, 'Session3')) {
+                            session = req.session;
                         }
                     }
                 }
@@ -419,7 +420,7 @@ export class DefaultRoute implements IDefaultRoute {
                 } else {
                     // no content
                     res.sendStatus(204);
-                    return;
+                    
                 }
             } catch (ie) {
                 if (ie instanceof VtsSchemaError) {
@@ -450,17 +451,18 @@ export class DefaultRoute implements IDefaultRoute {
                     statusCode: StatusCodes.INTERNAL_ERROR,
                     msg: 'Internal error, check the server logs.'
                 } as DefaultReturn);
-
-                return;
+                
             }
         };
 
         for (const url of urls) {
             try {
                 const active = description.parser ?? this._defaultParser;
-                const parsers = active
-                    ? (Array.isArray(active) ? active : [active])
-                    : [];
+                let parsers: any[] = [];
+
+                if (active) {
+                    parsers = Array.isArray(active) ? active : [active];
+                }
 
                 if (parsers.length > 0) {
                     this._routes[cMethod](url, ...parsers, routeHandle);
@@ -491,4 +493,5 @@ export class DefaultRoute implements IDefaultRoute {
             }
         }
     }
+
 }

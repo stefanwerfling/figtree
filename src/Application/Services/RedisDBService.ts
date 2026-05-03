@@ -116,4 +116,5 @@ export class RedisDBService extends ServiceAbstract {
             this._inProcess = false;
         }
     }
+
 }

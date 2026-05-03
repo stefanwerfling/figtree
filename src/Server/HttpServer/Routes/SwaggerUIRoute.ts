@@ -21,7 +21,7 @@ export class SwaggerUIRoute implements IDefaultRoute {
      */
     public static getInstance(): SwaggerUIRoute {
         if (SwaggerUIRoute._instance === null) {
-            SwaggerUIRoute._instance = new SwaggerUIRoute()
+            SwaggerUIRoute._instance = new SwaggerUIRoute();
         }
 
         return SwaggerUIRoute._instance;
@@ -85,11 +85,11 @@ export class SwaggerUIRoute implements IDefaultRoute {
         ResponseHeader,
         Session,
         SessionUser
-    >) {
+    >): void {
         let swagUrl = url;
         const spec = {
             summary: description.description,
-            tags: description.tags !== undefined ? description.tags : undefined,
+            tags: description.tags === undefined ? undefined : description.tags,
             requestBody: undefined as undefined | object,
             responses: undefined as undefined | object,
             parameters: undefined as undefined | object[]
@@ -132,7 +132,7 @@ export class SwaggerUIRoute implements IDefaultRoute {
         }
 
         // add path with spec
-        this._openApiSpec.paths[swagUrl] = this._openApiSpec.paths[swagUrl] || {};
+        this._openApiSpec.paths[swagUrl] ||= {};
         this._openApiSpec.paths[swagUrl][method] = spec;
     }
 
@@ -204,9 +204,11 @@ export class SwaggerUIRoute implements IDefaultRoute {
         routes.use('/swagger', swaggerUi.serve);
         routes.get('/swagger', (req, res, next) => {
             const handler = swaggerUi.setup(this._openApiSpec);
-            handler(req, res, next); // gibt HTML zurück
+            // gibt HTML zurück
+            handler(req, res, next);
         });
 
         return routes;
     }
+
 }

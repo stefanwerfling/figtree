@@ -5,13 +5,9 @@ export class HttpRouteProviders extends BaseProviders {
         super(HttpRouteProviderType);
     }
     async getProvidersRoutes() {
-        const list = [];
         const providers = await this.getProviders();
-        for (const provider of providers) {
-            const routeLoader = provider.getRouteLoader();
-            list.push(...await routeLoader.loadRoutes());
-        }
-        return list;
+        const routeLists = await Promise.all(providers.map((provider) => provider.getRouteLoader().loadRoutes()));
+        return routeLists.flat();
     }
 }
 //# sourceMappingURL=HttpRouteProviders.js.map

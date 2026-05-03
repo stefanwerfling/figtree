@@ -3,7 +3,13 @@ export class ChromaDbCollection {
     _name;
     _collection;
     constructor(name, metadata, client) {
-        const tclient = client ? client : (ChromaDbClient.hasInstance() ? ChromaDbClient.getInstance() : null);
+        let tclient = null;
+        if (client) {
+            tclient = client;
+        }
+        else if (ChromaDbClient.hasInstance()) {
+            tclient = ChromaDbClient.getInstance();
+        }
         if (tclient === null) {
             throw new Error('Please get a client instance from ChromaDbClient');
         }

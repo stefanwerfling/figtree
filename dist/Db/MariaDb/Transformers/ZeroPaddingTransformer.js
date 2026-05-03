@@ -9,7 +9,7 @@ export class ZeroPadding15Transformer {
         if (value === null) {
             return null;
         }
-        return value.replace(/^0+/, '');
+        return value.replace(/^0+/u, '');
     }
 }
 //# sourceMappingURL=ZeroPaddingTransformer.js.map

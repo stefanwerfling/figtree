@@ -43,8 +43,8 @@ export class IPCSharedStore extends SharedStore {
                 case 'get':
                     worker.send({
                         type: 'getResponse',
-                        requestId,
-                        key,
+                        requestId: requestId,
+                        key: key,
                         value: this._store.get(key)
                     });
                     break;
@@ -52,8 +52,8 @@ export class IPCSharedStore extends SharedStore {
                 case 'has':
                     worker.send({
                         type: 'hasResponse',
-                        requestId,
-                        key,
+                        requestId: requestId,
+                        key: key,
                         value: this._store.has(key)
                     });
                     break;
@@ -65,7 +65,7 @@ export class IPCSharedStore extends SharedStore {
         return new Promise((resolve) => {
             const requestId = Math.random().toString(36).substring(2);
 
-            const handler = (msg: any) => {
+            const handler = (msg: any): void => {
                 if (msg.requestId === requestId) {
                     process.off('message', handler);
                     resolve(msg.value);
@@ -73,7 +73,7 @@ export class IPCSharedStore extends SharedStore {
             };
 
             process.on('message', handler);
-            process.send?.({ type, key, value, requestId });
+            process.send?.({ type: type, key: key, value: value, requestId: requestId });
         });
     }
 
@@ -101,7 +101,7 @@ export class IPCSharedStore extends SharedStore {
         if (cluster.isPrimary) {
             this._store.set(key, value);
         } else {
-            process.send?.({ type: 'set', key, value });
+            process.send?.({ type: 'set', key: key, value: value });
         }
     }
 
@@ -114,7 +114,7 @@ export class IPCSharedStore extends SharedStore {
             this._store.delete(key);
         }
         else {
-            process.send?.({ type: 'delete', key });
+            process.send?.({ type: 'delete', key: key });
         }
     }
 

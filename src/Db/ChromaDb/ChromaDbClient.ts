@@ -1,4 +1,4 @@
-import { ChromaClient } from "chromadb";
+import { ChromaClient } from 'chromadb';
 import {ChromaDbCollection} from './ChromaDbCollection.js';
 import {ChromaDbCollectionLoader} from './ChromaDbCollectionLoader.js';
 

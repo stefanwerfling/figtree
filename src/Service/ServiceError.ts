@@ -20,9 +20,10 @@ export class ServiceError extends Error {
         this.name = 'ServiceError';
 
         if (cause instanceof Error && cause.stack) {
-            this.stack += '\nCaused by: ' + cause.stack;
+            this.stack += `\nCaused by: ${  cause.stack}`;
         }
 
         this.serviceName = serviceName;
     }
+
 }

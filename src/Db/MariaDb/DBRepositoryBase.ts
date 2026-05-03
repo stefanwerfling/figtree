@@ -26,7 +26,7 @@ export abstract class DBRepositoryBase<T extends BaseEntity> {
      * @return {S}
      */
     protected static getSingleInstance<S extends DBRepositoryBase<any>, TEntity extends BaseEntity>(
-        this: { new(target: EntityTarget<TEntity>): S; REGISTER_NAME: string },
+        this: { new(target: EntityTarget<TEntity>): S; REGISTER_NAME: string; },
         target: EntityTarget<TEntity>
     ): S {
         if (!DBRepositoryBase._instance.has(this.REGISTER_NAME)) {
@@ -98,4 +98,5 @@ export abstract class DBRepositoryBase<T extends BaseEntity> {
         const repository = await this._repository;
         return repository.save(entity);
     }
+
 }

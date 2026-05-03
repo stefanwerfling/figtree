@@ -27,7 +27,7 @@ export abstract class DBRepository<T extends DBBaseEntityId> {
      * @return {S}
      */
     protected static getSingleInstance<S extends DBRepository<any>, TEntity extends DBBaseEntityId>(
-        this: { new(target: EntityTarget<TEntity>): S; REGISTER_NAME: string },
+        this: { new(target: EntityTarget<TEntity>): S; REGISTER_NAME: string; },
         target: EntityTarget<TEntity>
     ): S {
         if (!DBRepository._instance.has(this.REGISTER_NAME)) {

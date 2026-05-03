@@ -62,7 +62,7 @@ export class SchemaHelper {
         }
         if (('items' in descript) && (typeof descript.items === 'object') && (descript.items !== null)) {
             for (const [key, value] of Object.entries(descript.items)) {
-                let tObject = this._convertByType(value);
+                const tObject = this._convertByType(value);
                 if (tObject !== null) {
                     rObject.properties[key] = tObject;
                     if (!('optional' in value) || !value.optional) {

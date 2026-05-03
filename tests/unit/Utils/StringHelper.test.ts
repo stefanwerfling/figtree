@@ -38,7 +38,7 @@ describe('StringHelper.sprintf', () => {
 
     it('returns %j as [Circular] for circular objects', () => {
         const obj: Record<string, unknown> = {};
-        obj['self'] = obj;
+        obj.self = obj;
         expect(StringHelper.sprintf('%j', obj)).toBe('[Circular]');
     });
 

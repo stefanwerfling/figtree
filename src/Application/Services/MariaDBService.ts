@@ -84,10 +84,12 @@ export class MariaDBService extends ServiceAbstract {
     protected async _runSetupHooks(): Promise<void> {
         const repo = DbSetupStateRepository.getInstance();
 
+        // sequential by design — hooks have ordering requirements and check/write applied state
+        /* eslint-disable no-await-in-loop */
         for (const hook of this._setupHooks) {
             if (hook.mode === 'once') {
                 const applied = await repo.isApplied(hook.id);
-                if (applied) continue;
+                if (applied) {continue;}
 
                 Logger.getLogger().info(`Running once-hook: ${hook.id}`, { class: 'MariaDBService' });
                 await hook.run();
@@ -98,6 +100,7 @@ export class MariaDBService extends ServiceAbstract {
                 await hook.run();
             }
         }
+        /* eslint-enable no-await-in-loop */
     }
 
     /**
@@ -140,8 +143,8 @@ export class MariaDBService extends ServiceAbstract {
                 database: tConfig.db.mysql.database,
                 entities: await this._loader.loadEntities(),
                 migrations: this._loader.loadMigrations(),
-                migrationsRun: this._options.migrationsRun !== undefined ? this._options.migrationsRun : true,
-                synchronize: this._options.synchronize !== undefined ? this._options.synchronize : true,
+                migrationsRun: this._options.migrationsRun ?? true,
+                synchronize: this._options.synchronize ?? true,
             });
 
             await this._runSetupHooks();
@@ -180,4 +183,5 @@ export class MariaDBService extends ServiceAbstract {
             this._inProcess = false;
         }
     }
+
 }

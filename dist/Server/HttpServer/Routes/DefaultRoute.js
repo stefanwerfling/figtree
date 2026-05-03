@@ -57,12 +57,12 @@ export class DefaultRoute {
                         return;
                     }
                 }
-                let headers = undefined;
-                let params = undefined;
-                let query = undefined;
-                let cookies = undefined;
-                let session = undefined;
-                let body = undefined;
+                let headers;
+                let params;
+                let query;
+                let cookies;
+                let session;
+                let body;
                 if (description.headerSchema) {
                     if (this.isSchemaValidate(description.headerSchema, req.headers, 'Header')) {
                         headers = req.headers;
@@ -87,18 +87,17 @@ export class DefaultRoute {
                     if (this.isSchemaValidate(description.sessionSchema, req.session, 'Session', false)) {
                         session = req.session;
                     }
-                    else {
-                        if (description.sessionInit) {
-                            req.session.user = await description.sessionInit();
-                            if (this.isSchemaValidate(description.sessionSchema, req.session, 'Session2')) {
-                                session = req.session;
-                            }
+                    else if (description.sessionInit) {
+                        const initialUser = await description.sessionInit();
+                        req.session.user = initialUser;
+                        if (this.isSchemaValidate(description.sessionSchema, req.session, 'Session2')) {
+                            session = req.session;
                         }
-                        else {
-                            req.session.user = Session.defaultInitSession();
-                            if (this.isSchemaValidate(description.sessionSchema, req.session, 'Session3')) {
-                                session = req.session;
-                            }
+                    }
+                    else {
+                        req.session.user = Session.defaultInitSession();
+                        if (this.isSchemaValidate(description.sessionSchema, req.session, 'Session3')) {
+                            session = req.session;
                         }
                     }
                 }
@@ -138,7 +137,6 @@ export class DefaultRoute {
                 }
                 else {
                     res.sendStatus(204);
-                    return;
                 }
             }
             catch (ie) {
@@ -159,15 +157,15 @@ export class DefaultRoute {
                     statusCode: StatusCodes.INTERNAL_ERROR,
                     msg: 'Internal error, check the server logs.'
                 });
-                return;
             }
         };
         for (const url of urls) {
             try {
                 const active = description.parser ?? this._defaultParser;
-                const parsers = active
-                    ? (Array.isArray(active) ? active : [active])
-                    : [];
+                let parsers = [];
+                if (active) {
+                    parsers = Array.isArray(active) ? active : [active];
+                }
                 if (parsers.length > 0) {
                     this._routes[cMethod](url, ...parsers, routeHandle);
                 }

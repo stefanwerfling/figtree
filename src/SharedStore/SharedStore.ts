@@ -6,7 +6,7 @@ export abstract class SharedStore {
     /**
      * Init the shared store
      */
-    abstract init(): Promise<void>;
+    public abstract init(): Promise<void>;
 
     /**
      * Get value by key
@@ -14,7 +14,7 @@ export abstract class SharedStore {
      * @return {T}
      * @template T
      */
-    abstract get<T = any>(key: string): Promise<T | undefined>;
+    public abstract get<T = any>(key: string): Promise<T | undefined>;
 
     /**
      * Set a value by key
@@ -22,23 +22,24 @@ export abstract class SharedStore {
      * @param {T} value
      * @template T
      */
-    abstract set<T = any>(key: string, value: T): Promise<void>;
+    public abstract set<T = any>(key: string, value: T): Promise<void>;
 
     /**
      * delete value by key
      * @param {string} key
      */
-    abstract delete(key: string): Promise<void>;
+    public abstract delete(key: string): Promise<void>;
 
     /**
      * has a key in the store
      * @param {string} key
      * @return {boolean}
      */
-    abstract has(key: string): Promise<boolean>;
+    public abstract has(key: string): Promise<boolean>;
 
     /**
      * Clear the shared store
      */
-    abstract clear(): Promise<void>;
+    public abstract clear(): Promise<void>;
+
 }

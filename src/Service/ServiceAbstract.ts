@@ -141,22 +141,30 @@ export class ServiceAbstract {
      * Start the service
      * @throws Error
      */
-    public async start(): Promise<void> {}
+    public async start(): Promise<void> {
+        // override in subclass
+    }
 
     /**
      * Invoke a service, can call by route save.
      */
-    public async invoke(): Promise<void> {}
+    public async invoke(): Promise<void> {
+        // override in subclass
+    }
 
     /**
      * Stop the service
-     * @param {boolean} forced
+     * @param {boolean} _forced
      */
-    public async stop(forced: boolean = false): Promise<void> {}
+    public async stop(_forced: boolean = false): Promise<void> {
+        // override in subclass
+    }
 
     /**
      * Reload the service
      */
-    public async reload(): Promise<void> {}
+    public async reload(): Promise<void> {
+        // override in subclass
+    }
 
 }

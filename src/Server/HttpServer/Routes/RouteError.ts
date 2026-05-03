@@ -51,7 +51,7 @@ export class RouteError extends Error {
         return {
             statusCode: this._status,
             msg: this._msg
-        }
+        };
     }
 
     /**

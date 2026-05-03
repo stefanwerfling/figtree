@@ -81,7 +81,7 @@ export class RedisClient {
         if (!namespace) {
             return key;
         }
-        const normalizedNs = namespace.endsWith(':') ? namespace : namespace + ':';
+        const normalizedNs = namespace.endsWith(':') ? namespace : `${namespace}:`;
         return `${normalizedNs}${key}`;
     }
     async get(key, namespace) {

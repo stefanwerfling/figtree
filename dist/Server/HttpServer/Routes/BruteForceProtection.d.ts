@@ -4,4 +4,4 @@ export type BruteForceProtectionOptions = {
     windowMs?: number;
     message?: string;
 };
-export declare function createBruteForceProtection(options?: BruteForceProtectionOptions): RequestHandler;
+export declare const createBruteForceProtection: (options?: BruteForceProtectionOptions) => RequestHandler;

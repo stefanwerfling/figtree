@@ -9,7 +9,7 @@ export class HttpWebSocketServer {
             throw new Error('Http server is not init!');
         }
 
-        server.on('upgrade', (request, socket, head) => {
+        server.on('upgrade', (_request, socket, _head) => {
             socket.on('error', (err) => {
                 console.error(err);
             });

@@ -27,7 +27,7 @@ export abstract class DBRepositoryUnid<T extends DBBaseEntityUnid> {
      * @return {S}
      */
     protected static getSingleInstance<S extends DBRepositoryUnid<any>, TEntityUnid extends DBBaseEntityUnid>(
-        this: { new(target: EntityTarget<TEntityUnid>): S; REGISTER_NAME: string },
+        this: { new(target: EntityTarget<TEntityUnid>): S; REGISTER_NAME: string; },
         target: EntityTarget<TEntityUnid>
     ): S {
         if (!DBRepositoryUnid._instance.has(this.REGISTER_NAME)) {

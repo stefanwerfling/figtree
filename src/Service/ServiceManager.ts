@@ -38,7 +38,7 @@ export class ServiceManager {
      */
     public getInfoList(): ServiceInfoEntry[] {
         return this._services.map(service => {
-            let schedulerInfo: ServiceInfoScheduler|undefined = undefined;
+            let schedulerInfo: ServiceInfoScheduler|undefined;
 
             if (service instanceof ServiceJobAbstract) {
                 schedulerInfo = {
@@ -76,7 +76,7 @@ export class ServiceManager {
         } catch (error) {
             switch (service.getImportance()) {
                 case ServiceImportance.Critical:
-                    throw new Error(`Critical service '${name}' could not be started: ${error}`);
+                    throw new Error(`Critical service '${name}' could not be started: ${error}`, {cause: error});
 
                 case ServiceImportance.Important:
                     Logger.getLogger().error(`Important service '${name}' could not be started:`, error);
@@ -165,8 +165,12 @@ export class ServiceManager {
             }
         }
 
+        // sequential by design — poll-and-start loop respects service dependency order
+        /* eslint-disable no-await-in-loop */
         while (waitingServices.length > 0) {
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise<void>((resolve) => {
+                setTimeout(resolve, 1000);
+            });
 
             for (const waitService of [...waitingServices]) {
                 const mService = this.getByName(waitService);
@@ -204,6 +208,7 @@ export class ServiceManager {
                 }
             }
         }
+        /* eslint-enable no-await-in-loop */
 
     }
 
@@ -290,6 +295,8 @@ export class ServiceManager {
 
         for (const dependent of dependents) {
             if (dependent.getStatus() === ServiceStatus.Success) {
+                // sequential by design — recursive stop respects dependency order
+                // eslint-disable-next-line no-await-in-loop
                 await this._stopRecursive(dependent.getServiceName(), visited);
             }
         }

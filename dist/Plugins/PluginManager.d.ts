@@ -23,5 +23,5 @@ export declare class PluginManager {
     getPlugins(): APlugin[];
     getPlugin(name: string): APlugin | null;
     registerEvents(listner: APluginEvent, plugin: APlugin): void;
-    getAllEvents<T extends APluginEvent>(aClass: Function): T[];
+    getAllEvents<T extends APluginEvent>(aClass: abstract new (...args: any[]) => T): T[];
 }

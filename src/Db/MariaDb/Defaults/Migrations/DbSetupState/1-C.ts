@@ -20,9 +20,10 @@ export class CreateTableDbSetupState0000000000001 implements MigrationInterface 
                 name: 'db_setup_state',
                 columns: [
                     {
+                        // UUID
                         name: 'unid',
                         type: 'varchar',
-                        length: '36',   // UUID
+                        length: '36',
                         isPrimary: true,
                         isNullable: false,
                     },
@@ -34,7 +35,8 @@ export class CreateTableDbSetupState0000000000001 implements MigrationInterface 
                     },
                 ],
             }),
-            true // ifNotExist
+            // ifNotExist
+            true
         );
     }
 
@@ -45,4 +47,5 @@ export class CreateTableDbSetupState0000000000001 implements MigrationInterface 
     public async down(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.dropTable('db_setup_state', true);
     }
+
 }

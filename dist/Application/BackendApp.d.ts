@@ -2,7 +2,7 @@ import { ConfigOptions, DefaultArgs } from 'figtree-schemas';
 import { Schema } from 'vts';
 import { ConfigBackend } from '../Config/ConfigBackend.js';
 import { ServiceManager } from '../Service/ServiceManager.js';
-export declare abstract class BackendApp<A extends DefaultArgs, C extends ConfigOptions> {
+export declare abstract class BackendApp<A extends DefaultArgs, _C extends ConfigOptions> {
     private static _instances;
     static getInstance(name: string): BackendApp<any, any> | null;
     protected _appName: string;

@@ -10,11 +10,22 @@ npm run compile      # Incremental TypeScript compile (tsc --project tsconfig.js
 npm run clean        # Remove dist directory
 npm test             # Run all tests once (vitest run)
 npm run test:watch   # Run tests in watch mode
+
+# Lint (ESLint v9 + legacy .eslintrc.json — flag ESLINT_USE_FLAT_CONFIG=false required)
+ESLINT_USE_FLAT_CONFIG=false npx eslint 'src/**/*.ts' 'tests/**/*.ts'
+ESLINT_USE_FLAT_CONFIG=false npx eslint 'src/**/*.ts' 'tests/**/*.ts' --fix
 ```
 
 TypeScript strict mode is enabled — `npm run compile` is the primary correctness check.
 
 The CLI binary is exposed after build at `./dist/Cli/index.js` (registered as `figtree` in package.json `bin`).
+
+## Lint conventions
+
+- ESLint config is `.eslintrc.json` (legacy format under ESLint v9 — pass `ESLINT_USE_FLAT_CONFIG=false`).
+- Unused parameters / vars / caught errors must be prefixed with `_` (configured via `argsIgnorePattern: "^_"` etc.).
+- TypeScript ambient types (`NodeJS.*`, `BufferEncoding`, `NonSharedBuffer`) are listed under `globals` rather than disabling `no-undef`.
+- `no-await-in-loop` is enforced; for genuinely sequential loops (retry with backoff, dependency-ordered start/stop, short-circuit checks) use `// eslint-disable-next-line no-await-in-loop` with a one-line reason.
 
 ## Tests
 

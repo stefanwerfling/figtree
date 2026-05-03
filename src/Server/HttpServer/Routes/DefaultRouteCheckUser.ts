@@ -1,6 +1,5 @@
 import {Request, Response} from 'express';
 import {RequestData, SchemaRequestData, StatusCodes} from 'figtree-schemas';
-import {ObjectSchema, ObjectSchemaItems, Schema} from 'vts';
 import {ACL} from '../../../ACL/ACL.js';
 import {Session} from '../Session.js';
 import {RequestContext} from './RequestContext.js';
@@ -17,33 +16,6 @@ export type DefaultRouteCheckUserLogin<
     response: RESP,
     aclRight?: string
 ) => Promise<boolean>;
-
-/**
- * Default function for check is a user logged in and acl
- * @param {unknown} req
- * @param {Response} res
- * @param {[aclRight]} aclRight
- * @constructor
- */
-export const DefaultRouteCheckUserIsLoginACL = async (
-    req: unknown,
-    res: Response,
-    aclRight?: string
-): Promise<boolean> => {
-    if (!DefaultRouteCheckUserIsLogin(req, true)) {
-        return false;
-    }
-
-    if (aclRight && req.session.user && req.session.user.role) {
-        const role = req.session.user.role;
-
-        if (await ACL.getInstance().checkAccess(role, aclRight)) {
-            return true;
-        }
-    }
-
-    throw new RouteError(StatusCodes.FORBIDDEN, 'User has no access!');
-};
 
 /**
  * Default function for check is a user logged in
@@ -82,4 +54,31 @@ export const DefaultRouteCheckUserIsLogin = (
     }
 
     return false;
-}
+};
+
+/**
+ * Default function for check is a user logged in and acl
+ * @param {unknown} req
+ * @param {Response} _res
+ * @param {[aclRight]} aclRight
+ * @constructor
+ */
+export const DefaultRouteCheckUserIsLoginACL = async(
+    req: unknown,
+    _res: Response,
+    aclRight?: string
+): Promise<boolean> => {
+    if (!DefaultRouteCheckUserIsLogin(req, true)) {
+        return false;
+    }
+
+    if (aclRight && req.session.user && req.session.user.role) {
+        const role = req.session.user.role;
+
+        if (await ACL.getInstance().checkAccess(role, aclRight)) {
+            return true;
+        }
+    }
+
+    throw new RouteError(StatusCodes.FORBIDDEN, 'User has no access!');
+};

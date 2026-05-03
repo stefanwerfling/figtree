@@ -1,6 +1,6 @@
-import * as fs from "fs";
-import { createHash } from "crypto";
-import * as path from "path";
+import * as fs from 'fs';
+import { createHash } from 'crypto';
+import * as path from 'path';
 import { DirHelper } from '../Utils/DirHelper.js';
 export class MerkleTreeRootHash {
     sha256(data) {
@@ -10,16 +10,17 @@ export class MerkleTreeRootHash {
         if (hashes.length === 0) {
             throw new Error('Empty input: none chunks given.');
         }
-        while (hashes.length > 1) {
+        let level = hashes;
+        while (level.length > 1) {
             const nextLevel = [];
-            for (let i = 0; i < hashes.length; i += 2) {
-                const left = hashes[i];
-                const right = i + 1 < hashes.length ? hashes[i + 1] : left;
+            for (let i = 0; i < level.length; i += 2) {
+                const left = level[i];
+                const right = i + 1 < level.length ? level[i + 1] : left;
                 nextLevel.push(this.sha256(Buffer.concat([left, right])));
             }
-            hashes = nextLevel;
+            level = nextLevel;
         }
-        return hashes[0];
+        return level[0];
     }
     async fromFile(filePath, chunkSize = 1024 * 1024) {
         return new Promise((resolve, reject) => {
@@ -44,16 +45,14 @@ export class MerkleTreeRootHash {
     async fromFolder(dir, recursive) {
         const filePaths = await DirHelper.getFiles(dir, recursive);
         filePaths.sort();
-        const fileHashes = [];
-        for (const relativePath of filePaths) {
+        const fileHashes = await Promise.all(filePaths.map(async (relativePath) => {
             const absPath = path.join(dir, relativePath);
             const fileHash = await this.fromFile(absPath);
-            const combined = this.sha256(Buffer.concat([
+            return this.sha256(Buffer.concat([
                 Buffer.from(relativePath, 'utf8'),
                 Buffer.from(fileHash, 'hex')
             ]));
-            fileHashes.push(combined);
-        }
+        }));
         const folderHash = this._buildMerkleRoot(fileHashes);
         return folderHash.toString('hex');
     }

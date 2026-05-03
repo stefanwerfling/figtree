@@ -172,9 +172,9 @@ export abstract class ServiceJobAbstract extends ServiceAbstract {
         hour = '*',
         day = '*'
     }: {
-        minute?: string | number,
-        hour?: string | number,
-        day?: string | number
+        minute?: string | number;
+        hour?: string | number;
+        day?: string | number;
     }): string {
         return `${minute} ${hour} ${day} * *`;
     }

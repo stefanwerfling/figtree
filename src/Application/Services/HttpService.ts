@@ -113,7 +113,7 @@ export class HttpService extends ServiceAbstract {
                 }
             }
 
-            let proxy: BaseHttpServerOptionProxy|undefined = undefined;
+            let proxy: BaseHttpServerOptionProxy|undefined;
 
             if (tConfig.httpserver.proxy) {
                 proxy = {
@@ -121,7 +121,7 @@ export class HttpService extends ServiceAbstract {
                 };
             }
 
-            let csrf: BaseHttpServerOptionCsrf|undefined = undefined;
+            let csrf: BaseHttpServerOptionCsrf|undefined;
 
             if (tConfig.httpserver.csrf) {
                 csrf = {
@@ -187,4 +187,5 @@ export class HttpService extends ServiceAbstract {
             this._inProcess = false;
         }
     }
+
 }

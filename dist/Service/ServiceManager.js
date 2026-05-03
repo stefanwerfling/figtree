@@ -12,7 +12,7 @@ export class ServiceManager {
     }
     getInfoList() {
         return this._services.map(service => {
-            let schedulerInfo = undefined;
+            let schedulerInfo;
             if (service instanceof ServiceJobAbstract) {
                 schedulerInfo = {
                     status: service.getStatusScheduler(),
@@ -42,7 +42,7 @@ export class ServiceManager {
         catch (error) {
             switch (service.getImportance()) {
                 case ServiceImportance.Critical:
-                    throw new Error(`Critical service '${name}' could not be started: ${error}`);
+                    throw new Error(`Critical service '${name}' could not be started: ${error}`, { cause: error });
                 case ServiceImportance.Important:
                     Logger.getLogger().error(`Important service '${name}' could not be started:`, error);
                     break;
@@ -103,7 +103,9 @@ export class ServiceManager {
             }
         }
         while (waitingServices.length > 0) {
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise((resolve) => {
+                setTimeout(resolve, 1000);
+            });
             for (const waitService of [...waitingServices]) {
                 const mService = this.getByName(waitService);
                 if (mService === null) {

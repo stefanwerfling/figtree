@@ -1,4 +1,3 @@
-import {exists} from 'node:fs';
 import {createClient, RedisClientType} from 'redis';
 import {Logger} from '../../Logger/Logger.js';
 import {RedisChannel} from './RedisChannel.js';
@@ -172,7 +171,7 @@ export class RedisClient {
             return key;
         }
 
-        const normalizedNs = namespace.endsWith(':') ? namespace : namespace + ':';
+        const normalizedNs = namespace.endsWith(':') ? namespace : `${namespace  }:`;
         return `${normalizedNs}${key}`;
     }
 

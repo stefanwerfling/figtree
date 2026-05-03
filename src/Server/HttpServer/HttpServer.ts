@@ -45,7 +45,7 @@ export class HttpServer extends BaseHttpServer {
             limit: async(request): Promise<number> => {
                 return this._limiterLimit(request);
             },
-            handler: async (req, res): Promise<void> => {
+            handler: async(req, res): Promise<void> => {
                 return this._limiterHandler(req, res);
             }
         });
@@ -101,7 +101,7 @@ export class HttpServer extends BaseHttpServer {
     protected async _limiterHandler(req: Request, res: Response): Promise<void> {
         Logger.getLogger().warn('HttpServer::_limiterHandler: Too Many Requests: %s is blocked for %s.', req.ip, req.url);
 
-        res.status(429).json({ message: "Too Many Requests" });
+        res.status(429).json({ message: 'Too Many Requests' });
     }
 
     /**
@@ -214,7 +214,7 @@ export class HttpServer extends BaseHttpServer {
             try {
                 await DirHelper.mkdir(options.sslPath, true);
                 ck = await super._getCertAndKey(options);
-            } catch (e) {
+            } catch (_e) {
                 Logger.getLogger().error(`HttpServer::_getCertAndKey: Can not create key and cert by ssl path: ${options.sslPath}`);
             }
         }
@@ -253,4 +253,5 @@ export class HttpServer extends BaseHttpServer {
 
         return false;
     }
+
 }

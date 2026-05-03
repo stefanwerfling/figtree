@@ -15,7 +15,7 @@ export class HttpFileStream {
     public static responseStream(stream: ReadStream, contentType: string, response: Response): boolean {
         let success = true;
 
-        stream.on('error', (err) => {
+        stream.on('error', (_err) => {
             Logger.getLogger().error('HttpFileStream::responseStream::stream::error: file error!');
             success = false;
         });

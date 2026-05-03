@@ -86,4 +86,5 @@ export class RedisSharedStore extends SharedStore {
             await this._client.clearAll();
         }
     }
+
 }
