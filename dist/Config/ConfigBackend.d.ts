@@ -14,6 +14,7 @@ export declare class ConfigBackend<T extends ConfigBackendOptions = ConfigBacken
     static readonly DEFAULT_DB_CHROMA_URL = "http://localhost:8000/";
     static getInstance(): ConfigBackend;
     protected _loadEnv(aConfig: T | null): T | null;
+    protected _loadEnvCluster(config: T): T;
     protected _loadEnvMariaDb(config: T): T;
     protected _loadEnvInfluxDb(config: T): T;
     protected _loadEnvRedisDb(config: T): T;

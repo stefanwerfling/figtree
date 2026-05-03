@@ -1,4 +1,10 @@
-import {ConfigBackendOptions, ENV_DB, SchemaConfigBackendOptions} from 'figtree-schemas';
+import {
+    ClusterSharedStoreType,
+    ConfigBackendOptions,
+    ENV_CLUSTER,
+    ENV_DB,
+    SchemaConfigBackendOptions
+} from 'figtree-schemas';
 import {Config} from './Config.js';
 
 /**
@@ -70,6 +76,68 @@ export class ConfigBackend<T extends ConfigBackendOptions = ConfigBackendOptions
         config = this._loadEnvChromaDb(config);
         config = this._loadEnvHttpserver(config);
         config = this._loadEnvLogging(config);
+        config = this._loadEnvCluster(config);
+
+        return config;
+    }
+
+    /**
+     * Load Cluster Env. Maps the CLUSTER_* env variables onto config.cluster.
+     * @param {T} config
+     * @returns {T}
+     * @protected
+     */
+    protected _loadEnvCluster(config: T): T {
+        const clusterEnvList = [
+            ENV_CLUSTER.CLUSTER_ENABLED,
+            ENV_CLUSTER.CLUSTER_WORKERS,
+            ENV_CLUSTER.CLUSTER_SHUTDOWN_TIMEOUT_MS,
+            ENV_CLUSTER.CLUSTER_SHARED_STORE_TYPE,
+            ENV_CLUSTER.CLUSTER_SHARED_STORE_NAMESPACE
+        ];
+
+        if (!clusterEnvList.some((entry) => process.env[entry])) {
+            return config;
+        }
+
+        if (!config.cluster) {
+            config.cluster = {};
+        }
+
+        if (process.env[ENV_CLUSTER.CLUSTER_ENABLED]) {
+            config.cluster.enabled = process.env[ENV_CLUSTER.CLUSTER_ENABLED] === '1' ||
+                process.env[ENV_CLUSTER.CLUSTER_ENABLED]?.toLowerCase() === 'true';
+        }
+
+        if (process.env[ENV_CLUSTER.CLUSTER_WORKERS]) {
+            const workers = parseInt(process.env[ENV_CLUSTER.CLUSTER_WORKERS]!, 10);
+
+            if (!Number.isNaN(workers) && workers > 0) {
+                config.cluster.workers = workers;
+            }
+        }
+
+        if (process.env[ENV_CLUSTER.CLUSTER_SHUTDOWN_TIMEOUT_MS]) {
+            const timeout = parseInt(process.env[ENV_CLUSTER.CLUSTER_SHUTDOWN_TIMEOUT_MS]!, 10);
+
+            if (!Number.isNaN(timeout) && timeout > 0) {
+                config.cluster.shutdownTimeoutMs = timeout;
+            }
+        }
+
+        const storeType = process.env[ENV_CLUSTER.CLUSTER_SHARED_STORE_TYPE];
+        const storeNs = process.env[ENV_CLUSTER.CLUSTER_SHARED_STORE_NAMESPACE];
+
+        if (storeType || storeNs) {
+            const validType = storeType === ClusterSharedStoreType.IPC || storeType === ClusterSharedStoreType.Redis
+                ? storeType
+                : config.cluster.sharedStore?.type ?? ClusterSharedStoreType.IPC;
+
+            config.cluster.sharedStore = {
+                type: validType,
+                namespace: storeNs ?? config.cluster.sharedStore?.namespace
+            };
+        }
 
         return config;
     }

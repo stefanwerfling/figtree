@@ -4,9 +4,21 @@ FigTree's `BackendCluster` runs your `BackendApp` across multiple Node.js worker
 
 ## Quick start
 
+The simplest entry point reads `config.json` and decides between cluster mode and single-process mode automatically:
+
+```typescript
+import { bootstrap } from 'figtree';
+import { MyBackend } from './MyBackend.js';
+
+await (await bootstrap(() => new MyBackend())).start();
+```
+
+With `cluster.enabled: true` in `config.json`, this forks workers; otherwise it runs single-process. Same entry point for both. See [Configuration](#configuration) below for the full schema.
+
+If you prefer explicit setup (no config), instantiate `BackendCluster` directly:
+
 ```typescript
 import { BackendCluster } from 'figtree';
-import { MyBackend } from './MyBackend.js';
 
 const cluster = new BackendCluster({
     appFactory: () => new MyBackend()
@@ -585,6 +597,98 @@ A subscriber callback that throws (sync) or rejects (async) does not affect sibl
 
 ## Roadmap
 
-Layers 1-6 are available. Remaining items on the roadmap:
+All layers 1-6 are available, plus declarative configuration via the config schema. The cluster feature set is feature-complete for the current scope.
 
-- **Cluster config in `ConfigBackend`** — declarative cluster setup (workers, roles, SharedStore choice) via the config schema.
+## Configuration
+
+Everything described above is also available declaratively via the `cluster` block in `config.json`. The schema is defined in [`figtree-schemas`](https://github.com/stefanwerfling/figtree-schemas) (`SchemaConfigCluster`).
+
+### Full example
+
+```jsonc
+{
+    "logging":    { "...": "..." },
+    "db":         { "...": "..." },
+    "httpserver": { "...": "..." },
+
+    "cluster": {
+        "enabled": true,
+        "roles":   { "http": 4, "cron": 1 },
+        "shutdownTimeoutMs": 15000,
+        "shutdownSignals":   ["SIGTERM", "SIGINT"],
+        "respawn": {
+            "backoffMs":    [0, 1000, 5000, 15000, 30000],
+            "maxPerWindow": 5,
+            "windowMs":     60000
+        },
+        "sharedStore": {
+            "type":      "redis",
+            "namespace": "myapp"
+        }
+    }
+}
+```
+
+### Field reference
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `enabled` | `boolean` | `false` | Master switch. If false (or missing), `bootstrap()` runs single-process. |
+| `workers` | `number` | `os.cpus().length` | Total worker count. Ignored when `roles` is set. |
+| `roles` | `Record<string, number>` | — | Worker role assignment. The total worker count is the sum of all values. Each worker receives its role via `WORKER_ROLE` env. |
+| `shutdownTimeoutMs` | `number` | `15000` | Time the master waits for workers to exit gracefully before SIGKILL. Should be larger than the worker-side shutdown timeout. |
+| `shutdownSignals` | `string[]` | `['SIGTERM', 'SIGINT']` | Signals that trigger a graceful cluster shutdown. |
+| `respawn.backoffMs` | `number[]` | `[0, 1000, 5000, 15000, 30000]` | Backoff sequence for crash respawns. |
+| `respawn.maxPerWindow` | `number` | `5` | Max crashes per window before the cluster halts. |
+| `respawn.windowMs` | `number` | `60000` | Rolling window for the circuit breaker. |
+| `sharedStore.type` | `'ipc' \| 'redis'` | — | Backend for `ClusterRegistry` / `ClusterLeader`. Required when those features are used. |
+| `sharedStore.namespace` | `string` | `'sharedstore'` | Key namespace prefix in the store. |
+
+### Auto-wiring `ClusterRegistry` from config
+
+`setupClusterRegistryFromConfig()` reads `cluster.sharedStore` and creates the right `SharedStore` + initializes the `ClusterRegistry` singleton. Call it from your `_initServices()`:
+
+```typescript
+import { setupClusterRegistryFromConfig } from 'figtree';
+
+protected override async _initServices(): Promise<void> {
+    await setupClusterRegistryFromConfig();   // no-op if cluster.enabled is false
+
+    this._serviceManager.add(new MariaDBService());
+    this._serviceManager.add(new HttpService(),   ['http']);
+    this._serviceManager.add(new MyCronJob(),     ['cron']);
+}
+```
+
+For `sharedStore.type === 'redis'`, the helper requires an initialized `RedisClient` singleton (or pass one explicitly via `options.redisClient`). Typical setup:
+
+```typescript
+import { RedisClient, setupClusterRegistryFromConfig } from 'figtree';
+
+protected override async _initServices(): Promise<void> {
+    const cfg = ConfigBackend.getInstance().get();
+
+    if (cfg?.db?.redis) {
+        RedisClient.getInstance({ url: cfg.db.redis.url, password: cfg.db.redis.password });
+    }
+
+    await setupClusterRegistryFromConfig();
+
+    this._serviceManager.add(new RedisDBService());   // connects RedisClient on start
+    // ...
+}
+```
+
+`RedisClient.connect()` is idempotent, so it doesn't matter whether `setupClusterRegistryFromConfig()` or `RedisDBService.start()` connects first.
+
+### Environment variables
+
+Setting any of the following environment variables enables / overrides the corresponding `cluster` field (when `useEnv` is enabled in `Config.load()`):
+
+| Env variable | Maps to |
+|---|---|
+| `CLUSTER_ENABLED` | `cluster.enabled` (`'1'` or `'true'`) |
+| `CLUSTER_WORKERS` | `cluster.workers` |
+| `CLUSTER_SHUTDOWN_TIMEOUT_MS` | `cluster.shutdownTimeoutMs` |
+| `CLUSTER_SHARED_STORE_TYPE` | `cluster.sharedStore.type` (`'ipc'` or `'redis'`) |
+| `CLUSTER_SHARED_STORE_NAMESPACE` | `cluster.sharedStore.namespace` |

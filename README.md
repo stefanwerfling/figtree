@@ -429,6 +429,28 @@ This generates a Merkle hash of all files in `dist/`. The hash is used by `Plugi
 
 FigTree supports multi-process clustering via `BackendCluster`. Workers share state via `IPCSharedStore` (single host) or `RedisSharedStore` (distributed).
 
+The simplest entry point reads `config.json` and decides between cluster mode and single-process mode automatically:
+
+```typescript
+import { bootstrap } from 'figtree';
+import { MyBackend } from './MyBackend.js';
+
+await (await bootstrap(() => new MyBackend())).start();
+```
+
+`config.json`:
+```jsonc
+{
+    "cluster": {
+        "enabled": true,
+        "roles": { "http": 4, "cron": 1 },
+        "sharedStore": { "type": "redis", "namespace": "myapp" }
+    }
+}
+```
+
+Or instantiate `BackendCluster` directly without config:
+
 ```typescript
 import { BackendCluster } from 'figtree';
 

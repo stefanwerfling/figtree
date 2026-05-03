@@ -132,9 +132,15 @@ export class RedisClient {
     }
 
     /**
-     * Connect to server
+     * Connect to server. Idempotent — safe to call from multiple call sites
+     * (e.g. RedisDBService.start() AND RedisSharedStore.init()).
      */
     public async connect(): Promise<void> {
+        if (this._client.isOpen) {
+            this._isConnect = true;
+            return;
+        }
+
         await this._client.connect();
         this._isConnect = true;
     }

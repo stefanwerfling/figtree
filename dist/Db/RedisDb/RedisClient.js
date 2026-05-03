@@ -56,6 +56,10 @@ export class RedisClient {
         await this._client.unsubscribe(channel);
     }
     async connect() {
+        if (this._client.isOpen) {
+            this._isConnect = true;
+            return;
+        }
         await this._client.connect();
         this._isConnect = true;
     }
