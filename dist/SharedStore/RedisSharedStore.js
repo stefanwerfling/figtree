@@ -1,5 +1,6 @@
 import { RedisClient } from '../Db/RedisDb/RedisClient.js';
 import { Logger } from '../Logger/Logger.js';
+import { RedisLease } from './RedisLease.js';
 import { SharedStore } from './SharedStore.js';
 export class RedisSharedStore extends SharedStore {
     _client;
@@ -82,6 +83,9 @@ export class RedisSharedStore extends SharedStore {
                 Logger.getLogger().warn?.('RedisSharedStore::unsubscribe: redis unsubscribe failed', err);
             }
         }
+    }
+    createLease(name, options) {
+        return new RedisLease(this._client, this._namespace, name, options);
     }
     async _getSubscriberClient() {
         if (!this._subscriberClient) {

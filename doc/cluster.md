@@ -225,6 +225,9 @@ For features that span workers — cluster-wide service visibility, cross-host s
 
 ```
 ┌─────────────────────────────────────────────────────────┐
+│ Layer 6: ClusterLeader (✓ available)                    │
+│          exactly-once leadership across the cluster     │
+├─────────────────────────────────────────────────────────┤
 │ Layer 5: ServiceRoute cluster view (✓ available)        │
 │          GET /v1/service/status/cluster                 │
 ├─────────────────────────────────────────────────────────┤
@@ -238,7 +241,7 @@ For features that span workers — cluster-wide service visibility, cross-host s
 │ Layer 3: SharedStore Pub/Sub (✓ available)              │
 │          publish() / subscribe()                        │
 ├─────────────────────────────────────────────────────────┤
-│ Layer 2: SharedStore KV + TTL (✓ available)             │
+│ Layer 2: SharedStore KV + TTL + leases (✓ available)    │
 │          IPCSharedStore + RedisSharedStore              │
 ├─────────────────────────────────────────────────────────┤
 │ Layer 1: Worker identity + roles (✓ available)          │
@@ -415,6 +418,87 @@ If `ClusterRegistry` is not initialized, the endpoint falls back to a local-only
 
 ACL: by default the same right as `/v1/service/status`; override with `accessRights.clusterStatus` on the `ServiceRoute` constructor if you need a different rule.
 
+## Leader election
+
+Worker roles solve "run exactly one of these per host". For "run exactly one of these across the entire cluster" — even when multiple hosts are involved — use `ClusterLeader`.
+
+Typical use: a cron worker that should not double-execute on multiple hosts. With `roles: { cron: 1 }` you'd get one cron worker per host; combine with `ClusterLeader` so only one host actually runs the jobs.
+
+### Quick start
+
+```typescript
+import { ClusterLeader, RedisSharedStore } from 'figtree';
+
+const store = new RedisSharedStore(redisClient, 'myapp');
+await store.init();
+
+const leader = new ClusterLeader(store, { name: 'cron-master' });
+
+leader.onLeaderElected(async () => {
+    Logger.getLogger().info('I am the cron leader — starting jobs');
+    await myCronJob.start();
+});
+
+leader.onLeaderLost(async () => {
+    Logger.getLogger().warn('Lost leadership — pausing jobs');
+    await myCronJob.stop();
+});
+
+await leader.start();
+// ... at shutdown:
+await leader.stop();
+```
+
+### How it works
+
+`ClusterLeader` is a thin lifecycle layer on top of a `ClusterLease`:
+
+1. `start()` calls `lease.acquire()`. If successful, fires `onLeaderElected`.
+2. While leader, the lease is renewed every `renewMs` (default `ttlMs / 3`) — well before it could expire.
+3. If a renewal fails (process was paused too long, network split, etc.), `onLeaderLost` fires and the worker enters retry mode.
+4. While not the leader, `acquire()` is retried every `retryMs` (default 5s).
+5. `stop()` releases the lease cleanly so other workers don't have to wait for the TTL to expire.
+
+### Options
+
+```typescript
+new ClusterLeader(store, {
+    name: 'cron-master',     // unique cluster-wide identifier for this leadership
+    ttlMs: 15_000,           // lease TTL, default 15s
+    renewMs: 5_000,          // renew interval — should be ttlMs/3 or less
+    retryMs: 5_000           // retry interval when not leader
+});
+```
+
+### Atomicity
+
+The underlying `ClusterLease` uses atomic primitives: Redis `SET NX PX` for acquire, and tiny server-side Lua scripts for compare-and-set (renew) and compare-and-delete (release). `IPCSharedStore` does the same in the master process — single-threaded JS already guarantees the atomicity. There is no race window where two workers can think they are both the leader at the same moment.
+
+### Caveats
+
+- **`ttlMs` vs renewal frequency.** Pick `renewMs` ≪ `ttlMs`. The default `ttlMs / 3` means we get 3 attempts per TTL — robust against a single network blip.
+- **Process pauses.** If a leader's event loop is blocked for longer than `ttlMs`, the lease expires and another worker takes over. The original leader's next renewal will fail; `onLeaderLost` fires. Guarantees **at-most-one** leader at any time; failover is on the order of `ttlMs`.
+- **No fencing token.** If you need a fencing token (e.g. to reject writes from a leader that just lost the lease), embed it in the value yourself and check on every operation. Not built in.
+- **Use Redis for multi-host.** `IPCSharedStore` only knows about workers on its host. For cluster-wide leadership across hosts, use `RedisSharedStore`.
+
+### Lower-level: `ClusterLease`
+
+If you need direct control over acquire / renew / release without the auto-loop, use the lease primitive returned by `store.createLease(name, options)`:
+
+```typescript
+const lease = store.createLease('my-resource', { ttlMs: 30_000 });
+
+if (await lease.acquire()) {
+    try {
+        // do work that requires exclusive cluster-wide access
+    } finally {
+        await lease.release();
+    }
+}
+```
+
+`ClusterLease` is also useful as a building block for distributed locks, idempotency guards, or one-shot migrations.
+
 ## Sharing state between workers
 
 Workers do **not** share memory. To coordinate state across workers, use one of the `SharedStore` implementations.
@@ -501,7 +585,6 @@ A subscriber callback that throws (sync) or rejects (async) does not affect sibl
 
 ## Roadmap
 
-Layers 1-5 are available. The remaining items on the roadmap:
+Layers 1-6 are available. Remaining items on the roadmap:
 
-- **Leader election** — Redis-backed lease so exactly one node runs singletons (migrations, cron master) even across multiple hosts. (Today: a singleton role on a single worker via `roles: { cron: 1 }` works for single-host setups but does not survive multi-host.)
 - **Cluster config in `ConfigBackend`** — declarative cluster setup (workers, roles, SharedStore choice) via the config schema.

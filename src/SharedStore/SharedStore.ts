@@ -1,3 +1,5 @@
+import {ClusterLease, ClusterLeaseOptions} from '../Cluster/ClusterLease.js';
+
 /**
  * Subscriber callback signature. May be async.
  * @template T
@@ -91,5 +93,14 @@ export abstract class SharedStore {
      * @template T
      */
     public abstract unsubscribe<T = any>(channel: string, callback?: SharedStoreSubscriber<T>): Promise<void>;
+
+    /**
+     * Build a distributed lease backed by this store. Cluster + multi-host wide
+     * exclusivity for the given `name`.
+     * @param {string} name
+     * @param {ClusterLeaseOptions} options
+     * @return {ClusterLease}
+     */
+    public abstract createLease(name: string, options?: ClusterLeaseOptions): ClusterLease;
 
 }

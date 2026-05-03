@@ -1,5 +1,7 @@
+import {ClusterLease, ClusterLeaseOptions} from '../Cluster/ClusterLease.js';
 import {RedisClient} from '../Db/RedisDb/RedisClient.js';
 import {Logger} from '../Logger/Logger.js';
+import {RedisLease} from './RedisLease.js';
 import {SharedStore, SharedStoreSubscriber} from './SharedStore.js';
 
 /**
@@ -188,6 +190,17 @@ export class RedisSharedStore extends SharedStore {
                 Logger.getLogger().warn?.('RedisSharedStore::unsubscribe: redis unsubscribe failed', err);
             }
         }
+    }
+
+    /**
+     * Build a distributed lease backed by Redis. Atomic via SET NX PX +
+     * tiny server-side Lua scripts for renew / release.
+     * @param {string} name
+     * @param {ClusterLeaseOptions} options
+     * @return {ClusterLease}
+     */
+    public createLease(name: string, options?: ClusterLeaseOptions): ClusterLease {
+        return new RedisLease(this._client, this._namespace, name, options);
     }
 
     /**

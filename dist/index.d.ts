@@ -41,6 +41,8 @@ export { IPCSharedStore } from './SharedStore/IPCSharedStore.js';
 export { RedisSharedStore } from './SharedStore/RedisSharedStore.js';
 export { ClusterPublishable } from './Cluster/ClusterPublishable.js';
 export { ClusterRegistry, ClusterRegistryOptions } from './Cluster/ClusterRegistry.js';
+export { ClusterLease, ClusterLeaseOptions } from './Cluster/ClusterLease.js';
+export { ClusterLeader, ClusterLeaderOptions, ClusterLeaderCallback } from './Cluster/ClusterLeader.js';
 export { Message as RawMessage } from './Server/RawServer/Base/Message.js';
 export { Server as RawServer } from './Server/RawServer/Server.js';
 export { Client as RawClient } from './Server/RawServer/Client/Client.js';

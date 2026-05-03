@@ -1,5 +1,6 @@
 import cluster from 'cluster';
 import { Logger } from '../Logger/Logger.js';
+import { IPCLease } from './IPCLease.js';
 import { SharedStore } from './SharedStore.js';
 export class IPCSharedStore extends SharedStore {
     _store = new Map();
@@ -59,12 +60,62 @@ export class IPCSharedStore extends SharedStore {
                     value: this._keysLocal(msg.prefix)
                 });
                 break;
+            case 'setIfAbsent':
+                worker.send({
+                    type: 'setIfAbsentResponse',
+                    requestId: msg.requestId,
+                    value: this._setIfAbsentLocal(msg.key, msg.value, msg.ttlMs)
+                });
+                break;
+            case 'compareAndSet':
+                worker.send({
+                    type: 'compareAndSetResponse',
+                    requestId: msg.requestId,
+                    value: this._compareAndSetLocal(msg.key, msg.expected, msg.value, msg.ttlMs)
+                });
+                break;
+            case 'deleteIfEqual':
+                worker.send({
+                    type: 'deleteIfEqualResponse',
+                    requestId: msg.requestId,
+                    value: this._deleteIfEqualLocal(msg.key, msg.expected)
+                });
+                break;
             case 'publish':
                 this._fanOutPublish(msg.channel, msg.value);
                 break;
             default:
                 break;
         }
+    }
+    _setIfAbsentLocal(key, value, ttlMs) {
+        if (this._store.has(key)) {
+            return false;
+        }
+        this._setLocal(key, value, ttlMs);
+        return true;
+    }
+    _compareAndSetLocal(key, expected, next, ttlMs) {
+        if (!this._store.has(key)) {
+            return false;
+        }
+        const current = this._store.get(key);
+        if (current !== expected) {
+            return false;
+        }
+        this._setLocal(key, next, ttlMs);
+        return true;
+    }
+    _deleteIfEqualLocal(key, expected) {
+        if (!this._store.has(key)) {
+            return false;
+        }
+        const current = this._store.get(key);
+        if (current !== expected) {
+            return false;
+        }
+        this._deleteLocal(key);
+        return true;
     }
     _setLocal(key, value, ttlMs) {
         this._store.set(key, value);
@@ -186,6 +237,27 @@ export class IPCSharedStore extends SharedStore {
                 this._subscribers.delete(channel);
             }
         }
+    }
+    async _setIfAbsent(key, value, ttlMs) {
+        if (cluster.isPrimary) {
+            return this._setIfAbsentLocal(key, value, ttlMs);
+        }
+        return this._sendAndWait('setIfAbsent', { key: key, value: value, ttlMs: ttlMs });
+    }
+    async _compareAndSet(key, expected, next, ttlMs) {
+        if (cluster.isPrimary) {
+            return this._compareAndSetLocal(key, expected, next, ttlMs);
+        }
+        return this._sendAndWait('compareAndSet', { key: key, expected: expected, value: next, ttlMs: ttlMs });
+    }
+    async _deleteIfEqual(key, expected) {
+        if (cluster.isPrimary) {
+            return this._deleteIfEqualLocal(key, expected);
+        }
+        return this._sendAndWait('deleteIfEqual', { key: key, expected: expected });
+    }
+    createLease(name, options) {
+        return new IPCLease(this, name, options);
     }
     _fanOutPublish(channel, message) {
         for (const w of Object.values(cluster.workers ?? {})) {

@@ -264,6 +264,109 @@ export class RedisClient {
     }
 
     /**
+     * Atomic "set if key is absent (or expired)". Backed by Redis `SET NX PX`.
+     * Returns true when the key was created.
+     * @param {string} key
+     * @param {T} value
+     * @param {string} namespace
+     * @param {number} ttlMs
+     * @return {boolean}
+     * @template T = any
+     */
+    public async setIfAbsent<T = any>(
+        key: string,
+        value: T,
+        namespace?: string,
+        ttlMs?: number
+    ): Promise<boolean> {
+        const rkey = this._buildKey(key, namespace);
+        const opts: { NX: true; PX?: number; } = { NX: true };
+
+        if (ttlMs && ttlMs > 0) {
+            opts.PX = ttlMs;
+        }
+
+        const result = await this._client.set(rkey, JSON.stringify(value), opts);
+        return result === 'OK';
+    }
+
+    /**
+     * Atomic compare-and-set. Updates the value (and refreshes TTL) only if
+     * the current value equals `expected`. Returns true on update.
+     *
+     * Implemented via a tiny server-side Lua script — single roundtrip, atomic
+     * by Redis itself.
+     *
+     * @param {string} key
+     * @param {T} expected
+     * @param {T} next
+     * @param {string} namespace
+     * @param {number} ttlMs
+     * @return {boolean}
+     * @template T = any
+     */
+    public async compareAndSet<T = any>(
+        key: string,
+        expected: T,
+        next: T,
+        namespace?: string,
+        ttlMs?: number
+    ): Promise<boolean> {
+        const rkey = this._buildKey(key, namespace);
+
+        // Lua: if GET == expected then SET (with PX if given) and return 1, else 0.
+        const script =
+            'if redis.call("get", KEYS[1]) == ARGV[1] then ' +
+                'if tonumber(ARGV[3]) > 0 then ' +
+                    'redis.call("set", KEYS[1], ARGV[2], "PX", tonumber(ARGV[3])) ' +
+                'else ' +
+                    'redis.call("set", KEYS[1], ARGV[2]) ' +
+                'end; return 1 ' +
+            'else return 0 end';
+
+        const result = await this._client.eval(script, {
+            keys: [rkey],
+            arguments: [
+                JSON.stringify(expected),
+                JSON.stringify(next),
+                String(ttlMs ?? 0)
+            ]
+        });
+
+        return result === 1;
+    }
+
+    /**
+     * Atomic compare-and-delete. Deletes the key only if its current value
+     * equals `expected`. Returns true on delete.
+     *
+     * @param {string} key
+     * @param {T} expected
+     * @param {string} namespace
+     * @return {boolean}
+     * @template T = any
+     */
+    public async deleteIfEqual<T = any>(
+        key: string,
+        expected: T,
+        namespace?: string
+    ): Promise<boolean> {
+        const rkey = this._buildKey(key, namespace);
+
+        const script =
+            'if redis.call("get", KEYS[1]) == ARGV[1] then ' +
+                'return redis.call("del", KEYS[1]) ' +
+            'else return 0 end';
+
+        const result = await this._client.eval(script, {
+            keys: [rkey],
+            arguments: [JSON.stringify(expected)]
+        });
+
+        return result === 1;
+    }
+
+    /**
      * Scan keys matching a glob pattern and return them.
      * @param {string} pattern
      * @return {string[]}

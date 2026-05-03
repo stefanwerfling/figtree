@@ -127,6 +127,45 @@ export class RedisClient {
             await this._client.set(rkey, JSON.stringify(value));
         }
     }
+    async setIfAbsent(key, value, namespace, ttlMs) {
+        const rkey = this._buildKey(key, namespace);
+        const opts = { NX: true };
+        if (ttlMs && ttlMs > 0) {
+            opts.PX = ttlMs;
+        }
+        const result = await this._client.set(rkey, JSON.stringify(value), opts);
+        return result === 'OK';
+    }
+    async compareAndSet(key, expected, next, namespace, ttlMs) {
+        const rkey = this._buildKey(key, namespace);
+        const script = 'if redis.call("get", KEYS[1]) == ARGV[1] then ' +
+            'if tonumber(ARGV[3]) > 0 then ' +
+            'redis.call("set", KEYS[1], ARGV[2], "PX", tonumber(ARGV[3])) ' +
+            'else ' +
+            'redis.call("set", KEYS[1], ARGV[2]) ' +
+            'end; return 1 ' +
+            'else return 0 end';
+        const result = await this._client.eval(script, {
+            keys: [rkey],
+            arguments: [
+                JSON.stringify(expected),
+                JSON.stringify(next),
+                String(ttlMs ?? 0)
+            ]
+        });
+        return result === 1;
+    }
+    async deleteIfEqual(key, expected, namespace) {
+        const rkey = this._buildKey(key, namespace);
+        const script = 'if redis.call("get", KEYS[1]) == ARGV[1] then ' +
+            'return redis.call("del", KEYS[1]) ' +
+            'else return 0 end';
+        const result = await this._client.eval(script, {
+            keys: [rkey],
+            arguments: [JSON.stringify(expected)]
+        });
+        return result === 1;
+    }
     async scanKeys(pattern) {
         if (!this.isConnected()) {
             return [];

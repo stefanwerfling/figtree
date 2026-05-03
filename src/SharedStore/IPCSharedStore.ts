@@ -1,5 +1,7 @@
 import cluster, {Worker} from 'cluster';
+import {ClusterLease, ClusterLeaseOptions} from '../Cluster/ClusterLease.js';
 import {Logger} from '../Logger/Logger.js';
+import {IPCLease} from './IPCLease.js';
 import {SharedStore, SharedStoreSubscriber} from './SharedStore.js';
 
 /**
@@ -9,6 +11,7 @@ type IPCMessage = {
     type: string;
     key?: string;
     value?: any;
+    expected?: any;
     requestId?: string;
     channel?: string;
     ttlMs?: number;
@@ -109,6 +112,30 @@ export class IPCSharedStore extends SharedStore {
                 });
                 break;
 
+            case 'setIfAbsent':
+                worker.send({
+                    type: 'setIfAbsentResponse',
+                    requestId: msg.requestId,
+                    value: this._setIfAbsentLocal(msg.key as string, msg.value, msg.ttlMs)
+                });
+                break;
+
+            case 'compareAndSet':
+                worker.send({
+                    type: 'compareAndSetResponse',
+                    requestId: msg.requestId,
+                    value: this._compareAndSetLocal(msg.key as string, msg.expected, msg.value, msg.ttlMs)
+                });
+                break;
+
+            case 'deleteIfEqual':
+                worker.send({
+                    type: 'deleteIfEqualResponse',
+                    requestId: msg.requestId,
+                    value: this._deleteIfEqualLocal(msg.key as string, msg.expected)
+                });
+                break;
+
             case 'publish':
                 this._fanOutPublish(msg.channel as string, msg.value);
                 break;
@@ -116,6 +143,70 @@ export class IPCSharedStore extends SharedStore {
             default:
                 break;
         }
+    }
+
+    /**
+     * Master-only: atomic "set if key is absent (or expired)".
+     * @param {string} key
+     * @param {any} value
+     * @param {number} ttlMs
+     * @return {boolean}
+     * @private
+     */
+    private _setIfAbsentLocal(key: string, value: any, ttlMs?: number): boolean {
+        if (this._store.has(key)) {
+            return false;
+        }
+
+        this._setLocal(key, value, ttlMs);
+        return true;
+    }
+
+    /**
+     * Master-only: atomic "set value to `next` only if current value equals
+     * `expected`". Refreshes TTL when ttlMs is provided.
+     * @param {string} key
+     * @param {any} expected
+     * @param {any} next
+     * @param {number} ttlMs
+     * @return {boolean}
+     * @private
+     */
+    private _compareAndSetLocal(key: string, expected: any, next: any, ttlMs?: number): boolean {
+        if (!this._store.has(key)) {
+            return false;
+        }
+
+        const current = this._store.get(key);
+
+        if (current !== expected) {
+            return false;
+        }
+
+        this._setLocal(key, next, ttlMs);
+        return true;
+    }
+
+    /**
+     * Master-only: atomic "delete only if current value equals `expected`".
+     * @param {string} key
+     * @param {any} expected
+     * @return {boolean}
+     * @private
+     */
+    private _deleteIfEqualLocal(key: string, expected: any): boolean {
+        if (!this._store.has(key)) {
+            return false;
+        }
+
+        const current = this._store.get(key);
+
+        if (current !== expected) {
+            return false;
+        }
+
+        this._deleteLocal(key);
+        return true;
     }
 
     /**
@@ -336,6 +427,64 @@ export class IPCSharedStore extends SharedStore {
                 this._subscribers.delete(channel);
             }
         }
+    }
+
+    /**
+     * Internal — used by IPCLease. Atomic "set if absent".
+     * @param {string} key
+     * @param {any} value
+     * @param {number} ttlMs
+     * @return {boolean}
+     */
+    public async _setIfAbsent(key: string, value: any, ttlMs?: number): Promise<boolean> {
+        if (cluster.isPrimary) {
+            return this._setIfAbsentLocal(key, value, ttlMs);
+        }
+
+        return this._sendAndWait<boolean>('setIfAbsent', { key: key, value: value, ttlMs: ttlMs });
+    }
+
+    /**
+     * Internal — used by IPCLease. Atomic "set if value matches expected".
+     * @param {string} key
+     * @param {any} expected
+     * @param {any} next
+     * @param {number} ttlMs
+     * @return {boolean}
+     */
+    public async _compareAndSet(key: string, expected: any, next: any, ttlMs?: number): Promise<boolean> {
+        if (cluster.isPrimary) {
+            return this._compareAndSetLocal(key, expected, next, ttlMs);
+        }
+
+        return this._sendAndWait<boolean>(
+            'compareAndSet',
+            { key: key, expected: expected, value: next, ttlMs: ttlMs }
+        );
+    }
+
+    /**
+     * Internal — used by IPCLease. Atomic "delete if value matches expected".
+     * @param {string} key
+     * @param {any} expected
+     * @return {boolean}
+     */
+    public async _deleteIfEqual(key: string, expected: any): Promise<boolean> {
+        if (cluster.isPrimary) {
+            return this._deleteIfEqualLocal(key, expected);
+        }
+
+        return this._sendAndWait<boolean>('deleteIfEqual', { key: key, expected: expected });
+    }
+
+    /**
+     * Build a distributed lease backed by this IPC store.
+     * @param {string} name
+     * @param {ClusterLeaseOptions} options
+     * @return {ClusterLease}
+     */
+    public createLease(name: string, options?: ClusterLeaseOptions): ClusterLease {
+        return new IPCLease(this, name, options);
     }
 
     /**

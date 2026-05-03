@@ -497,7 +497,24 @@ protected override async _initServices(): Promise<void> {
 
 `ServiceManager` already implements `ClusterPublishable` — `BackendApp` registers it automatically when a `ClusterRegistry` singleton exists. The HTTP endpoint `GET /v1/service/status/cluster` (provided by `ServiceRoute`) aggregates `ServiceInfoEntry` lists across all workers and all hosts.
 
-For the full picture (architecture diagram, custom publishables, Pub/Sub) see [`doc/cluster.md`](doc/cluster.md).
+### Leader election
+
+For tasks that must run exactly once cluster-wide (cron master, migration runner, scheduled cleanup) regardless of how many hosts are running, use `ClusterLeader`:
+
+```typescript
+import { ClusterLeader } from 'figtree';
+
+const leader = new ClusterLeader(store, { name: 'cron-master' });
+
+leader.onLeaderElected(() => startCronJobs());
+leader.onLeaderLost(() => stopCronJobs());
+
+await leader.start();
+```
+
+Backed by an atomic distributed lease (Redis `SET NX PX` + tiny Lua scripts for compare-and-set, IPC for single-host). At-most-one leader cluster-wide; failover on the order of the lease TTL.
+
+For the full picture (architecture diagram, custom publishables, Pub/Sub, leases) see [`doc/cluster.md`](doc/cluster.md).
 
 ### Graceful shutdown
 

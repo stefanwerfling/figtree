@@ -29,6 +29,13 @@ All notable changes to this project are documented in this file.
 - `ServiceRoute`: new `GET /v1/service/status/cluster` endpoint aggregating `ServiceInfoEntry` lists across all workers and hosts via `ClusterRegistry`. Falls back to a local-only view when no `ClusterRegistry` is configured. New optional `accessRights.clusterStatus` ACL right on `ServiceRouteACLRights` (defaults to `accessRights.status`).
 - `SchemaServiceClusterStatusResponse` / `ServiceClusterStatusResponse` exported from `ServiceRoute.ts`.
 - 3 additional `ServiceManager` tests for `ClusterPublishable` conformance.
+- `ClusterLease` (`src/Cluster/ClusterLease.ts`): Abstract distributed-lease primitive with `acquire / renew / release / isHolder / getName`. Backed by atomic operations in the underlying `SharedStore`.
+- `IPCLease` / `RedisLease`: Concrete implementations. IPC uses master-process atomic map operations; Redis uses `SET NX PX` for acquire and two tiny server-side Lua scripts (compare-and-set + compare-and-delete) for renew and release. Each lease holder has a randomly generated nonce so a stale renewal cannot overwrite another holder.
+- `SharedStore`: New abstract `createLease(name, options?)` method.
+- `RedisClient`: New public `setIfAbsent / compareAndSet / deleteIfEqual` methods (CAS primitives used by `RedisLease` — Lua scripts are an internal implementation detail, hidden from user code).
+- `ClusterLeader` (`src/Cluster/ClusterLeader.ts`): Lifecycle abstraction on top of `ClusterLease`. `start()` / `stop()`, `isLeader()`, `onLeaderElected(cb)`, `onLeaderLost(cb)`. Internal renew/retry loop with configurable `ttlMs` (default 15s) / `renewMs` (default `ttlMs/3`) / `retryMs` (default 5s). At-most-one leader cluster-wide; failover within `ttlMs`.
+- `tests/unit/Cluster/IPCLease.test.ts`: 10 tests for the IPC lease (acquire, contention, expiry, renew, release, getName).
+- `tests/unit/Cluster/ClusterLeader.test.ts`: 6 tests for the leader lifecycle (election, contention, loss, takeover, idempotent start, callback error isolation).
 - `tests/unit/Application/BackendCluster.test.ts`, `tests/unit/Service/ServiceManager.test.ts`, `tests/unit/SharedStore/IPCSharedStore.test.ts`: Unit tests for worker identity, role helpers, the role filter, and IPC Pub/Sub behavior (21 new tests).
 - `doc/cluster.md`: Comprehensive cluster guide covering startup, crash respawn (backoff + circuit breaker), graceful shutdown, worker roles, Pub/Sub, layered cluster architecture, shared state, and roadmap.
 - `CLAUDE.md`: ESLint commands and lint conventions documented.

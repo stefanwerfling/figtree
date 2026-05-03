@@ -1,3 +1,4 @@
+import { ClusterLease, ClusterLeaseOptions } from '../Cluster/ClusterLease.js';
 export type SharedStoreSubscriber<T = any> = (message: T) => void | Promise<void>;
 export declare abstract class SharedStore {
     abstract init(): Promise<void>;
@@ -10,4 +11,5 @@ export declare abstract class SharedStore {
     abstract publish<T = any>(channel: string, message: T): Promise<void>;
     abstract subscribe<T = any>(channel: string, callback: SharedStoreSubscriber<T>): Promise<void>;
     abstract unsubscribe<T = any>(channel: string, callback?: SharedStoreSubscriber<T>): Promise<void>;
+    abstract createLease(name: string, options?: ClusterLeaseOptions): ClusterLease;
 }

@@ -1,3 +1,4 @@
+import { ClusterLease, ClusterLeaseOptions } from '../Cluster/ClusterLease.js';
 import { SharedStore, SharedStoreSubscriber } from './SharedStore.js';
 export declare class IPCSharedStore extends SharedStore {
     private _store;
@@ -5,6 +6,9 @@ export declare class IPCSharedStore extends SharedStore {
     private _subscribers;
     init(): Promise<void>;
     private _handlePrimaryMessage;
+    private _setIfAbsentLocal;
+    private _compareAndSetLocal;
+    private _deleteIfEqualLocal;
     private _setLocal;
     private _deleteLocal;
     private _clearLocal;
@@ -19,6 +23,10 @@ export declare class IPCSharedStore extends SharedStore {
     publish<T = any>(channel: string, message: T): Promise<void>;
     subscribe<T = any>(channel: string, callback: SharedStoreSubscriber<T>): Promise<void>;
     unsubscribe<T = any>(channel: string, callback?: SharedStoreSubscriber<T>): Promise<void>;
+    _setIfAbsent(key: string, value: any, ttlMs?: number): Promise<boolean>;
+    _compareAndSet(key: string, expected: any, next: any, ttlMs?: number): Promise<boolean>;
+    _deleteIfEqual(key: string, expected: any): Promise<boolean>;
+    createLease(name: string, options?: ClusterLeaseOptions): ClusterLease;
     private _fanOutPublish;
     private _dispatchLocalSubscribers;
 }

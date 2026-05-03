@@ -65,6 +65,8 @@ export {RedisSharedStore} from './SharedStore/RedisSharedStore.js';
 // Cluster -------------------------------------------------------------------------------------------------------------
 export {ClusterPublishable} from './Cluster/ClusterPublishable.js';
 export {ClusterRegistry, ClusterRegistryOptions} from './Cluster/ClusterRegistry.js';
+export {ClusterLease, ClusterLeaseOptions} from './Cluster/ClusterLease.js';
+export {ClusterLeader, ClusterLeaderOptions, ClusterLeaderCallback} from './Cluster/ClusterLeader.js';
 
 // Raw Server ----------------------------------------------------------------------------------------------------------
 export {Message as RawMessage} from './Server/RawServer/Base/Message.js';

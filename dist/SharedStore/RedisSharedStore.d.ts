@@ -1,3 +1,4 @@
+import { ClusterLease, ClusterLeaseOptions } from '../Cluster/ClusterLease.js';
 import { RedisClient } from '../Db/RedisDb/RedisClient.js';
 import { SharedStore, SharedStoreSubscriber } from './SharedStore.js';
 export declare class RedisSharedStore extends SharedStore {
@@ -16,6 +17,7 @@ export declare class RedisSharedStore extends SharedStore {
     publish<T = any>(channel: string, message: T): Promise<void>;
     subscribe<T = any>(channel: string, callback: SharedStoreSubscriber<T>): Promise<void>;
     unsubscribe<T = any>(channel: string, callback?: SharedStoreSubscriber<T>): Promise<void>;
+    createLease(name: string, options?: ClusterLeaseOptions): ClusterLease;
     private _getSubscriberClient;
     private _namespacedChannel;
     private _dispatchLocalSubscribers;
