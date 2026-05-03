@@ -118,9 +118,24 @@ export class RedisClient {
             return null;
         }
     }
-    async set(key, value, namespace) {
+    async set(key, value, namespace, ttlMs) {
         const rkey = this._buildKey(key, namespace);
-        await this._client.set(rkey, JSON.stringify(value));
+        if (ttlMs && ttlMs > 0) {
+            await this._client.set(rkey, JSON.stringify(value), { PX: ttlMs });
+        }
+        else {
+            await this._client.set(rkey, JSON.stringify(value));
+        }
+    }
+    async scanKeys(pattern) {
+        if (!this.isConnected()) {
+            return [];
+        }
+        const keys = [];
+        for await (const key of this._client.scanIterator({ MATCH: pattern })) {
+            keys.push(key);
+        }
+        return keys;
     }
     async delete(key, namespace) {
         const rkey = this._buildKey(key, namespace);

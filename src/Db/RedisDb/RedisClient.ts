@@ -246,15 +246,40 @@ export class RedisClient {
     }
 
     /**
-     * Set the value by key
+     * Set the value by key.
      * @param {string} key
      * @param {T} value
      * @param {string} namespace
+     * @param {number} ttlMs Optional TTL in milliseconds — uses Redis `PX` option.
      * @template T = any
      */
-    public async set<T = any>(key: string, value: T, namespace?: string): Promise<void> {
+    public async set<T = any>(key: string, value: T, namespace?: string, ttlMs?: number): Promise<void> {
         const rkey = this._buildKey(key, namespace);
-        await this._client.set(rkey, JSON.stringify(value));
+
+        if (ttlMs && ttlMs > 0) {
+            await this._client.set(rkey, JSON.stringify(value), { PX: ttlMs });
+        } else {
+            await this._client.set(rkey, JSON.stringify(value));
+        }
+    }
+
+    /**
+     * Scan keys matching a glob pattern and return them.
+     * @param {string} pattern
+     * @return {string[]}
+     */
+    public async scanKeys(pattern: string): Promise<string[]> {
+        if (!this.isConnected()) {
+            return [];
+        }
+
+        const keys: string[] = [];
+
+        for await (const key of this._client.scanIterator({ MATCH: pattern })) {
+            keys.push(key);
+        }
+
+        return keys;
     }
 
     /**

@@ -58,9 +58,13 @@ export {ChromaDbCollectionLoader} from './Db/ChromaDb/ChromaDbCollectionLoader.j
 export {ChromaDbClientOptions, ChromaDbClient} from './Db/ChromaDb/ChromaDbClient.js';
 
 // SharedStore ---------------------------------------------------------------------------------------------------------
-export {SharedStore} from './SharedStore/SharedStore.js';
+export {SharedStore, SharedStoreSubscriber} from './SharedStore/SharedStore.js';
 export {IPCSharedStore} from './SharedStore/IPCSharedStore.js';
 export {RedisSharedStore} from './SharedStore/RedisSharedStore.js';
+
+// Cluster -------------------------------------------------------------------------------------------------------------
+export {ClusterPublishable} from './Cluster/ClusterPublishable.js';
+export {ClusterRegistry, ClusterRegistryOptions} from './Cluster/ClusterRegistry.js';
 
 // Raw Server ----------------------------------------------------------------------------------------------------------
 export {Message as RawMessage} from './Server/RawServer/Base/Message.js';

@@ -18,7 +18,12 @@ All notable changes to this project are documented in this file.
 - `SharedStore`: Pub/Sub support — new abstract `publish(channel, message)`, `subscribe(channel, callback)`, `unsubscribe(channel, callback?)` methods plus exported `SharedStoreSubscriber<T>` type.
 - `IPCSharedStore`: Pub/Sub via master broker — workers send publishes to the master, which fans out to all live workers and to its own local subscribers. Multiple subscribers per channel; subscriber errors are isolated (logged, do not affect siblings).
 - `RedisSharedStore`: Pub/Sub via native Redis Pub/Sub — uses a lazy-created subscriber connection (Redis requires a separate connection because a subscribed connection cannot issue regular commands). Channel names are namespaced like KV keys.
-- `RedisClient`: New public `subscribe(channel, callback)`, `unsubscribe(channel)`, and `duplicate()` methods. Constructor now stores its options for `duplicate()`.
+- `RedisClient`: New public `subscribe(channel, callback)`, `unsubscribe(channel)`, and `duplicate()` methods. Constructor now stores its options for `duplicate()`. New `scanKeys(pattern)` and optional `ttlMs` parameter on `set()`.
+- `SharedStore`: Optional `ttlMs` parameter on `set(key, value, ttlMs?)` — Redis uses native `PX`, IPC simulates via `setTimeout` in master.
+- `SharedStore`: New `keys(prefix?)` method — returns all keys (optionally filtered by prefix). Redis uses `SCAN`, IPC iterates the master map and filters.
+- `ClusterPublishable` interface (`src/Cluster/ClusterPublishable.ts`): Two-method interface (`getNamespace()`, `serialize()`) any class can implement to publish its state cluster-wide.
+- `ClusterRegistry` class (`src/Cluster/ClusterRegistry.ts`): Heartbeat-based registry built on `SharedStore`. Each tick serializes every registered publishable and writes it to `cluster:<namespace>:<workerId>` with TTL. `queryAll<T>(namespace)` returns `Record<workerId, T>` cluster-wide. Supports singleton (`initialize`/`getInstance`) or direct instantiation.
+- `tests/unit/Cluster/ClusterRegistry.test.ts`: 11 tests covering registration, querying, heartbeat, async serialize, error isolation, and singleton helpers.
 - `tests/unit/Application/BackendCluster.test.ts`, `tests/unit/Service/ServiceManager.test.ts`, `tests/unit/SharedStore/IPCSharedStore.test.ts`: Unit tests for worker identity, role helpers, the role filter, and IPC Pub/Sub behavior (21 new tests).
 - `doc/cluster.md`: Comprehensive cluster guide covering startup, crash respawn (backoff + circuit breaker), graceful shutdown, worker roles, Pub/Sub, layered cluster architecture, shared state, and roadmap.
 - `CLAUDE.md`: ESLint commands and lint conventions documented.

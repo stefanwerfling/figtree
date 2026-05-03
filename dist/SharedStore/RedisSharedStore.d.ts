@@ -8,7 +8,8 @@ export declare class RedisSharedStore extends SharedStore {
     constructor(client?: RedisClient, namespace?: string);
     init(): Promise<void>;
     get<T = any>(key: string): Promise<T | undefined>;
-    set<T = any>(key: string, value: T): Promise<void>;
+    set<T = any>(key: string, value: T, ttlMs?: number): Promise<void>;
+    keys(prefix?: string): Promise<string[]>;
     has(key: string): Promise<boolean>;
     delete(key: string): Promise<void>;
     clear(): Promise<void>;

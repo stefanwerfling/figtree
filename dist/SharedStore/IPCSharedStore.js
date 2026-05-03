@@ -3,6 +3,7 @@ import { Logger } from '../Logger/Logger.js';
 import { SharedStore } from './SharedStore.js';
 export class IPCSharedStore extends SharedStore {
     _store = new Map();
+    _ttlTimers = new Map();
     _subscribers = new Map();
     async init() {
         if (cluster.isPrimary) {
@@ -27,13 +28,13 @@ export class IPCSharedStore extends SharedStore {
     _handlePrimaryMessage(worker, msg) {
         switch (msg.type) {
             case 'set':
-                this._store.set(msg.key, msg.value);
+                this._setLocal(msg.key, msg.value, msg.ttlMs);
                 break;
             case 'delete':
-                this._store.delete(msg.key);
+                this._deleteLocal(msg.key);
                 break;
             case 'clear':
-                this._store.clear();
+                this._clearLocal();
                 break;
             case 'get':
                 worker.send({
@@ -51,6 +52,13 @@ export class IPCSharedStore extends SharedStore {
                     value: this._store.has(msg.key)
                 });
                 break;
+            case 'keys':
+                worker.send({
+                    type: 'keysResponse',
+                    requestId: msg.requestId,
+                    value: this._keysLocal(msg.prefix)
+                });
+                break;
             case 'publish':
                 this._fanOutPublish(msg.channel, msg.value);
                 break;
@@ -58,7 +66,44 @@ export class IPCSharedStore extends SharedStore {
                 break;
         }
     }
-    _sendAndWait(type, key, value) {
+    _setLocal(key, value, ttlMs) {
+        this._store.set(key, value);
+        const previousTimer = this._ttlTimers.get(key);
+        if (previousTimer) {
+            clearTimeout(previousTimer);
+            this._ttlTimers.delete(key);
+        }
+        if (ttlMs && ttlMs > 0) {
+            const timer = setTimeout(() => {
+                this._store.delete(key);
+                this._ttlTimers.delete(key);
+            }, ttlMs);
+            this._ttlTimers.set(key, timer);
+        }
+    }
+    _deleteLocal(key) {
+        this._store.delete(key);
+        const timer = this._ttlTimers.get(key);
+        if (timer) {
+            clearTimeout(timer);
+            this._ttlTimers.delete(key);
+        }
+    }
+    _clearLocal() {
+        for (const timer of this._ttlTimers.values()) {
+            clearTimeout(timer);
+        }
+        this._ttlTimers.clear();
+        this._store.clear();
+    }
+    _keysLocal(prefix) {
+        const all = Array.from(this._store.keys());
+        if (!prefix) {
+            return all;
+        }
+        return all.filter((k) => k.startsWith(prefix));
+    }
+    _sendAndWait(type, payload = {}) {
         return new Promise((resolve) => {
             const requestId = Math.random().toString(36).substring(2);
             const handler = (msg) => {
@@ -68,26 +113,26 @@ export class IPCSharedStore extends SharedStore {
                 }
             };
             process.on('message', handler);
-            process.send?.({ type: type, key: key, value: value, requestId: requestId });
+            process.send?.({ ...payload, type: type, requestId: requestId });
         });
     }
     async get(key) {
         if (cluster.isPrimary) {
             return this._store.get(key);
         }
-        return this._sendAndWait('get', key);
+        return this._sendAndWait('get', { key: key });
     }
-    async set(key, value) {
+    async set(key, value, ttlMs) {
         if (cluster.isPrimary) {
-            this._store.set(key, value);
+            this._setLocal(key, value, ttlMs);
         }
         else {
-            process.send?.({ type: 'set', key: key, value: value });
+            process.send?.({ type: 'set', key: key, value: value, ttlMs: ttlMs });
         }
     }
     async delete(key) {
         if (cluster.isPrimary) {
-            this._store.delete(key);
+            this._deleteLocal(key);
         }
         else {
             process.send?.({ type: 'delete', key: key });
@@ -97,15 +142,21 @@ export class IPCSharedStore extends SharedStore {
         if (cluster.isPrimary) {
             return this._store.has(key);
         }
-        return this._sendAndWait('has', key);
+        return this._sendAndWait('has', { key: key });
     }
     async clear() {
         if (cluster.isPrimary) {
-            this._store.clear();
+            this._clearLocal();
         }
         else {
             process.send?.({ type: 'clear' });
         }
+    }
+    async keys(prefix) {
+        if (cluster.isPrimary) {
+            return this._keysLocal(prefix);
+        }
+        return this._sendAndWait('keys', { prefix: prefix });
     }
     async publish(channel, message) {
         if (cluster.isPrimary) {

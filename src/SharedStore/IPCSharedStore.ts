@@ -11,6 +11,8 @@ type IPCMessage = {
     value?: any;
     requestId?: string;
     channel?: string;
+    ttlMs?: number;
+    prefix?: string;
 };
 
 /**
@@ -19,10 +21,16 @@ type IPCMessage = {
 export class IPCSharedStore extends SharedStore {
 
     /**
-     * Store
+     * Store (master only).
      * @private
      */
     private _store = new Map<string, any>();
+
+    /**
+     * TTL timers per key (master only) — used to expire keys with ttlMs > 0.
+     * @private
+     */
+    private _ttlTimers = new Map<string, NodeJS.Timeout>();
 
     /**
      * Local pub/sub subscribers — channel name → set of callbacks for THIS process.
@@ -64,15 +72,15 @@ export class IPCSharedStore extends SharedStore {
     private _handlePrimaryMessage(worker: Worker, msg: IPCMessage): void {
         switch (msg.type) {
             case 'set':
-                this._store.set(msg.key as string, msg.value);
+                this._setLocal(msg.key as string, msg.value, msg.ttlMs);
                 break;
 
             case 'delete':
-                this._store.delete(msg.key as string);
+                this._deleteLocal(msg.key as string);
                 break;
 
             case 'clear':
-                this._store.clear();
+                this._clearLocal();
                 break;
 
             case 'get':
@@ -93,6 +101,14 @@ export class IPCSharedStore extends SharedStore {
                 });
                 break;
 
+            case 'keys':
+                worker.send({
+                    type: 'keysResponse',
+                    requestId: msg.requestId,
+                    value: this._keysLocal(msg.prefix)
+                });
+                break;
+
             case 'publish':
                 this._fanOutPublish(msg.channel as string, msg.value);
                 break;
@@ -102,7 +118,78 @@ export class IPCSharedStore extends SharedStore {
         }
     }
 
-    private _sendAndWait<T>(type: string, key?: string, value?: any): Promise<T> {
+    /**
+     * Master-only: write to the local map and schedule TTL expiry if requested.
+     * @param {string} key
+     * @param {any} value
+     * @param {number} ttlMs
+     * @private
+     */
+    private _setLocal(key: string, value: any, ttlMs?: number): void {
+        this._store.set(key, value);
+
+        const previousTimer = this._ttlTimers.get(key);
+
+        if (previousTimer) {
+            clearTimeout(previousTimer);
+            this._ttlTimers.delete(key);
+        }
+
+        if (ttlMs && ttlMs > 0) {
+            const timer = setTimeout(() => {
+                this._store.delete(key);
+                this._ttlTimers.delete(key);
+            }, ttlMs);
+            this._ttlTimers.set(key, timer);
+        }
+    }
+
+    /**
+     * Master-only: delete a key and cancel its TTL timer if any.
+     * @param {string} key
+     * @private
+     */
+    private _deleteLocal(key: string): void {
+        this._store.delete(key);
+
+        const timer = this._ttlTimers.get(key);
+
+        if (timer) {
+            clearTimeout(timer);
+            this._ttlTimers.delete(key);
+        }
+    }
+
+    /**
+     * Master-only: clear all keys and cancel all TTL timers.
+     * @private
+     */
+    private _clearLocal(): void {
+        for (const timer of this._ttlTimers.values()) {
+            clearTimeout(timer);
+        }
+
+        this._ttlTimers.clear();
+        this._store.clear();
+    }
+
+    /**
+     * Master-only: return all keys (optionally filtered by prefix).
+     * @param {string} prefix
+     * @return {string[]}
+     * @private
+     */
+    private _keysLocal(prefix?: string): string[] {
+        const all = Array.from(this._store.keys());
+
+        if (!prefix) {
+            return all;
+        }
+
+        return all.filter((k) => k.startsWith(prefix));
+    }
+
+    private _sendAndWait<T>(type: string, payload: Partial<IPCMessage> = {}): Promise<T> {
         return new Promise((resolve) => {
             const requestId = Math.random().toString(36).substring(2);
 
@@ -114,7 +201,7 @@ export class IPCSharedStore extends SharedStore {
             };
 
             process.on('message', handler);
-            process.send?.({ type: type, key: key, value: value, requestId: requestId });
+            process.send?.({ ...payload, type: type, requestId: requestId });
         });
     }
 
@@ -129,20 +216,21 @@ export class IPCSharedStore extends SharedStore {
             return this._store.get(key);
         }
 
-        return this._sendAndWait<T>('get', key);
+        return this._sendAndWait<T>('get', { key: key });
     }
 
     /**
-     * Set a value by key
+     * Set a value by key.
      * @param {string} key
      * @param {T} value
+     * @param {number} ttlMs Optional time-to-live in milliseconds (master schedules a setTimeout).
      * @template T
      */
-    public async set<T = any>(key: string, value: T): Promise<void> {
+    public async set<T = any>(key: string, value: T, ttlMs?: number): Promise<void> {
         if (cluster.isPrimary) {
-            this._store.set(key, value);
+            this._setLocal(key, value, ttlMs);
         } else {
-            process.send?.({ type: 'set', key: key, value: value });
+            process.send?.({ type: 'set', key: key, value: value, ttlMs: ttlMs });
         }
     }
 
@@ -152,9 +240,8 @@ export class IPCSharedStore extends SharedStore {
      */
     public async delete(key: string): Promise<void> {
         if (cluster.isPrimary) {
-            this._store.delete(key);
-        }
-        else {
+            this._deleteLocal(key);
+        } else {
             process.send?.({ type: 'delete', key: key });
         }
     }
@@ -169,7 +256,7 @@ export class IPCSharedStore extends SharedStore {
             return this._store.has(key);
         }
 
-        return this._sendAndWait<boolean>('has', key);
+        return this._sendAndWait<boolean>('has', { key: key });
     }
 
     /**
@@ -177,11 +264,23 @@ export class IPCSharedStore extends SharedStore {
      */
     public async clear(): Promise<void> {
         if (cluster.isPrimary) {
-            this._store.clear();
-        }
-        else {
+            this._clearLocal();
+        } else {
             process.send?.({ type: 'clear' });
         }
+    }
+
+    /**
+     * Return all keys, optionally filtered by prefix.
+     * @param {string} prefix
+     * @return {string[]}
+     */
+    public async keys(prefix?: string): Promise<string[]> {
+        if (cluster.isPrimary) {
+            return this._keysLocal(prefix);
+        }
+
+        return this._sendAndWait<string[]>('keys', { prefix: prefix });
     }
 
     /**

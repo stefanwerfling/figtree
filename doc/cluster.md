@@ -227,17 +227,17 @@ For features that span workers — cluster-wide service visibility, cross-host s
 ┌─────────────────────────────────────────────────────────┐
 │ Layer 5: ServiceRoute cluster view (planned)            │
 ├─────────────────────────────────────────────────────────┤
-│ Layer 4: Worker registry — heartbeat + service info     │
-│          (planned)                                      │
+│ Layer 4: Worker registry — ServiceManager publishes     │
+│          itself (planned)                               │
 ├─────────────────────────────────────────────────────────┤
 │ Layer 3.5: ClusterRegistry / ClusterPublishable         │
-│            (planned — pattern for any class to share    │
-│             its state across the cluster)               │
+│            (✓ available — pattern for any class to      │
+│             share its state across the cluster)         │
 ├─────────────────────────────────────────────────────────┤
 │ Layer 3: SharedStore Pub/Sub (✓ available)              │
 │          publish() / subscribe()                        │
 ├─────────────────────────────────────────────────────────┤
-│ Layer 2: SharedStore KV (✓ available)                   │
+│ Layer 2: SharedStore KV + TTL (✓ available)             │
 │          IPCSharedStore + RedisSharedStore              │
 ├─────────────────────────────────────────────────────────┤
 │ Layer 1: Worker identity + roles (✓ available)          │
@@ -247,21 +247,117 @@ For features that span workers — cluster-wide service visibility, cross-host s
 
 The layered model means: with `RedisSharedStore` configured to a single shared Redis instance, every worker on every host sees the same state. A reverse proxy distributing requests across hosts changes nothing — whichever worker handles a request can read and write the cluster-wide state.
 
-The `ClusterRegistry` (Layer 3.5) is the planned generic abstraction for "this class wants to publish its state cluster-wide". Any class implementing the `ClusterPublishable` interface (a `getNamespace()` and `serialize()` pair) is automatically picked up by the registry's heartbeat and becomes queryable cluster-wide:
+The `ClusterRegistry` (Layer 3.5) is the generic abstraction for "this class wants to publish its state cluster-wide". Any class implementing the `ClusterPublishable` interface (a `getNamespace()` and `serialize()` pair) is automatically picked up by the registry's heartbeat and becomes queryable cluster-wide. See the [Cluster registry](#cluster-registry) section below.
+
+## Cluster registry
+
+`ClusterRegistry` is the generic abstraction for sharing class state cluster-wide. It builds on top of the `SharedStore` KV (TTL) and removes the boilerplate of designing key schemes, heartbeating, and cleanup yourself.
+
+### When to use it
+
+- A class has state you want to inspect across all workers and hosts (queue depths, cache sizes, in-flight job counters, custom service info).
+- A frontend or admin endpoint needs an aggregated view (`{host1:1234: ..., host2:5678: ...}`).
+- You don't want to write Redis keys / heartbeats / TTL handling yourself.
+
+### How it works
+
+1. Your class implements `ClusterPublishable` — two methods: `getNamespace()` (a stable string) and `serialize()` (sync or async, JSON-serializable result).
+2. You register it with `ClusterRegistry`.
+3. The registry runs a heartbeat (default every 10s); on each tick it calls `serialize()` on every registered item and writes the result to the underlying `SharedStore` under the key `cluster:<namespace>:<workerId>` with a TTL (default 30s, i.e. 3× heartbeat).
+4. When a worker dies, its entries naturally expire from the store.
+5. Any worker can query `queryAll(namespace)` and get a `Record<workerId, T>` of every live entry across the cluster.
+
+### Setup
 
 ```typescript
-// planned API
-class JobQueue implements ClusterPublishable {
-    public getNamespace(): string { return 'job-queue'; }
-    public serialize(): unknown { return { depth: this._queue.length }; }
-}
+import {
+    ClusterRegistry,
+    IPCSharedStore,        // or RedisSharedStore for multi-host
+} from 'figtree';
 
-ClusterRegistry.getInstance().register(new JobQueue());
-const all = await ClusterRegistry.getInstance().queryAll<QueueInfo>('job-queue');
-// → { 'host1:1234': {depth: 5}, 'host2:5678': {depth: 12}, ... }
+const store = new IPCSharedStore();
+await store.init();
+
+ClusterRegistry.initialize(store, {
+    heartbeatMs: 10_000,   // optional, default 10s
+    ttlMs: 30_000          // optional, default 30s (must be > heartbeatMs)
+});
+
+await ClusterRegistry.getInstance().start();
 ```
 
-This is the same pattern that `ServiceRoute` will use to provide a cluster-wide view, but exposed as public API so any user class can participate.
+For multi-host scaling, use `RedisSharedStore` instead of `IPCSharedStore`. Same registry API, same publishables, no other changes needed.
+
+### A custom publishable
+
+```typescript
+import {ClusterPublishable, ClusterRegistry} from 'figtree';
+
+class JobQueue implements ClusterPublishable {
+
+    private _queue: Job[] = [];
+    private _processed = 0;
+
+    public getNamespace(): string {
+        return 'job-queue';
+    }
+
+    public serialize(): unknown {
+        return {
+            depth: this._queue.length,
+            processed: this._processed
+        };
+    }
+}
+
+const queue = new JobQueue();
+ClusterRegistry.getInstance().register(queue);
+```
+
+### Querying
+
+```typescript
+type QueueInfo = { depth: number; processed: number; };
+
+// All workers across the cluster
+const all = await ClusterRegistry.getInstance().queryAll<QueueInfo>('job-queue');
+// → { 'host1:1234': {depth: 5, processed: 100},
+//     'host2:5678': {depth: 12, processed: 87} }
+
+// Just this worker's own snapshot
+const own = await ClusterRegistry.getInstance().queryOwn<QueueInfo>('job-queue');
+// → { depth: 5, processed: 100 }  or null
+```
+
+### Lifecycle
+
+- `start()` — begin heartbeating. Runs an immediate first tick so entries are visible without waiting one full interval.
+- `stop()` — clear the timer and remove this worker's entries from the store. Call from your service shutdown or `BackendApp` exit hook.
+- `unregister(item)` — stop publishing one item; immediately removes its entry from the store.
+
+### Async serialize
+
+`serialize()` may be async. The registry awaits it on every tick. Errors thrown (sync) or rejected (async) are logged but do not interrupt other items' ticks.
+
+```typescript
+class CacheStats implements ClusterPublishable {
+    public getNamespace(): string { return 'cache-stats'; }
+
+    public async serialize(): Promise<{ entries: number; bytes: number; }> {
+        return {
+            entries: await this._cache.count(),
+            bytes: await this._cache.size()
+        };
+    }
+}
+```
+
+### Caveats
+
+- **Heartbeat cost.** Each tick serializes every registered item and does one `set` per item. Keep `serialize()` cheap; if it's expensive, increase `heartbeatMs`.
+- **Eventually consistent.** Reads via `queryAll` reflect state up to the last heartbeat. A sub-second view is not the goal; for that, layer Pub/Sub on top.
+- **TTL is honored only by Redis.** `IPCSharedStore` simulates TTL with `setTimeout`; that's enough for keeping the in-memory map clean. Cross-process freshness is implicit because IPC dies with the cluster.
+- **Two `ClusterPublishable` instances must not share a namespace** within the same worker — the second would overwrite the first on every tick.
 
 ## Sharing state between workers
 
@@ -349,9 +445,8 @@ A subscriber callback that throws (sync) or rejects (async) does not affect sibl
 
 ## Roadmap
 
-Layers 1-3 (worker identity, roles, KV `SharedStore`, Pub/Sub) are available. The following layers are planned and will be built incrementally:
+Layers 1-3.5 (worker identity, roles, KV+TTL `SharedStore`, Pub/Sub, `ClusterRegistry`) are available. The following layers are planned and will be built incrementally:
 
-- **Layer 3.5: `ClusterRegistry` + `ClusterPublishable`** — generic pattern for any class to publish its state cluster-wide. Heartbeat-based with TTL so dead workers expire automatically.
 - **Layer 4: Worker registry** — `ServiceManager` (and other internal classes) implements `ClusterPublishable` so its state becomes queryable across the cluster.
 - **Layer 5: `ServiceRoute` cluster view** — `?cluster=1` query param aggregates services across all workers and hosts.
 - **Leader election** — Redis-backed lease so exactly one node runs singletons (migrations, cron master) even across multiple hosts.

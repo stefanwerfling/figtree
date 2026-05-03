@@ -20,8 +20,17 @@ export class RedisSharedStore extends SharedStore {
         const value = await this._client.get(key, this._namespace);
         return value ?? undefined;
     }
-    async set(key, value) {
-        return this._client.set(key, value, this._namespace);
+    async set(key, value, ttlMs) {
+        return this._client.set(key, value, this._namespace, ttlMs);
+    }
+    async keys(prefix) {
+        const nsPrefix = this._namespace ? `${this._namespace}:` : '';
+        const pattern = `${nsPrefix}${prefix ?? ''}*`;
+        const fullKeys = await this._client.scanKeys(pattern);
+        if (!nsPrefix) {
+            return fullKeys;
+        }
+        return fullKeys.map((k) => k.startsWith(nsPrefix) ? k.substring(nsPrefix.length) : k);
     }
     async has(key) {
         return this._client.has(key, this._namespace);

@@ -23,12 +23,19 @@ export abstract class SharedStore {
     public abstract get<T = any>(key: string): Promise<T | undefined>;
 
     /**
-     * Set a value by key
+     * Set a value by key.
+     *
+     * The optional `ttlMs` parameter expires the key after the given milliseconds.
+     * - `RedisSharedStore` uses Redis' native `EX` option.
+     * - `IPCSharedStore` schedules a `setTimeout` in the master process; the key
+     *   is removed when the timeout fires (or earlier on explicit delete/clear).
+     *
      * @param {string} key
      * @param {T} value
+     * @param {number} ttlMs Optional time-to-live in milliseconds.
      * @template T
      */
-    public abstract set<T = any>(key: string, value: T): Promise<void>;
+    public abstract set<T = any>(key: string, value: T, ttlMs?: number): Promise<void>;
 
     /**
      * delete value by key
@@ -47,6 +54,14 @@ export abstract class SharedStore {
      * Clear the shared store
      */
     public abstract clear(): Promise<void>;
+
+    /**
+     * Return all keys that start with the given prefix. If no prefix is given,
+     * returns all keys. The returned order is implementation-defined.
+     * @param {string} prefix
+     * @return {string[]}
+     */
+    public abstract keys(prefix?: string): Promise<string[]>;
 
     /**
      * Publish a message to all subscribers of a channel — across all workers

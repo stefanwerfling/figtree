@@ -24,7 +24,8 @@ export declare class RedisClient {
     isConnected(): boolean;
     protected _buildKey(key: string, namespace?: string): string;
     get<T = any>(key: string, namespace?: string): Promise<T | null>;
-    set<T = any>(key: string, value: T, namespace?: string): Promise<void>;
+    set<T = any>(key: string, value: T, namespace?: string, ttlMs?: number): Promise<void>;
+    scanKeys(pattern: string): Promise<string[]>;
     delete(key: string, namespace?: string): Promise<void>;
     unlink(key: string, namespace?: string): Promise<void>;
     has(key: string, namespace?: string): Promise<boolean>;

@@ -65,13 +65,32 @@ export class RedisSharedStore extends SharedStore {
     }
 
     /**
-     * Set a value by key
+     * Set a value by key.
      * @param {string} key
      * @param {T} value
+     * @param {number} ttlMs Optional time-to-live in milliseconds (Redis `PX`).
      * @template T
      */
-    public async set<T = any>(key: string, value: T): Promise<void> {
-        return this._client.set(key, value, this._namespace);
+    public async set<T = any>(key: string, value: T, ttlMs?: number): Promise<void> {
+        return this._client.set(key, value, this._namespace, ttlMs);
+    }
+
+    /**
+     * Return all keys (in the namespace) matching the given prefix. Returned
+     * keys are namespace-stripped — i.e. relative to the configured namespace.
+     * @param {string} prefix
+     * @return {string[]}
+     */
+    public async keys(prefix?: string): Promise<string[]> {
+        const nsPrefix = this._namespace ? `${this._namespace}:` : '';
+        const pattern = `${nsPrefix}${prefix ?? ''}*`;
+        const fullKeys = await this._client.scanKeys(pattern);
+
+        if (!nsPrefix) {
+            return fullKeys;
+        }
+
+        return fullKeys.map((k) => k.startsWith(nsPrefix) ? k.substring(nsPrefix.length) : k);
     }
 
     /**
