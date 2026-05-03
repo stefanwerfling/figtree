@@ -41,6 +41,12 @@ All notable changes to this project are documented in this file.
 - `ConfigBackend._loadEnvCluster()`: Maps the `CLUSTER_*` env variables (`CLUSTER_ENABLED`, `CLUSTER_WORKERS`, `CLUSTER_SHUTDOWN_TIMEOUT_MS`, `CLUSTER_SHARED_STORE_TYPE`, `CLUSTER_SHARED_STORE_NAMESPACE`) onto the `cluster` config block.
 - `RedisClient.connect()`: Now idempotent — checks `_client.isOpen` first. Safe to call from multiple call sites (e.g. `RedisDBService.start()` and `RedisSharedStore.init()`) without race conditions.
 - 18 new tests for `bootstrap`, `setupClusterRegistryFromConfig`, and the cluster env mapping.
+- `examples/single-process/` and `examples/cluster/` — two complete, self-contained example backends moved out of `src/`. Each ships with its own `main.ts`, `config.json`, `tsconfig.json`, and `README.md`. The cluster example demonstrates `bootstrap()`, `setupClusterRegistryFromConfig()`, role-filtered services (`http` / `cron`), a sample `ServiceJobAbstract` cron job, and a `ClusterLeader`-gated cron worker for multi-host setups.
+- `package.json`: new `files` field (`["dist", "README.md", "CHANGELOG.md", "LICENSE"]`) so `examples/` and other dev artifacts are excluded from the published npm package.
+- Root `tsconfig.json`: explicit `exclude` for `examples`, `tests`, `dist`, `node_modules`.
+
+### Removed
+- `src/Example/` — replaced by the two self-contained packages under `examples/`.
 - `tests/unit/Application/BackendCluster.test.ts`, `tests/unit/Service/ServiceManager.test.ts`, `tests/unit/SharedStore/IPCSharedStore.test.ts`: Unit tests for worker identity, role helpers, the role filter, and IPC Pub/Sub behavior (21 new tests).
 - `doc/cluster.md`: Comprehensive cluster guide covering startup, crash respawn (backoff + circuit breaker), graceful shutdown, worker roles, Pub/Sub, layered cluster architecture, shared state, and roadmap.
 - `CLAUDE.md`: ESLint commands and lint conventions documented.
