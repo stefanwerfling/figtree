@@ -15,8 +15,12 @@ All notable changes to this project are documented in this file.
 - `ServiceManager.add(service, roles?)`: Optional role filter — service is silently skipped when the current `WORKER_ROLE` doesn't match. In single-process mode (no `WORKER_ROLE`), the filter is inactive.
 - `BackendClusterOptions`: New `shutdownTimeoutMs`, `shutdownSignals`, `respawn`, and `roles` options.
 - `BackendClusterRespawnOptions`, `BackendClusterRoles`: New exported types.
-- `tests/unit/Application/BackendCluster.test.ts`, `tests/unit/Service/ServiceManager.test.ts`: Unit tests for worker identity, role helpers, and the role filter (14 new tests).
-- `doc/cluster.md`: Comprehensive cluster guide covering startup, crash respawn (backoff + circuit breaker), graceful shutdown, worker roles, layered cluster architecture, shared state, and roadmap.
+- `SharedStore`: Pub/Sub support — new abstract `publish(channel, message)`, `subscribe(channel, callback)`, `unsubscribe(channel, callback?)` methods plus exported `SharedStoreSubscriber<T>` type.
+- `IPCSharedStore`: Pub/Sub via master broker — workers send publishes to the master, which fans out to all live workers and to its own local subscribers. Multiple subscribers per channel; subscriber errors are isolated (logged, do not affect siblings).
+- `RedisSharedStore`: Pub/Sub via native Redis Pub/Sub — uses a lazy-created subscriber connection (Redis requires a separate connection because a subscribed connection cannot issue regular commands). Channel names are namespaced like KV keys.
+- `RedisClient`: New public `subscribe(channel, callback)`, `unsubscribe(channel)`, and `duplicate()` methods. Constructor now stores its options for `duplicate()`.
+- `tests/unit/Application/BackendCluster.test.ts`, `tests/unit/Service/ServiceManager.test.ts`, `tests/unit/SharedStore/IPCSharedStore.test.ts`: Unit tests for worker identity, role helpers, the role filter, and IPC Pub/Sub behavior (21 new tests).
+- `doc/cluster.md`: Comprehensive cluster guide covering startup, crash respawn (backoff + circuit breaker), graceful shutdown, worker roles, Pub/Sub, layered cluster architecture, shared state, and roadmap.
 - `CLAUDE.md`: ESLint commands and lint conventions documented.
 
 ### Improved

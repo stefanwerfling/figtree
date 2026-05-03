@@ -17,8 +17,10 @@ export class RedisClient {
         return RedisClient._instance !== null;
     }
     _client;
+    _options;
     _isConnect = false;
     constructor(options) {
+        this._options = options;
         if (options.password) {
             this._client = createClient({
                 url: options.url,
@@ -33,6 +35,25 @@ export class RedisClient {
         this._client.on('error', (err) => {
             Logger.getLogger().error('RedisClient::client::error: Redis Client Error', err);
         });
+    }
+    async duplicate() {
+        const sibling = new RedisClient(this._options);
+        await sibling.connect();
+        return sibling;
+    }
+    async subscribe(channel, callback) {
+        if (!this._isConnect) {
+            throw new Error('RedisClient::subscribe: client is not connected');
+        }
+        await this._client.subscribe(channel, async (message) => {
+            await callback(message);
+        });
+    }
+    async unsubscribe(channel) {
+        if (!this._isConnect) {
+            return;
+        }
+        await this._client.unsubscribe(channel);
     }
     async connect() {
         await this._client.connect();

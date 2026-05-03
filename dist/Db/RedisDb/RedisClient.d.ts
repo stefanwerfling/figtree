@@ -10,8 +10,12 @@ export declare class RedisClient {
     static getInstance(options?: RedisClientOptions): RedisClient;
     static hasInstance(): boolean;
     protected _client: RedisClientType;
+    protected _options: RedisClientOptions;
     protected _isConnect: boolean;
     constructor(options: RedisClientOptions);
+    duplicate(): Promise<RedisClient>;
+    subscribe(channel: string, callback: FunChannelCallback): Promise<void>;
+    unsubscribe(channel: string): Promise<void>;
     connect(): Promise<void>;
     disconnect(): Promise<void>;
     protected _registerChannel(channel: string, callback: FunChannelCallback): Promise<void>;

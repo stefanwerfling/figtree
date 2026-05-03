@@ -234,7 +234,7 @@ For features that span workers — cluster-wide service visibility, cross-host s
 │            (planned — pattern for any class to share    │
 │             its state across the cluster)               │
 ├─────────────────────────────────────────────────────────┤
-│ Layer 3: SharedStore Pub/Sub (planned)                  │
+│ Layer 3: SharedStore Pub/Sub (✓ available)              │
 │          publish() / subscribe()                        │
 ├─────────────────────────────────────────────────────────┤
 │ Layer 2: SharedStore KV (✓ available)                   │
@@ -267,7 +267,9 @@ This is the same pattern that `ServiceRoute` will use to provide a cluster-wide 
 
 Workers do **not** share memory. To coordinate state across workers, use one of the `SharedStore` implementations.
 
-### IPC (single host)
+### Key/value
+
+#### IPC (single host)
 
 ```typescript
 import { IPCSharedStore } from 'figtree';
@@ -282,7 +284,7 @@ const user = await store.get<{ name: string }>('user:42');
 
 The master process holds the actual `Map`; workers communicate via Node's IPC channel. Suitable for single-host clusters.
 
-### Redis (distributed)
+#### Redis (distributed)
 
 ```typescript
 import { RedisSharedStore, RedisClient } from 'figtree';
@@ -295,6 +297,49 @@ await store.set('user:42', { name: 'Alice' });
 
 Use this when running multiple `BackendCluster` instances across multiple hosts.
 
+### Pub/Sub
+
+Both `SharedStore` implementations support fan-out messaging through `publish()` / `subscribe()`. Messages are JSON-encoded and delivered to every subscriber in the cluster — including subscribers on the same process that published the message.
+
+```typescript
+const store = new IPCSharedStore();   // or new RedisSharedStore(...)
+await store.init();
+
+await store.subscribe<{ userId: string }>('user.updated', (msg) => {
+    console.log('user updated:', msg.userId);
+});
+
+// From any worker (or any host with RedisSharedStore):
+await store.publish('user.updated', { userId: '42' });
+```
+
+#### How it works
+
+- **`IPCSharedStore`**: the master is the broker. A worker that calls `publish()` sends an IPC message to the master, which fans out to every live worker (including the publisher) and to its own local subscribers. Channels live in memory; nothing is persisted.
+- **`RedisSharedStore`**: uses native Redis Pub/Sub. The first `subscribe()` on a channel lazy-creates a dedicated subscriber connection (Redis requires a separate connection because a subscribed connection cannot issue regular commands). Channel names are namespaced with the same prefix as KV keys (`<namespace>:<channel>`).
+
+#### Multiple subscribers per channel
+
+Subscribing the same channel from multiple call sites is supported — each callback fires independently.
+
+```typescript
+await store.subscribe('cache.invalidate', refreshUserCache);
+await store.subscribe('cache.invalidate', refreshOrderCache);
+
+await store.unsubscribe('cache.invalidate', refreshUserCache);  // remove just one
+await store.unsubscribe('cache.invalidate');                    // remove all
+```
+
+#### Errors
+
+A subscriber callback that throws (sync) or rejects (async) does not affect sibling callbacks — the error is logged and the next subscriber still fires.
+
+#### Caveats
+
+- **Order is best-effort.** With Redis Pub/Sub there is no global ordering guarantee across workers; if you need ordering, embed a sequence number in the payload.
+- **At-most-once delivery.** A subscriber that is offline when a message is published will not receive it. For durable delivery, write to a Redis stream or a database table instead.
+- **No replay.** Pub/Sub does not retain history.
+
 ## Caveats
 
 - **Listeners and timers in `appFactory`:** the factory is called once per worker. If you create singletons or listeners outside of services, they will exist per worker — make sure that is intentional.
@@ -304,9 +349,8 @@ Use this when running multiple `BackendCluster` instances across multiple hosts.
 
 ## Roadmap
 
-Layers 1-2 (worker identity, roles, KV `SharedStore`) are available. The following layers are planned and will be built incrementally:
+Layers 1-3 (worker identity, roles, KV `SharedStore`, Pub/Sub) are available. The following layers are planned and will be built incrementally:
 
-- **Layer 3: Pub/Sub on `SharedStore`** — `publish()` / `subscribe()` on the existing `SharedStore` interface; IPC implementation via master relay, Redis implementation via native Pub/Sub. Foundation for live event propagation.
 - **Layer 3.5: `ClusterRegistry` + `ClusterPublishable`** — generic pattern for any class to publish its state cluster-wide. Heartbeat-based with TTL so dead workers expire automatically.
 - **Layer 4: Worker registry** — `ServiceManager` (and other internal classes) implements `ClusterPublishable` so its state becomes queryable across the cluster.
 - **Layer 5: `ServiceRoute` cluster view** — `?cluster=1` query param aggregates services across all workers and hosts.

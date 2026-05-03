@@ -57,6 +57,12 @@ export class RedisClient {
     protected _client: RedisClientType;
 
     /**
+     * Stored options — used by duplicate().
+     * @protected
+     */
+    protected _options: RedisClientOptions;
+
+    /**
      * Is Connected
      * @protected
      */
@@ -67,6 +73,8 @@ export class RedisClient {
      * @param {RedisClientOptions} options
      */
     public constructor(options: RedisClientOptions) {
+        this._options = options;
+
         if (options.password) {
             this._client = createClient({
                 url: options.url,
@@ -81,6 +89,46 @@ export class RedisClient {
         this._client.on('error', (err) => {
             Logger.getLogger().error('RedisClient::client::error: Redis Client Error', err);
         });
+    }
+
+    /**
+     * Create a connected sibling client that shares the same options.
+     * Required for Pub/Sub: a connection that has called `subscribe` cannot
+     * issue regular commands, so a separate connection is needed.
+     * @return {RedisClient}
+     */
+    public async duplicate(): Promise<RedisClient> {
+        const sibling = new RedisClient(this._options);
+        await sibling.connect();
+
+        return sibling;
+    }
+
+    /**
+     * Subscribe to a Redis channel. The callback receives the raw message string.
+     * @param {string} channel
+     * @param {FunChannelCallback} callback
+     */
+    public async subscribe(channel: string, callback: FunChannelCallback): Promise<void> {
+        if (!this._isConnect) {
+            throw new Error('RedisClient::subscribe: client is not connected');
+        }
+
+        await this._client.subscribe(channel, async(message) => {
+            await callback(message);
+        });
+    }
+
+    /**
+     * Unsubscribe from a Redis channel.
+     * @param {string} channel
+     */
+    public async unsubscribe(channel: string): Promise<void> {
+        if (!this._isConnect) {
+            return;
+        }
+
+        await this._client.unsubscribe(channel);
     }
 
     /**
