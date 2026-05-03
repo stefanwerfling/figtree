@@ -5,9 +5,21 @@ import {Logger} from '../../Logger/Logger.js';
 import {BaseHttpServerOptionCsrf, BaseHttpServerOptionProxy} from '../../Server/HttpServer/BaseHttpServer.js';
 import {HttpRouteLoaderType} from '../../Server/HttpServer/HttpRouteLoader.js';
 import {HttpServer} from '../../Server/HttpServer/HttpServer.js';
+import {WebSocketEndpointLoaderType} from '../../Server/HttpServer/WebSocket/WebSocketEndpointLoader.js';
+import {WebSocketServer, WebSocketServerOptions} from '../../Server/HttpServer/WebSocket/WebSocketServer.js';
 import {ServiceAbstract} from '../../Service/ServiceAbstract.js';
 import {ServiceError} from '../../Service/ServiceError.js';
 import {StringHelper} from '../../Utils/StringHelper.js';
+
+/**
+ * Optional WebSocket configuration for `HttpService`.
+ */
+export type HttpServiceWebSocketOptions = {
+    /** Loader supplying the application's WebSocket endpoints. */
+    loader: WebSocketEndpointLoaderType;
+    /** Server-level options (heartbeat, payload limits). */
+    server?: WebSocketServerOptions;
+};
 
 /**
  * Http Service
@@ -31,20 +43,40 @@ export class HttpService extends ServiceAbstract {
     protected _loader: HttpRouteLoaderType;
 
     /**
+     * Optional WebSocket configuration. When set, an attached
+     * `WebSocketServer` shares the underlying `http.Server`.
+     * @protected
+     */
+    protected _wsOptions?: HttpServiceWebSocketOptions;
+
+    /**
      * Http Server
      * @protected
      */
     protected _server: HttpServer|null = null;
 
     /**
+     * WebSocket server (only when `wsOptions` was passed to the constructor).
+     * @protected
+     */
+    protected _wsServer: WebSocketServer|null = null;
+
+    /**
      * Constructor
      * @param {HttpRouteLoaderType} loader
      * @param {[string]} serviceName
      * @param {[string[]]} serviceDependencies
+     * @param {HttpServiceWebSocketOptions} [wsOptions]
      */
-    public constructor(loader: HttpRouteLoaderType, serviceName?: string, serviceDependencies?: string[]) {
+    public constructor(
+        loader: HttpRouteLoaderType,
+        serviceName?: string,
+        serviceDependencies?: string[],
+        wsOptions?: HttpServiceWebSocketOptions
+    ) {
         super(serviceName ?? HttpService.NAME, serviceDependencies);
         this._loader = loader;
+        this._wsOptions = wsOptions;
     }
 
     /**
@@ -52,6 +84,13 @@ export class HttpService extends ServiceAbstract {
      */
     public getServer(): HttpServer|null {
         return this._server;
+    }
+
+    /**
+     * Return the WebSocket server, if configured.
+     */
+    public getWebSocketServer(): WebSocketServer|null {
+        return this._wsServer;
     }
 
     /**
@@ -150,6 +189,18 @@ export class HttpService extends ServiceAbstract {
             });
 
             await this._server.setupAndListen();
+
+            if (this._wsOptions) {
+                this._wsServer = new WebSocketServer(this._server, this._wsOptions.server);
+
+                const endpoints = await this._wsOptions.loader.loadEndpoints();
+
+                for (const endpoint of endpoints) {
+                    this._wsServer.addEndpoint(endpoint);
+                }
+
+                this._wsServer.start();
+            }
         } catch(error) {
             this._status = ServiceStatus.Error;
             this._inProcess = false;
@@ -174,6 +225,11 @@ export class HttpService extends ServiceAbstract {
      */
     public override async stop(): Promise<void> {
         try {
+            if (this._wsServer) {
+                await this._wsServer.stop();
+                this._wsServer = null;
+            }
+
             if (this._server) {
                 this._server.close();
             }

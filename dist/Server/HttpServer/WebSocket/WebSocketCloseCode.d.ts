@@ -1,0 +1,10 @@
+export declare enum WebSocketCloseCode {
+    NORMAL = 1000,
+    GOING_AWAY = 1001,
+    POLICY_VIOLATION = 1008,
+    INVALID_PAYLOAD = 4400,
+    UNAUTHORIZED = 4401,
+    FORBIDDEN = 4403,
+    HEARTBEAT_TIMEOUT = 4408,
+    SHUTDOWN = 4503
+}

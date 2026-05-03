@@ -1,0 +1,1 @@
+{"version":3,"file":"WebSocketEndpoint.js","sourceRoot":"","sources":["../../../../src/Server/HttpServer/WebSocket/WebSocketEndpoint.ts"],"names":[],"mappings":"AA0FA,MAAM,OAAgB,iBAAiB;IAS5B,KAAK,CAAC,SAAS,CAAC,IAAgC;IAEvD,CAAC;IAMM,KAAK,CAAC,SAAS,CAClB,IAAgC,EAChC,KAAY;IAGhB,CAAC;IAGM,KAAK,CAAC,OAAO,CAChB,IAAgC,EAChC,KAAa,EACb,OAAe;IAGnB,CAAC;CAEJ"}

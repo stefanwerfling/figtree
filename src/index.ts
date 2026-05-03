@@ -142,6 +142,22 @@ export {HttpRouteProviders} from './Server/HttpServer/HttpRouteProviders.js';
 export {HttpMiddlewareProviderType} from './Server/HttpServer/HttpMiddlewareProviderType.js';
 export {IHttpMiddlewareProvider} from './Server/HttpServer/IHttpMiddlewareProvider.js';
 export {HttpMiddlewareProviders} from './Server/HttpServer/HttpMiddlewareProviders.js';
+export {WebSocketCloseCode} from './Server/HttpServer/WebSocket/WebSocketCloseCode.js';
+export {
+    WebSocketContext,
+    WebSocketEndpoint,
+    WebSocketEndpointOptions
+} from './Server/HttpServer/WebSocket/WebSocketEndpoint.js';
+export {
+    WebSocketEndpointLoader,
+    WebSocketEndpointLoaderType
+} from './Server/HttpServer/WebSocket/WebSocketEndpointLoader.js';
+export {WebSocketServer, WebSocketServerOptions} from './Server/HttpServer/WebSocket/WebSocketServer.js';
+export {
+    WebSocketEndpointProviderType
+} from './Server/HttpServer/WebSocket/WebSocketEndpointProviderType.js';
+export {IWebSocketEndpointProvider} from './Server/HttpServer/WebSocket/IWebSocketEndpointProvider.js';
+export {WebSocketEndpointProviders} from './Server/HttpServer/WebSocket/WebSocketEndpointProviders.js';
 
 // ACL -----------------------------------------------------------------------------------------------------------------
 
@@ -168,4 +184,4 @@ export {MariaDBServiceOptions, MariaDBService} from './Application/Services/Mari
 export {InfluxDBService} from './Application/Services/InfluxDBService.js';
 export {RedisDBService} from './Application/Services/RedisDBService.js';
 export {ChromaDBService} from './Application/Services/ChromaDBService.js';
-export {HttpService} from './Application/Services/HttpService.js';
+export {HttpService, HttpServiceWebSocketOptions} from './Application/Services/HttpService.js';

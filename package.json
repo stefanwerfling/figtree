@@ -17,6 +17,7 @@
     "@types/supertest": "^7.2.0",
     "@types/swagger-ui-express": "^4.1.8",
     "@types/uuid": "^10.0.0",
+    "@types/ws": "^8.18.1",
     "@typescript-eslint/eslint-plugin": "^8.21.0",
     "@typescript-eslint/parser": "^8.21.0",
     "eslint": "^9.19.0",
@@ -101,6 +102,9 @@
       "optional": true
     },
     "@types/uuid": {
+      "optional": true
+    },
+    "@types/ws": {
       "optional": true
     },
     "vite": {

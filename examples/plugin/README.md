@@ -1,11 +1,12 @@
 # Plugin example
 
-A FigTree backend plus a sample plugin that demonstrates **all three plugin extension points** added in this iteration:
+A FigTree backend plus a sample plugin that demonstrates the available plugin extension points:
 
 | Hook | What the plugin does |
 |---|---|
 | **`AProviderOnLoadEvent` → `IHttpRouteProvider`** | Adds `GET /json/v1/plugin/hello` to the host's HTTP server. |
 | **`AProviderOnLoadEvent` → `IHttpMiddlewareProvider`** | Installs a global `X-Request-Id` middleware that sets a header on every response. |
+| **`AProviderOnLoadEvent` → `IWebSocketEndpointProvider`** | Adds an echo WebSocket endpoint at `/ws/v1/plugin/echo`. |
 | **`OnBackendLifecycleEvent`** | Logs a message when the backend finishes startup and again when it begins shutdown. |
 
 ## Layout
@@ -65,6 +66,15 @@ The response:
 - Comes from the route contributed by the plugin (`HelloRoute`).
 - Carries an `X-Request-Id` header set by the plugin's middleware.
 - The body includes `"plugin": "my-plugin"` and the host's `pid`.
+
+The WebSocket endpoint:
+
+```bash
+# any tool with a ws client; the npm `wscat` package is convenient:
+npx wscat -c ws://localhost:3000/ws/v1/plugin/echo
+> {"msg": "hello"}
+< {"echo": "hello"}
+```
 
 On Ctrl-C you'll see:
 

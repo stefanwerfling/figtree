@@ -58,7 +58,20 @@ All notable changes to this project are documented in this file.
 - New `IHttpMiddlewareProvider` / `HttpMiddlewareProviders` / `HttpMiddlewareProviderType`: plugins can contribute Express middleware that auto-installs in `BaseHttpServer._initExpressUsePlugins()` between the standard pre-route middleware and the application routes.
 - `BaseHttpServer._initExpressUsePlugins()`: new step in `setup()` — queries `HttpMiddlewareProviders` via `PluginManager` and `app.use()`s every returned handler. No-op when no `PluginManager` is initialized.
 - New `OnBackendLifecycleEvent` (`src/Plugins/OnBackendLifecycleEvent.ts`): plugin event with `onStart()` / `onStop()` hooks. `BackendApp.start()` fires `onStart` after services are up and the cluster registry is running; the exit hook fires `onStop` BEFORE `ServiceManager.stopAll()`, so plugins can flush state while the backend is still operational.
-- `examples/plugin/`: new self-contained example with a host backend and a plugin (`my-plugin`). The plugin demonstrates all three extension points — a route (`HelloRoute` via `IHttpRouteProvider`), middleware (`X-Request-Id` via `IHttpMiddlewareProvider`), and lifecycle hooks (`OnBackendLifecycleEvent`).
+- `examples/plugin/`: new self-contained example with a host backend and a plugin (`my-plugin`). The plugin demonstrates the available extension points — a route (`HelloRoute` via `IHttpRouteProvider`), middleware (`X-Request-Id` via `IHttpMiddlewareProvider`), a WebSocket endpoint (`EchoWebSocketEndpoint` via `IWebSocketEndpointProvider`), and lifecycle hooks (`OnBackendLifecycleEvent`).
+
+### WebSocket server
+
+- `WebSocketServer` (`src/Server/HttpServer/WebSocket/WebSocketServer.ts`): real WebSocket implementation built on `ws` (8.x), replacing the previous `HttpWebSocketServer` stub. Hangs off `BaseHttpServer.getServer()` via `noServer: true`. Per-path endpoint routing (exact match), heartbeat (default 30s ping/pong, terminates dead clients), graceful drain on `stop()`, configurable `maxPayloadBytes` (default 1 MB).
+- Session integration: when an endpoint declares `sessionSchema`, the upgrade request is run through `BaseHttpServer.getSessionParser()` so `req.session` is populated and `ctx.session` / `ctx.sessionId` are available in handlers. Schema-invalid sessions cause a `401 Unauthorized` rejection at the upgrade stage.
+- ACL integration: when an endpoint declares `aclRight`, the role on `req.session.user.role` is checked via `ACL.getInstance().checkAccess()` before the WS handshake completes; failures yield 401/403.
+- Schema validation: when `bodySchema` is set, every incoming text message is JSON-decoded and validated; on failure the connection is closed with `INVALID_PAYLOAD` (4400).
+- `WebSocketEndpoint` abstract class: `getPath()`, `getOptions()`, `onConnect()`, `onMessage()`, `onClose()`. Generic over `TBody` and `TSession`.
+- `WebSocketEndpointLoader` analog to `HttpRouteLoader`. Optional `wsOptions` argument on `HttpService` constructor — `{ loader, server? }`.
+- `IWebSocketEndpointProvider` plugin extension point analog to `IHttpRouteProvider` — plugins can contribute WebSocket endpoints via `AProviderOnLoadEvent`. New `WebSocketEndpointProviders` collects them.
+- `WebSocketCloseCode` enum with figtree-specific 4xxx codes: `INVALID_PAYLOAD` (4400), `UNAUTHORIZED` (4401), `FORBIDDEN` (4403), `HEARTBEAT_TIMEOUT` (4408), `SHUTDOWN` (4503).
+- New peer dependency entry: `@types/ws` (optional).
+- `tests/integration/Server/WebSocketServer.test.ts`: integration tests covering echo, schema-invalid input, invalid JSON, session-schema rejection, and post-stop upgrade refusal.
 - `tests/unit/Application/BackendCluster.test.ts`, `tests/unit/Service/ServiceManager.test.ts`, `tests/unit/SharedStore/IPCSharedStore.test.ts`: Unit tests for worker identity, role helpers, the role filter, and IPC Pub/Sub behavior (21 new tests).
 - `doc/cluster.md`: Comprehensive cluster guide covering startup, crash respawn (backoff + circuit breaker), graceful shutdown, worker roles, Pub/Sub, layered cluster architecture, shared state, and roadmap.
 - `CLAUDE.md`: ESLint commands and lint conventions documented.

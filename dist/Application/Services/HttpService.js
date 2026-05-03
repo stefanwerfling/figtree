@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid';
 import { Config } from '../../Config/Config.js';
 import { Logger } from '../../Logger/Logger.js';
 import { HttpServer } from '../../Server/HttpServer/HttpServer.js';
+import { WebSocketServer } from '../../Server/HttpServer/WebSocket/WebSocketServer.js';
 import { ServiceAbstract } from '../../Service/ServiceAbstract.js';
 import { ServiceError } from '../../Service/ServiceError.js';
 import { StringHelper } from '../../Utils/StringHelper.js';
@@ -10,13 +11,19 @@ export class HttpService extends ServiceAbstract {
     static NAME = 'httpserver';
     _importance = ServiceImportance.Important;
     _loader;
+    _wsOptions;
     _server = null;
-    constructor(loader, serviceName, serviceDependencies) {
+    _wsServer = null;
+    constructor(loader, serviceName, serviceDependencies, wsOptions) {
         super(serviceName ?? HttpService.NAME, serviceDependencies);
         this._loader = loader;
+        this._wsOptions = wsOptions;
     }
     getServer() {
         return this._server;
+    }
+    getWebSocketServer() {
+        return this._wsServer;
     }
     async start() {
         this._inProcess = true;
@@ -89,6 +96,14 @@ export class HttpService extends ServiceAbstract {
                 csrf: csrf
             });
             await this._server.setupAndListen();
+            if (this._wsOptions) {
+                this._wsServer = new WebSocketServer(this._server, this._wsOptions.server);
+                const endpoints = await this._wsOptions.loader.loadEndpoints();
+                for (const endpoint of endpoints) {
+                    this._wsServer.addEndpoint(endpoint);
+                }
+                this._wsServer.start();
+            }
         }
         catch (error) {
             this._status = ServiceStatus.Error;
@@ -103,6 +118,10 @@ export class HttpService extends ServiceAbstract {
     }
     async stop() {
         try {
+            if (this._wsServer) {
+                await this._wsServer.stop();
+                this._wsServer = null;
+            }
             if (this._server) {
                 this._server.close();
             }

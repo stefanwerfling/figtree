@@ -74,6 +74,12 @@ export { HttpRouteProviderType } from './Server/HttpServer/HttpRouteProviderType
 export { HttpRouteProviders } from './Server/HttpServer/HttpRouteProviders.js';
 export { HttpMiddlewareProviderType } from './Server/HttpServer/HttpMiddlewareProviderType.js';
 export { HttpMiddlewareProviders } from './Server/HttpServer/HttpMiddlewareProviders.js';
+export { WebSocketCloseCode } from './Server/HttpServer/WebSocket/WebSocketCloseCode.js';
+export { WebSocketEndpoint } from './Server/HttpServer/WebSocket/WebSocketEndpoint.js';
+export { WebSocketEndpointLoader } from './Server/HttpServer/WebSocket/WebSocketEndpointLoader.js';
+export { WebSocketServer } from './Server/HttpServer/WebSocket/WebSocketServer.js';
+export { WebSocketEndpointProviderType } from './Server/HttpServer/WebSocket/WebSocketEndpointProviderType.js';
+export { WebSocketEndpointProviders } from './Server/HttpServer/WebSocket/WebSocketEndpointProviders.js';
 export { ACLRbac } from './ACL/ACLRbac.js';
 export { ACL } from './ACL/ACL.js';
 export { BackendApp } from './Application/BackendApp.js';

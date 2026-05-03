@@ -4,6 +4,7 @@ import {ACL, BackendApp, HttpService, PluginService} from 'figtree';
 import {MyACLRbac} from '../ACL/MyACLRbac.js';
 import {ExampleConfig} from '../Config/ExampleConfig.js';
 import {ExampleRouteLoader} from '../Routes/ExampleRouteLoader.js';
+import {ExampleWebSocketEndpointLoader} from '../Routes/ExampleWebSocketEndpointLoader.js';
 
 export class ExampleBackend extends BackendApp<DefaultArgs, ConfigOptions> {
 
@@ -36,9 +37,15 @@ export class ExampleBackend extends BackendApp<DefaultArgs, ConfigOptions> {
         // up under `host/node_modules/my-plugin` after `npm install`.
         this._serviceManager.add(new PluginService(ExampleBackend.NAME));
 
-        // HttpService starts AFTER PluginService — by then the plugin's
-        // HttpRouteProviders / HttpMiddlewareProviders have been registered.
-        this._serviceManager.add(new HttpService(ExampleRouteLoader));
+        // HttpService starts AFTER PluginService — by then the plugin has
+        // registered its HttpRouteProviders / HttpMiddlewareProviders /
+        // WebSocketEndpointProviders.
+        this._serviceManager.add(new HttpService(
+            ExampleRouteLoader,
+            undefined,
+            undefined,
+            { loader: ExampleWebSocketEndpointLoader }
+        ));
     }
 
 }
