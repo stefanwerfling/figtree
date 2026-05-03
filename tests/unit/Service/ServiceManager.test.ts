@@ -77,3 +77,25 @@ describe('ServiceManager.add (role filter)', () => {
     });
 
 });
+
+describe('ServiceManager (ClusterPublishable)', () => {
+
+    it('exposes the cluster namespace "service-manager"', () => {
+        const mgr = new ServiceManager();
+        expect(mgr.getNamespace()).toBe('service-manager');
+    });
+
+    it('serialize() returns the same payload as getInfoList()', () => {
+        const mgr = new ServiceManager();
+        mgr.add(new FakeService('a'));
+        mgr.add(new FakeService('b'));
+
+        expect(mgr.serialize()).toEqual(mgr.getInfoList());
+    });
+
+    it('serialize() returns an empty list when no services are registered', () => {
+        const mgr = new ServiceManager();
+        expect(mgr.serialize()).toEqual([]);
+    });
+
+});

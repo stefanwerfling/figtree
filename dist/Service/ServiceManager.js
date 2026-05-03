@@ -2,6 +2,7 @@ import { ServiceImportance, ServiceStatus } from 'figtree-schemas';
 import { Logger } from '../Logger/Logger.js';
 import { DateHelper } from '../Utils/DateHelper.js';
 import { ServiceJobAbstract } from './ServiceJobAbstract.js';
+export const SERVICE_MANAGER_NAMESPACE = 'service-manager';
 export class ServiceManager {
     _services = [];
     add(service, roles) {
@@ -205,6 +206,12 @@ export class ServiceManager {
                 throw new Error(`The service has not successfully started to stop: ${name}`);
             }
         }
+    }
+    getNamespace() {
+        return SERVICE_MANAGER_NAMESPACE;
+    }
+    serialize() {
+        return this.getInfoList();
     }
     async invokeService(name) {
         const service = this.getByName(name);

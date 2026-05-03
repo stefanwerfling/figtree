@@ -1,4 +1,5 @@
 import path from 'path';
+import { ClusterRegistry } from '../Cluster/ClusterRegistry.js';
 import { Config } from '../Config/Config.js';
 import { ConfigBackend } from '../Config/ConfigBackend.js';
 import { Args } from '../Env/Args.js';
@@ -94,6 +95,9 @@ export class BackendApp {
             });
             try {
                 Logger.getLogger().info('Stop %s Service ...', Config.getInstance().getAppName());
+                if (ClusterRegistry.hasInstance()) {
+                    await ClusterRegistry.getInstance().stop();
+                }
                 await Promise.race([this._serviceManager.stopAll(), timeout]);
                 Logger.getLogger().info('... End.');
             }
@@ -108,6 +112,11 @@ export class BackendApp {
         Logger.getLogger().info('Start %s Service ...', Config.getInstance().getAppName());
         await this._initServices();
         await this._serviceManager.startAll();
+        if (ClusterRegistry.hasInstance()) {
+            const registry = ClusterRegistry.getInstance();
+            registry.register(this._serviceManager);
+            await registry.start();
+        }
     }
     getServiceManager() {
         return this._serviceManager;

@@ -1,6 +1,7 @@
 import {ConfigOptions, DefaultArgs} from 'figtree-schemas';
 import path from 'path';
 import {Schema} from 'vts';
+import {ClusterRegistry} from '../Cluster/ClusterRegistry.js';
 import {Config} from '../Config/Config.js';
 import {ConfigBackend} from '../Config/ConfigBackend.js';
 import {Args} from '../Env/Args.js';
@@ -180,6 +181,10 @@ export abstract class BackendApp<A extends DefaultArgs, _C extends ConfigOptions
             try {
                 Logger.getLogger().info('Stop %s Service ...', Config.getInstance().getAppName());
 
+                if (ClusterRegistry.hasInstance()) {
+                    await ClusterRegistry.getInstance().stop();
+                }
+
                 await Promise.race([this._serviceManager.stopAll(), timeout]);
 
                 Logger.getLogger().info('... End.');
@@ -196,6 +201,15 @@ export abstract class BackendApp<A extends DefaultArgs, _C extends ConfigOptions
         Logger.getLogger().info('Start %s Service ...', Config.getInstance().getAppName());
         await this._initServices();
         await this._serviceManager.startAll();
+
+        // If the consumer initialized a ClusterRegistry singleton in _initServices,
+        // auto-register the ServiceManager and start the heartbeat after services
+        // are up so the first tick shows a meaningful state.
+        if (ClusterRegistry.hasInstance()) {
+            const registry = ClusterRegistry.getInstance();
+            registry.register(this._serviceManager);
+            await registry.start();
+        }
     }
 
     /**

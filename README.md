@@ -477,6 +477,28 @@ BackendCluster.getWorkerRole();   // 'http' | 'cron' | 'default'
 BackendCluster.getWorkerId();     // '<hostname>:<pid>'
 ```
 
+### Cluster-wide visibility
+
+Any class can publish its state cluster-wide via `ClusterRegistry`. Implement `ClusterPublishable` (two methods: `getNamespace()`, `serialize()`), register the instance with the registry, and the merged view is queryable on every worker — including across hosts when `RedisSharedStore` points to a shared Redis.
+
+```typescript
+import { ClusterRegistry, RedisSharedStore } from 'figtree';
+
+protected override async _initServices(): Promise<void> {
+    const store = new RedisSharedStore(redisClient, 'myapp');
+    await store.init();
+
+    ClusterRegistry.initialize(store);   // BackendApp auto-wires the rest
+
+    this._serviceManager.add(new HttpService(), ['http']);
+    this._serviceManager.add(new MyCronJob(), ['cron']);
+}
+```
+
+`ServiceManager` already implements `ClusterPublishable` — `BackendApp` registers it automatically when a `ClusterRegistry` singleton exists. The HTTP endpoint `GET /v1/service/status/cluster` (provided by `ServiceRoute`) aggregates `ServiceInfoEntry` lists across all workers and all hosts.
+
+For the full picture (architecture diagram, custom publishables, Pub/Sub) see [`doc/cluster.md`](doc/cluster.md).
+
 ### Graceful shutdown
 
 When the master receives a shutdown signal (`SIGTERM` / `SIGINT` by default):

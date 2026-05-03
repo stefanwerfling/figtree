@@ -2,14 +2,35 @@ import {Router} from 'express';
 import {
     DefaultReturn, SchemaDefaultReturn,
     SchemaServiceByNameRequest,
+    SchemaServiceInfoEntry,
     SchemaServiceStatusResponse,
+    ServiceInfoEntry,
     ServiceStatusResponse,
     StatusCodes
 } from 'figtree-schemas';
+import {ExtractSchemaResultType, Schema, Vts} from 'vts';
 import {ACLRight} from '../../../ACL/ACLRight.js';
 import {BackendApp} from '../../../Application/BackendApp.js';
+import {BackendCluster} from '../../../Application/BackendCluster.js';
+import {ClusterRegistry} from '../../../Cluster/ClusterRegistry.js';
+import {SERVICE_MANAGER_NAMESPACE} from '../../../Service/ServiceManager.js';
 import {DefaultRoute} from './DefaultRoute.js';
 import {DefaultRouteCheckUserLogin} from './DefaultRouteCheckUser.js';
+
+/**
+ * Response schema for the cluster status endpoint.
+ * `workers` maps `<hostname>:<pid>` to the service info list of that worker.
+ */
+export const SchemaServiceClusterStatusResponse = Vts.object({
+    statusCode: Vts.or<Schema<unknown>>([Vts.string(), Vts.enum(StatusCodes)]),
+    msg: Vts.optional(Vts.string()),
+    workers: Vts.object2(
+        Vts.string(),
+        Vts.array(SchemaServiceInfoEntry)
+    )
+});
+
+export type ServiceClusterStatusResponse = ExtractSchemaResultType<typeof SchemaServiceClusterStatusResponse>;
 
 /**
  * Service ACLRights
@@ -19,6 +40,8 @@ export type ServiceRouteACLRights = {
     start: ACLRight;
     stop: ACLRight;
     invoke: ACLRight;
+    /** Defaults to `status` when omitted. */
+    clusterStatus?: ACLRight;
 };
 
 /**
@@ -162,6 +185,49 @@ export class ServiceRoute extends DefaultRoute {
                 bodySchema: SchemaServiceByNameRequest,
                 responseBodySchema: SchemaDefaultReturn,
                 aclRight: this._accessRights?.stop
+            }
+        );
+
+        this._get(
+            this._getUrl('v1', 'service', 'status/cluster'),
+            this._onlyUserAccess,
+            async(_request, _response, _data): Promise<ServiceClusterStatusResponse> => {
+                const backend = BackendApp.getInstance(this._backendInstanceName);
+
+                if (!backend) {
+                    return {
+                        statusCode: StatusCodes.INTERNAL_ERROR,
+                        msg: 'Backend not found, no information for services',
+                        workers: {}
+                    };
+                }
+
+                // Cluster-wide aggregation requires a configured ClusterRegistry.
+                // Fall back to local-only view (this worker's id → its services)
+                // so the endpoint stays useful in single-process / non-clustered setups.
+                if (!ClusterRegistry.hasInstance()) {
+                    return {
+                        statusCode: StatusCodes.OK,
+                        msg: 'ClusterRegistry not initialized — returning local view only',
+                        workers: {
+                            [BackendCluster.getWorkerId()]: backend.getServiceManager().getInfoList()
+                        }
+                    };
+                }
+
+                const workers = await ClusterRegistry.getInstance()
+                .queryAll<ServiceInfoEntry[]>(SERVICE_MANAGER_NAMESPACE);
+
+                return {
+                    statusCode: StatusCodes.OK,
+                    workers: workers
+                };
+            },
+            {
+                description: 'Cluster-wide service status — aggregated across all workers and hosts',
+                tags: ['service'],
+                responseBodySchema: SchemaServiceClusterStatusResponse,
+                aclRight: this._accessRights?.clusterStatus ?? this._accessRights?.status
             }
         );
 

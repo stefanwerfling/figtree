@@ -1,13 +1,19 @@
 import {ServiceImportance, ServiceInfoEntry, ServiceInfoScheduler, ServiceStatus} from 'figtree-schemas';
+import {ClusterPublishable} from '../Cluster/ClusterPublishable.js';
 import {Logger} from '../Logger/Logger.js';
 import {DateHelper} from '../Utils/DateHelper.js';
 import {ServiceAbstract} from './ServiceAbstract.js';
 import {ServiceJobAbstract} from './ServiceJobAbstract.js';
 
 /**
+ * Cluster registry namespace under which the ServiceManager publishes its info list.
+ */
+export const SERVICE_MANAGER_NAMESPACE = 'service-manager';
+
+/**
  * Service Manager
  */
-export class ServiceManager {
+export class ServiceManager implements ClusterPublishable {
 
     /**
      * Services
@@ -338,6 +344,27 @@ export class ServiceManager {
             }
         }
     }
+
+    // -- ClusterPublishable -------------------------------------------------------------------------------------------
+
+    /**
+     * Cluster-wide namespace under which the ServiceManager publishes its state.
+     * @return {string}
+     */
+    public getNamespace(): string {
+        return SERVICE_MANAGER_NAMESPACE;
+    }
+
+    /**
+     * Serialized snapshot of this manager — same shape as `getInfoList()`.
+     * Used by `ClusterRegistry` to publish the manager's state cluster-wide.
+     * @return {ServiceInfoEntry[]}
+     */
+    public serialize(): ServiceInfoEntry[] {
+        return this.getInfoList();
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * invoke a service by name

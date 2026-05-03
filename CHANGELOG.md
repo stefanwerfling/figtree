@@ -24,6 +24,11 @@ All notable changes to this project are documented in this file.
 - `ClusterPublishable` interface (`src/Cluster/ClusterPublishable.ts`): Two-method interface (`getNamespace()`, `serialize()`) any class can implement to publish its state cluster-wide.
 - `ClusterRegistry` class (`src/Cluster/ClusterRegistry.ts`): Heartbeat-based registry built on `SharedStore`. Each tick serializes every registered publishable and writes it to `cluster:<namespace>:<workerId>` with TTL. `queryAll<T>(namespace)` returns `Record<workerId, T>` cluster-wide. Supports singleton (`initialize`/`getInstance`) or direct instantiation.
 - `tests/unit/Cluster/ClusterRegistry.test.ts`: 11 tests covering registration, querying, heartbeat, async serialize, error isolation, and singleton helpers.
+- `ServiceManager`: implements `ClusterPublishable` (namespace `'service-manager'`, payload = `getInfoList()`). Exported `SERVICE_MANAGER_NAMESPACE` constant.
+- `BackendApp`: auto-wires `ClusterRegistry` lifecycle — when a `ClusterRegistry` singleton was initialized in `_initServices()`, the local `ServiceManager` is registered automatically and the registry is started after services are up / stopped before services on shutdown.
+- `ServiceRoute`: new `GET /v1/service/status/cluster` endpoint aggregating `ServiceInfoEntry` lists across all workers and hosts via `ClusterRegistry`. Falls back to a local-only view when no `ClusterRegistry` is configured. New optional `accessRights.clusterStatus` ACL right on `ServiceRouteACLRights` (defaults to `accessRights.status`).
+- `SchemaServiceClusterStatusResponse` / `ServiceClusterStatusResponse` exported from `ServiceRoute.ts`.
+- 3 additional `ServiceManager` tests for `ClusterPublishable` conformance.
 - `tests/unit/Application/BackendCluster.test.ts`, `tests/unit/Service/ServiceManager.test.ts`, `tests/unit/SharedStore/IPCSharedStore.test.ts`: Unit tests for worker identity, role helpers, the role filter, and IPC Pub/Sub behavior (21 new tests).
 - `doc/cluster.md`: Comprehensive cluster guide covering startup, crash respawn (backoff + circuit breaker), graceful shutdown, worker roles, Pub/Sub, layered cluster architecture, shared state, and roadmap.
 - `CLAUDE.md`: ESLint commands and lint conventions documented.

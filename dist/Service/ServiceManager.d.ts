@@ -1,6 +1,8 @@
 import { ServiceInfoEntry } from 'figtree-schemas';
+import { ClusterPublishable } from '../Cluster/ClusterPublishable.js';
 import { ServiceAbstract } from './ServiceAbstract.js';
-export declare class ServiceManager {
+export declare const SERVICE_MANAGER_NAMESPACE = "service-manager";
+export declare class ServiceManager implements ClusterPublishable {
     protected _services: ServiceAbstract[];
     add(service: ServiceAbstract, roles?: string[]): void;
     getByName(name: string): ServiceAbstract | null;
@@ -12,5 +14,7 @@ export declare class ServiceManager {
     start(name: string): Promise<void>;
     stop(name: string): Promise<void>;
     private _stopRecursive;
+    getNamespace(): string;
+    serialize(): ServiceInfoEntry[];
     invokeService(name: string): Promise<void>;
 }

@@ -225,10 +225,11 @@ For features that span workers — cluster-wide service visibility, cross-host s
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│ Layer 5: ServiceRoute cluster view (planned)            │
+│ Layer 5: ServiceRoute cluster view (✓ available)        │
+│          GET /v1/service/status/cluster                 │
 ├─────────────────────────────────────────────────────────┤
 │ Layer 4: Worker registry — ServiceManager publishes     │
-│          itself (planned)                               │
+│          itself (✓ available)                           │
 ├─────────────────────────────────────────────────────────┤
 │ Layer 3.5: ClusterRegistry / ClusterPublishable         │
 │            (✓ available — pattern for any class to      │
@@ -359,6 +360,61 @@ class CacheStats implements ClusterPublishable {
 - **TTL is honored only by Redis.** `IPCSharedStore` simulates TTL with `setTimeout`; that's enough for keeping the in-memory map clean. Cross-process freshness is implicit because IPC dies with the cluster.
 - **Two `ClusterPublishable` instances must not share a namespace** within the same worker — the second would overwrite the first on every tick.
 
+### Built-in: ServiceManager
+
+`ServiceManager` implements `ClusterPublishable` out of the box (namespace `'service-manager'`, payload = `getInfoList()`). When you initialize the `ClusterRegistry` singleton in `_initServices()`, `BackendApp` automatically:
+
+1. Registers the local `ServiceManager` with the registry.
+2. Starts the registry **after** all services are up so the first heartbeat reports a meaningful state.
+3. Stops the registry on shutdown **before** stopping services so this worker's entries are removed cleanly.
+
+```typescript
+protected override async _initServices(): Promise<void> {
+    const store = new RedisSharedStore(redisClient, 'myapp');
+    await store.init();
+
+    ClusterRegistry.initialize(store);   // BackendApp picks this up
+
+    this._serviceManager.add(new MariaDBService());
+    this._serviceManager.add(new HttpService(), ['http']);
+    this._serviceManager.add(new MyCronJob(), ['cron']);
+}
+```
+
+That's all. From any worker you can now query the cluster-wide service state:
+
+```typescript
+const all = await ClusterRegistry.getInstance()
+    .queryAll<ServiceInfoEntry[]>('service-manager');
+// → { 'host1:1234': [...services on http worker...],
+//     'host1:1235': [...services on cron worker...],
+//     'host2:9876': [...services on http worker on other host...] }
+```
+
+### HTTP endpoint: cluster status
+
+`ServiceRoute` exposes a cluster-wide aggregation endpoint:
+
+```
+GET /v1/service/status/cluster
+```
+
+Response:
+
+```json
+{
+    "statusCode": "200",
+    "workers": {
+        "host1:1234": [ /* ServiceInfoEntry[] */ ],
+        "host2:5678": [ /* ServiceInfoEntry[] */ ]
+    }
+}
+```
+
+If `ClusterRegistry` is not initialized, the endpoint falls back to a local-only view (the calling worker's services keyed under its own `workerId`) and returns an explanatory `msg`. This way the endpoint stays useful in single-process setups.
+
+ACL: by default the same right as `/v1/service/status`; override with `accessRights.clusterStatus` on the `ServiceRoute` constructor if you need a different rule.
+
 ## Sharing state between workers
 
 Workers do **not** share memory. To coordinate state across workers, use one of the `SharedStore` implementations.
@@ -445,9 +501,7 @@ A subscriber callback that throws (sync) or rejects (async) does not affect sibl
 
 ## Roadmap
 
-Layers 1-3.5 (worker identity, roles, KV+TTL `SharedStore`, Pub/Sub, `ClusterRegistry`) are available. The following layers are planned and will be built incrementally:
+Layers 1-5 are available. The remaining items on the roadmap:
 
-- **Layer 4: Worker registry** — `ServiceManager` (and other internal classes) implements `ClusterPublishable` so its state becomes queryable across the cluster.
-- **Layer 5: `ServiceRoute` cluster view** — `?cluster=1` query param aggregates services across all workers and hosts.
-- **Leader election** — Redis-backed lease so exactly one node runs singletons (migrations, cron master) even across multiple hosts.
+- **Leader election** — Redis-backed lease so exactly one node runs singletons (migrations, cron master) even across multiple hosts. (Today: a singleton role on a single worker via `roles: { cron: 1 }` works for single-host setups but does not survive multi-host.)
 - **Cluster config in `ConfigBackend`** — declarative cluster setup (workers, roles, SharedStore choice) via the config schema.

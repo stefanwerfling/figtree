@@ -1,6 +1,15 @@
-import { SchemaDefaultReturn, SchemaServiceByNameRequest, SchemaServiceStatusResponse, StatusCodes } from 'figtree-schemas';
+import { SchemaDefaultReturn, SchemaServiceByNameRequest, SchemaServiceInfoEntry, SchemaServiceStatusResponse, StatusCodes } from 'figtree-schemas';
+import { Vts } from 'vts';
 import { BackendApp } from '../../../Application/BackendApp.js';
+import { BackendCluster } from '../../../Application/BackendCluster.js';
+import { ClusterRegistry } from '../../../Cluster/ClusterRegistry.js';
+import { SERVICE_MANAGER_NAMESPACE } from '../../../Service/ServiceManager.js';
 import { DefaultRoute } from './DefaultRoute.js';
+export const SchemaServiceClusterStatusResponse = Vts.object({
+    statusCode: Vts.or([Vts.string(), Vts.enum(StatusCodes)]),
+    msg: Vts.optional(Vts.string()),
+    workers: Vts.object2(Vts.string(), Vts.array(SchemaServiceInfoEntry))
+});
 export class ServiceRoute extends DefaultRoute {
     _backendInstanceName;
     _onlyUserAccess;
@@ -85,6 +94,36 @@ export class ServiceRoute extends DefaultRoute {
             bodySchema: SchemaServiceByNameRequest,
             responseBodySchema: SchemaDefaultReturn,
             aclRight: this._accessRights?.stop
+        });
+        this._get(this._getUrl('v1', 'service', 'status/cluster'), this._onlyUserAccess, async (_request, _response, _data) => {
+            const backend = BackendApp.getInstance(this._backendInstanceName);
+            if (!backend) {
+                return {
+                    statusCode: StatusCodes.INTERNAL_ERROR,
+                    msg: 'Backend not found, no information for services',
+                    workers: {}
+                };
+            }
+            if (!ClusterRegistry.hasInstance()) {
+                return {
+                    statusCode: StatusCodes.OK,
+                    msg: 'ClusterRegistry not initialized — returning local view only',
+                    workers: {
+                        [BackendCluster.getWorkerId()]: backend.getServiceManager().getInfoList()
+                    }
+                };
+            }
+            const workers = await ClusterRegistry.getInstance()
+                .queryAll(SERVICE_MANAGER_NAMESPACE);
+            return {
+                statusCode: StatusCodes.OK,
+                workers: workers
+            };
+        }, {
+            description: 'Cluster-wide service status — aggregated across all workers and hosts',
+            tags: ['service'],
+            responseBodySchema: SchemaServiceClusterStatusResponse,
+            aclRight: this._accessRights?.clusterStatus ?? this._accessRights?.status
         });
         this._post(this._getUrl('v1', 'service', 'invoke'), this._onlyUserAccess, async (_request, _response, data) => {
             const backend = BackendApp.getInstance(this._backendInstanceName);
