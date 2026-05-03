@@ -16,10 +16,31 @@ export class ServiceManager {
     protected _services: ServiceAbstract[] = [];
 
     /**
-     * Add a Service
+     * Add a Service.
+     *
+     * The optional `roles` filter restricts the service to specific cluster
+     * worker roles. If the current `WORKER_ROLE` env variable is set and is
+     * not part of the filter, the service is silently skipped (not added).
+     *
+     * Behavior:
+     * - `roles` undefined or empty → service runs everywhere.
+     * - `roles` set, `WORKER_ROLE` set, role matches → service runs.
+     * - `roles` set, `WORKER_ROLE` set, role does not match → service is skipped.
+     * - `roles` set, `WORKER_ROLE` not set (single-process mode) → service runs
+     *   (filter only applies inside a role-based cluster).
+     *
      * @param {ServiceAbstract} service
+     * @param {string[]} roles Optional cluster roles this service should run on.
      */
-    public add(service: ServiceAbstract): void {
+    public add(service: ServiceAbstract, roles?: string[]): void {
+        if (roles && roles.length > 0) {
+            const currentRole = process.env.WORKER_ROLE;
+
+            if (currentRole && !roles.includes(currentRole)) {
+                return;
+            }
+        }
+
         this._services.push(service);
     }
 

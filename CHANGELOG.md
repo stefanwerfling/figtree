@@ -9,9 +9,14 @@ All notable changes to this project are documented in this file.
 ### Added
 - `BackendCluster`: Graceful shutdown — master propagates `SIGTERM`/`SIGINT` to workers, waits up to `shutdownTimeoutMs`, then `SIGKILL`s holdouts. Respawn is disabled during shutdown.
 - `BackendCluster`: Crash backoff with circuit breaker — respawns are delayed by a configurable backoff sequence (default `[0, 1000, 5000, 15000, 30000]` ms); if more than `maxPerWindow` crashes (default 5) happen within `windowMs` (default 60s), the master halts the cluster with `process.exit(1)` so a supervisor (systemd, k8s) can restart it.
-- `BackendClusterOptions`: New `shutdownTimeoutMs`, `shutdownSignals`, and `respawn` options.
-- `BackendClusterRespawnOptions`: New exported type with `backoffMs`, `maxPerWindow`, `windowMs`.
-- `doc/cluster.md`: Comprehensive cluster guide covering startup, crash respawn (backoff + circuit breaker), graceful shutdown, shared state, and roadmap.
+- `BackendCluster`: Worker roles — new `roles?: Record<string, number>` option assigns each worker a logical role (e.g. `{http: 4, cron: 1}`), propagated via `WORKER_ROLE` env. Crash respawn preserves the role.
+- `BackendCluster.getWorkerId()`: Returns a stable `<hostname>:<pid>` identifier for the current process; works in single-process and clustered modes.
+- `BackendCluster.getWorkerRole()`: Returns the current worker role or `'default'` when not in a role-based cluster.
+- `ServiceManager.add(service, roles?)`: Optional role filter — service is silently skipped when the current `WORKER_ROLE` doesn't match. In single-process mode (no `WORKER_ROLE`), the filter is inactive.
+- `BackendClusterOptions`: New `shutdownTimeoutMs`, `shutdownSignals`, `respawn`, and `roles` options.
+- `BackendClusterRespawnOptions`, `BackendClusterRoles`: New exported types.
+- `tests/unit/Application/BackendCluster.test.ts`, `tests/unit/Service/ServiceManager.test.ts`: Unit tests for worker identity, role helpers, and the role filter (14 new tests).
+- `doc/cluster.md`: Comprehensive cluster guide covering startup, crash respawn (backoff + circuit breaker), graceful shutdown, worker roles, layered cluster architecture, shared state, and roadmap.
 - `CLAUDE.md`: ESLint commands and lint conventions documented.
 
 ### Improved

@@ -24,7 +24,10 @@ type BackendClusterOptions = {
     /** Backend factory — called once per worker. */
     appFactory: () => BackendApp<any, any>;
 
-    /** Number of workers. Defaults to os.cpus().length. */
+    /**
+     * Number of workers when no roles are configured. Defaults to os.cpus().length.
+     * Ignored when `roles` is set.
+     */
     workers?: number;
 
     /**
@@ -58,6 +61,12 @@ type BackendClusterOptions = {
         /** Window for the circuit breaker in ms. Default 60_000. */
         windowMs?: number;
     };
+
+    /**
+     * Worker roles. Each key is a role name, the value is the number of workers
+     * for that role. The total worker count equals the sum of all values.
+     */
+    roles?: Record<string, number>;
 };
 ```
 
@@ -152,6 +161,108 @@ new BackendCluster({
 });
 ```
 
+## Worker roles
+
+Workers can be assigned logical roles, propagated via the `WORKER_ROLE` env variable. Roles let you split your workload — e.g. four HTTP workers handle requests while one cron worker runs scheduled jobs.
+
+### Configuration
+
+```typescript
+new BackendCluster({
+    appFactory: () => new MyBackend(),
+    roles: {
+        http: 4,
+        cron: 1
+    }
+});
+```
+
+When `roles` is set, the `workers` option is ignored. The total worker count equals the sum of all role counts (`5` in the example above). Each worker is started with `WORKER_ROLE=<role>` in its environment.
+
+### Filtering services by role
+
+Pass a list of allowed roles as the second argument to `ServiceManager.add()`:
+
+```typescript
+protected override async _initServices(): Promise<void> {
+    // every worker runs these (no role filter)
+    this._serviceManager.add(new MariaDBService());
+    this._serviceManager.add(new RedisDBService());
+
+    // only http workers
+    this._serviceManager.add(new HttpService(), ['http']);
+
+    // only the cron worker
+    this._serviceManager.add(new MyReportJob(), ['cron']);
+
+    // multi-role: http and cron both register this
+    this._serviceManager.add(new HealthCheckService(), ['http', 'cron']);
+}
+```
+
+The service is silently skipped when the current `WORKER_ROLE` doesn't match the filter. In single-process mode (no `BackendCluster`), the filter is inactive — every service runs. This means you can develop without thinking about roles.
+
+### Helpers
+
+```typescript
+BackendCluster.getWorkerRole();   // 'http' | 'cron' | ... | 'default'
+BackendCluster.getWorkerId();     // '<hostname>:<pid>'
+```
+
+`getWorkerRole()` returns `'default'` when `WORKER_ROLE` is not set (single-process mode or a `BackendCluster` started without roles). `getWorkerId()` always returns a `<hostname>:<pid>` string — stable across cluster and single-process modes — and is used as the unique identity in cluster-wide registries (see roadmap).
+
+### Crash respawn preserves roles
+
+When a worker dies, the master remembers its role and respawns a new worker with the **same** role. A cron worker stays a cron worker; an http worker stays an http worker. Without this, a crash could turn your only cron worker into another http worker.
+
+### What is NOT shared
+
+Each worker is its own Node.js process with its own memory. The `ServiceManager` of an http worker does not see the services of the cron worker. To see "what is running across the entire cluster", you need the cluster registry (see below).
+
+## Cluster architecture
+
+For features that span workers — cluster-wide service visibility, cross-host scaling, leader election — FigTree builds layered abstractions on top of `BackendCluster`. The current state and the roadmap:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│ Layer 5: ServiceRoute cluster view (planned)            │
+├─────────────────────────────────────────────────────────┤
+│ Layer 4: Worker registry — heartbeat + service info     │
+│          (planned)                                      │
+├─────────────────────────────────────────────────────────┤
+│ Layer 3.5: ClusterRegistry / ClusterPublishable         │
+│            (planned — pattern for any class to share    │
+│             its state across the cluster)               │
+├─────────────────────────────────────────────────────────┤
+│ Layer 3: SharedStore Pub/Sub (planned)                  │
+│          publish() / subscribe()                        │
+├─────────────────────────────────────────────────────────┤
+│ Layer 2: SharedStore KV (✓ available)                   │
+│          IPCSharedStore + RedisSharedStore              │
+├─────────────────────────────────────────────────────────┤
+│ Layer 1: Worker identity + roles (✓ available)          │
+│          WORKER_ID, WORKER_ROLE                         │
+└─────────────────────────────────────────────────────────┘
+```
+
+The layered model means: with `RedisSharedStore` configured to a single shared Redis instance, every worker on every host sees the same state. A reverse proxy distributing requests across hosts changes nothing — whichever worker handles a request can read and write the cluster-wide state.
+
+The `ClusterRegistry` (Layer 3.5) is the planned generic abstraction for "this class wants to publish its state cluster-wide". Any class implementing the `ClusterPublishable` interface (a `getNamespace()` and `serialize()` pair) is automatically picked up by the registry's heartbeat and becomes queryable cluster-wide:
+
+```typescript
+// planned API
+class JobQueue implements ClusterPublishable {
+    public getNamespace(): string { return 'job-queue'; }
+    public serialize(): unknown { return { depth: this._queue.length }; }
+}
+
+ClusterRegistry.getInstance().register(new JobQueue());
+const all = await ClusterRegistry.getInstance().queryAll<QueueInfo>('job-queue');
+// → { 'host1:1234': {depth: 5}, 'host2:5678': {depth: 12}, ... }
+```
+
+This is the same pattern that `ServiceRoute` will use to provide a cluster-wide view, but exposed as public API so any user class can participate.
+
 ## Sharing state between workers
 
 Workers do **not** share memory. To coordinate state across workers, use one of the `SharedStore` implementations.
@@ -193,9 +304,11 @@ Use this when running multiple `BackendCluster` instances across multiple hosts.
 
 ## Roadmap
 
-The following improvements are planned for `BackendCluster`:
+Layers 1-2 (worker identity, roles, KV `SharedStore`) are available. The following layers are planned and will be built incrementally:
 
-- **Worker roles** — designate workers as `http`, `cron`, `worker`, etc., propagated via `process.env.WORKER_ROLE`.
-- **Leader election** — Redis-backed lease so exactly one node runs singletons (migrations, cron master).
-- **Pub/Sub on `SharedStore`** — `publish` / `subscribe` for cache invalidation, config reload, plugin reinit across workers.
-- **Cluster config in `ConfigBackend`** — declarative cluster setup via the config schema.
+- **Layer 3: Pub/Sub on `SharedStore`** — `publish()` / `subscribe()` on the existing `SharedStore` interface; IPC implementation via master relay, Redis implementation via native Pub/Sub. Foundation for live event propagation.
+- **Layer 3.5: `ClusterRegistry` + `ClusterPublishable`** — generic pattern for any class to publish its state cluster-wide. Heartbeat-based with TTL so dead workers expire automatically.
+- **Layer 4: Worker registry** — `ServiceManager` (and other internal classes) implements `ClusterPublishable` so its state becomes queryable across the cluster.
+- **Layer 5: `ServiceRoute` cluster view** — `?cluster=1` query param aggregates services across all workers and hosts.
+- **Leader election** — Redis-backed lease so exactly one node runs singletons (migrations, cron master) even across multiple hosts.
+- **Cluster config in `ConfigBackend`** — declarative cluster setup (workers, roles, SharedStore choice) via the config schema.

@@ -434,16 +434,47 @@ import { BackendCluster } from 'figtree';
 
 const cluster = new BackendCluster({
     appFactory: () => new MyBackend(),
-    workers: 4,                             // optional, defaults to os.cpus().length
+    workers: 4,                             // optional, defaults to os.cpus().length (ignored when `roles` is set)
     shutdownTimeoutMs: 15_000,              // optional, default 15s
     shutdownSignals: ['SIGTERM', 'SIGINT'], // optional
     respawn: {                              // optional
         backoffMs: [0, 1000, 5000, 15_000, 30_000],
         maxPerWindow: 5,
         windowMs: 60_000
+    },
+    roles: {                                // optional — see "Worker roles" below
+        http: 4,
+        cron: 1
     }
 });
 await cluster.start();
+```
+
+### Worker roles
+
+Workers can be assigned logical roles, propagated via the `WORKER_ROLE` env variable. Services can then be filtered by role at registration time:
+
+```typescript
+protected override async _initServices(): Promise<void> {
+    // runs on every worker (no role filter)
+    this._serviceManager.add(new MariaDBService());
+    this._serviceManager.add(new RedisDBService());
+
+    // runs only on http workers
+    this._serviceManager.add(new HttpService(), ['http']);
+
+    // runs only on the cron worker (singleton in the cluster)
+    this._serviceManager.add(new MyReportJob(), ['cron']);
+}
+```
+
+In single-process mode (no `BackendCluster`), the role filter is inactive — every service runs. Inside a role-based cluster, services are only registered on workers whose role matches.
+
+Helpers:
+
+```typescript
+BackendCluster.getWorkerRole();   // 'http' | 'cron' | 'default'
+BackendCluster.getWorkerId();     // '<hostname>:<pid>'
 ```
 
 ### Graceful shutdown

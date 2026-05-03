@@ -2,7 +2,7 @@ import { ServiceInfoEntry } from 'figtree-schemas';
 import { ServiceAbstract } from './ServiceAbstract.js';
 export declare class ServiceManager {
     protected _services: ServiceAbstract[];
-    add(service: ServiceAbstract): void;
+    add(service: ServiceAbstract, roles?: string[]): void;
     getByName(name: string): ServiceAbstract | null;
     getInfoList(): ServiceInfoEntry[];
     protected _startService(service: ServiceAbstract): Promise<void>;

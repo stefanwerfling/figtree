@@ -4,7 +4,13 @@ import { DateHelper } from '../Utils/DateHelper.js';
 import { ServiceJobAbstract } from './ServiceJobAbstract.js';
 export class ServiceManager {
     _services = [];
-    add(service) {
+    add(service, roles) {
+        if (roles && roles.length > 0) {
+            const currentRole = process.env.WORKER_ROLE;
+            if (currentRole && !roles.includes(currentRole)) {
+                return;
+            }
+        }
         this._services.push(service);
     }
     getByName(name) {
