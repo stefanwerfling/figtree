@@ -434,9 +434,14 @@ import { BackendCluster } from 'figtree';
 
 const cluster = new BackendCluster({
     appFactory: () => new MyBackend(),
-    workers: 4,                            // optional, defaults to os.cpus().length
-    shutdownTimeoutMs: 15_000,             // optional, default 15s
-    shutdownSignals: ['SIGTERM', 'SIGINT'] // optional
+    workers: 4,                             // optional, defaults to os.cpus().length
+    shutdownTimeoutMs: 15_000,              // optional, default 15s
+    shutdownSignals: ['SIGTERM', 'SIGINT'], // optional
+    respawn: {                              // optional
+        backoffMs: [0, 1000, 5000, 15_000, 30_000],
+        maxPerWindow: 5,
+        windowMs: 60_000
+    }
 });
 await cluster.start();
 ```
@@ -452,6 +457,14 @@ When the master receives a shutdown signal (`SIGTERM` / `SIGINT` by default):
 5. The master exits with code `0`.
 
 `shutdownTimeoutMs` should be larger than the worker-side timeout (10s in `BackendApp.start()`) so the worker has a chance to finish first.
+
+### Crash backoff & circuit breaker
+
+When a worker exits unexpectedly, respawn is delayed by a progressive backoff and bounded by a circuit breaker:
+
+- The 1st crash respawns instantly, the 2nd after `1s`, the 3rd after `5s`, etc. (configurable via `respawn.backoffMs`).
+- Crashes are tracked across a rolling window (`respawn.windowMs`, default `60s`).
+- If more than `respawn.maxPerWindow` (default `5`) crashes occur within that window, the master halts the cluster with `process.exit(1)` so a process supervisor (systemd, Kubernetes, etc.) can restart it.
 
 For more details see [`doc/cluster.md`](doc/cluster.md).
 

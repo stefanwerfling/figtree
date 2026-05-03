@@ -8,8 +8,10 @@ All notable changes to this project are documented in this file.
 
 ### Added
 - `BackendCluster`: Graceful shutdown — master propagates `SIGTERM`/`SIGINT` to workers, waits up to `shutdownTimeoutMs`, then `SIGKILL`s holdouts. Respawn is disabled during shutdown.
-- `BackendClusterOptions`: New `shutdownTimeoutMs` (default 15s) and `shutdownSignals` (default `['SIGTERM', 'SIGINT']`) options.
-- `doc/cluster.md`: Comprehensive cluster guide covering startup, crash respawn, graceful shutdown, shared state, and roadmap.
+- `BackendCluster`: Crash backoff with circuit breaker — respawns are delayed by a configurable backoff sequence (default `[0, 1000, 5000, 15000, 30000]` ms); if more than `maxPerWindow` crashes (default 5) happen within `windowMs` (default 60s), the master halts the cluster with `process.exit(1)` so a supervisor (systemd, k8s) can restart it.
+- `BackendClusterOptions`: New `shutdownTimeoutMs`, `shutdownSignals`, and `respawn` options.
+- `BackendClusterRespawnOptions`: New exported type with `backoffMs`, `maxPerWindow`, `windowMs`.
+- `doc/cluster.md`: Comprehensive cluster guide covering startup, crash respawn (backoff + circuit breaker), graceful shutdown, shared state, and roadmap.
 - `CLAUDE.md`: ESLint commands and lint conventions documented.
 
 ### Improved

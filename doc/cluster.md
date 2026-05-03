@@ -38,6 +38,26 @@ type BackendClusterOptions = {
      * Default: ['SIGTERM', 'SIGINT'].
      */
     shutdownSignals?: NodeJS.Signals[];
+
+    /** Respawn / circuit-breaker behavior for crashed workers. */
+    respawn?: {
+        /**
+         * Backoff sequence in ms; index = number of recent crashes - 1.
+         * The last value is reused once the index exceeds the array length.
+         * Default: [0, 1000, 5000, 15000, 30000]
+         * (1st crash → instant, 2nd → 1s, 3rd → 5s, ...).
+         */
+        backoffMs?: number[];
+
+        /**
+         * If more than maxPerWindow crashes happen within windowMs,
+         * halt the cluster (process.exit(1)). Default 5.
+         */
+        maxPerWindow?: number;
+
+        /** Window for the circuit breaker in ms. Default 60_000. */
+        windowMs?: number;
+    };
 };
 ```
 
@@ -51,9 +71,39 @@ type BackendClusterOptions = {
 
 ### Crash respawn
 
-If a worker exits unexpectedly, the master respawns a new one immediately. This happens only **outside** of shutdown — once a shutdown signal has been received, exited workers are not replaced.
+If a worker exits unexpectedly, the master schedules a respawn after a progressive backoff delay. This happens only **outside** of shutdown — once a shutdown signal has been received, exited workers are not replaced.
 
-> **Note:** the current implementation does not yet apply backoff between respawns. If a worker fails to start (e.g. a misconfiguration), it will be respawned in a tight loop. Crash backoff is on the roadmap.
+#### Backoff
+
+The default backoff sequence is `[0, 1000, 5000, 15000, 30000]` ms — the first crash respawns instantly, the second after 1 second, the third after 5 seconds, and so on. Once the crash counter exceeds the array length, the last value is reused.
+
+```typescript
+new BackendCluster({
+    appFactory: () => new MyBackend(),
+    respawn: {
+        backoffMs: [0, 500, 2000, 10_000]
+    }
+});
+```
+
+#### Circuit breaker
+
+To prevent a tight respawn loop on persistent boot failures (misconfiguration, missing dependency, broken migration), the master tracks crashes across a rolling window. If too many happen in that window, the cluster halts:
+
+- `respawn.windowMs` — rolling window length, default `60_000` (60 seconds).
+- `respawn.maxPerWindow` — maximum crashes allowed in the window before halting, default `5`.
+
+When the breaker trips:
+
+```
+BackendCluster: circuit breaker tripped — 6 crashes within 60000ms. Halting cluster.
+```
+
+The master sets `_shuttingDown` and calls `process.exit(1)`. A process supervisor (systemd, PM2, Kubernetes, Docker `restart: on-failure`) is expected to restart the whole cluster after that.
+
+#### Counter window
+
+Old crash timestamps are pruned automatically on every exit event, so a single transient crash does not accumulate forever. After a quiet period of `windowMs` the next crash is treated as the 1st again (instant respawn).
 
 ### Graceful shutdown
 
@@ -145,7 +195,6 @@ Use this when running multiple `BackendCluster` instances across multiple hosts.
 
 The following improvements are planned for `BackendCluster`:
 
-- **Crash backoff with circuit breaker** — exponential delay between respawns; cluster halt after N crashes per minute.
 - **Worker roles** — designate workers as `http`, `cron`, `worker`, etc., propagated via `process.env.WORKER_ROLE`.
 - **Leader election** — Redis-backed lease so exactly one node runs singletons (migrations, cron master).
 - **Pub/Sub on `SharedStore`** — `publish` / `subscribe` for cache invalidation, config reload, plugin reinit across workers.
