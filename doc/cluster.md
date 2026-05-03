@@ -15,6 +15,13 @@ await (await bootstrap(() => new MyBackend())).start();
 
 With `cluster.enabled: true` in `config.json`, this forks workers; otherwise it runs single-process. Same entry point for both. See [Configuration](#configuration) below for the full schema.
 
+`bootstrap()` resolves the config file in this order:
+1. `options.configFile` if passed.
+2. `--config=<path>` from the CLI.
+3. `./config.json` in the current working directory.
+
+`CLUSTER_*` environment variables (e.g. `CLUSTER_ENABLED=1`) are applied on top, so cluster mode can also be enabled via env vars alone — useful for container deployments without a config file.
+
 If you prefer explicit setup (no config), instantiate `BackendCluster` directly:
 
 ```typescript

@@ -16,11 +16,11 @@ npm run build                                  # build the library
 
 # single-process
 npx tsx examples/single-process/main.ts \
-    --config examples/single-process/config.json
+    --config=examples/single-process/config.json
 
 # cluster
 npx tsx examples/cluster/main.ts \
-    --config examples/cluster/config.json
+    --config=examples/cluster/config.json
 ```
 
 ## Adapting to your own project

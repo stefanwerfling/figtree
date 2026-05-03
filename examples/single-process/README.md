@@ -9,7 +9,7 @@ From the figtree root:
 ```bash
 npm run build                                  # build the library
 npx tsx examples/single-process/main.ts \
-    --config examples/single-process/config.json
+    --config=examples/single-process/config.json
 ```
 
 Then open:

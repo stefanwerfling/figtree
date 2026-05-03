@@ -47,6 +47,10 @@ All notable changes to this project are documented in this file.
 
 ### Removed
 - `src/Example/` — replaced by the two self-contained packages under `examples/`.
+
+### Fixed
+- `bootstrap()`: now resolves the config file via `--config=<path>` from the CLI (parsed via `Args.get(SchemaDefaultArgs)`) and applies `CLUSTER_*` env variables on top. Previously the master only looked at `./config.json` in the current working directory, which meant `npx tsx examples/cluster/main.ts --config=examples/cluster/config.json` would silently fall through to single-process mode because the master never saw the flag. Cluster mode can now also be enabled with env vars alone (no config file required).
+- 3 new tests covering the new env-override and CLI-flag pathways.
 - `tests/unit/Application/BackendCluster.test.ts`, `tests/unit/Service/ServiceManager.test.ts`, `tests/unit/SharedStore/IPCSharedStore.test.ts`: Unit tests for worker identity, role helpers, the role filter, and IPC Pub/Sub behavior (21 new tests).
 - `doc/cluster.md`: Comprehensive cluster guide covering startup, crash respawn (backoff + circuit breaker), graceful shutdown, worker roles, Pub/Sub, layered cluster architecture, shared state, and roadmap.
 - `CLAUDE.md`: ESLint commands and lint conventions documented.

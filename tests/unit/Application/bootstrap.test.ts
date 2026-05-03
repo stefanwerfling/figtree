@@ -84,3 +84,78 @@ describe('bootstrap (master / standalone)', () => {
     });
 
 });
+
+describe('bootstrap (CLUSTER_* env overrides)', () => {
+
+    let tmpDir: string;
+    const original: Record<string, string | undefined> = {};
+    const keys = [
+        'CLUSTER_ENABLED',
+        'CLUSTER_WORKERS',
+        'CLUSTER_SHUTDOWN_TIMEOUT_MS',
+        'CLUSTER_SHARED_STORE_TYPE',
+        'CLUSTER_SHARED_STORE_NAMESPACE'
+    ];
+
+    beforeEach(async() => {
+        tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'figtree-bootstrap-env-'));
+
+        for (const k of keys) {
+            original[k] = process.env[k];
+            delete process.env[k];
+        }
+    });
+
+    afterEach(async() => {
+        await fs.rm(tmpDir, { recursive: true, force: true });
+
+        for (const k of keys) {
+            if (original[k] === undefined) {
+                delete process.env[k];
+            } else {
+                process.env[k] = original[k];
+            }
+        }
+    });
+
+    it('CLUSTER_ENABLED=1 enables cluster mode even with no config file', async() => {
+        process.env.CLUSTER_ENABLED = '1';
+        process.env.CLUSTER_SHARED_STORE_TYPE = 'ipc';
+
+        const result = await bootstrap(fakeFactory, {
+            configFile: path.join(tmpDir, 'missing.json')
+        });
+
+        expect(result).toBeInstanceOf(BackendCluster);
+    });
+
+    it('CLUSTER_ENABLED=true overrides cluster.enabled=false in the file', async() => {
+        const file = path.join(tmpDir, 'config.json');
+        await fs.writeFile(file, JSON.stringify({
+            cluster: { enabled: false, workers: 1 }
+        }));
+
+        process.env.CLUSTER_ENABLED = 'true';
+
+        const result = await bootstrap(fakeFactory, { configFile: file });
+        expect(result).toBeInstanceOf(BackendCluster);
+    });
+
+    it('preserves file-only fields when only some env vars are set', async() => {
+        const file = path.join(tmpDir, 'config.json');
+        await fs.writeFile(file, JSON.stringify({
+            cluster: {
+                enabled: true,
+                roles: { http: 2, cron: 1 },
+                shutdownTimeoutMs: 8000
+            }
+        }));
+
+        process.env.CLUSTER_SHUTDOWN_TIMEOUT_MS = '20000';
+
+        const result = await bootstrap(fakeFactory, { configFile: file });
+        // file-defined roles are preserved; env overrides shutdownTimeoutMs
+        expect(result).toBeInstanceOf(BackendCluster);
+    });
+
+});

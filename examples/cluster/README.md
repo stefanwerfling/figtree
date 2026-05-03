@@ -19,7 +19,7 @@ From the figtree root:
 ```bash
 npm run build                                  # build the library
 npx tsx examples/cluster/main.ts \
-    --config examples/cluster/config.json
+    --config=examples/cluster/config.json
 ```
 
 Output:
