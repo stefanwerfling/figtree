@@ -9,6 +9,7 @@ export class PluginManager {
     static _instance = null;
     _appPath;
     _checkDistHash = false;
+    _pluginKey = 'figtree';
     _serviceName;
     _plugins = [];
     _events = new Map();
@@ -28,6 +29,9 @@ export class PluginManager {
         }
         if (options.checkDistHash) {
             this._checkDistHash = true;
+        }
+        if (options.pluginKey) {
+            this._pluginKey = options.pluginKey;
         }
         this._serviceName = serviceName;
         PluginManager._instance = this;
@@ -66,11 +70,12 @@ export class PluginManager {
                     const packageFile = path.join(packageJsonPath, 'package.json');
                     const packetData = await FileHelper.readJsonFile(packageFile);
                     if (packetData) {
-                        if (packetData.flyingfish) {
+                        const definition = packetData[this._pluginKey];
+                        if (definition) {
                             const errors = [];
-                            if (SchemaPluginDefinition.validate(packetData.flyingfish, errors)) {
+                            if (SchemaPluginDefinition.validate(definition, errors)) {
                                 informations.push({
-                                    definition: packetData.flyingfish,
+                                    definition: definition,
                                     path: packageJsonPath
                                 });
                             }

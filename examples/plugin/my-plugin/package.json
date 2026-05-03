@@ -1,0 +1,16 @@
+{
+    "name": "my-plugin",
+    "private": true,
+    "version": "1.0.0",
+    "description": "Example FigTree plugin demonstrating route, middleware and lifecycle hooks.",
+    "type": "module",
+    "main": "src/index.ts",
+    "peerDependencies": {
+        "figtree": "*"
+    },
+    "figtree": {
+        "name": "my-plugin",
+        "version": "1.0.0",
+        "main": "src/index.ts"
+    }
+}

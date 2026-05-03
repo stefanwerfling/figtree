@@ -9,7 +9,9 @@ import cookieParser from 'cookie-parser';
 import session, {Store} from 'express-session';
 import {PemHelper} from '../../Crypto/PemHelper.js';
 import {Logger} from '../../Logger/Logger.js';
+import {PluginManager} from '../../Plugins/PluginManager.js';
 import {FileHelper} from '../../Utils/FileHelper.js';
+import {HttpMiddlewareProviders} from './HttpMiddlewareProviders.js';
 import {IDefaultRoute} from './Routes/IDefaultRoute.js';
 import {ITlsClientError} from './Tls/ITlsClientError.js';
 import {ITlsSocket} from './Tls/ITlsSocket.js';
@@ -338,8 +340,54 @@ export class BaseHttpServer {
 
         this._initSession();
         this._initExpressUsePre();
+        await this._initExpressUsePlugins();
         this._initExpressUseMain();
         this._initExpressUseAfter();
+    }
+
+    /**
+     * Install plugin-contributed middleware between the standard pre-route
+     * middleware (body, cookies, CSRF, session) and the application routes.
+     *
+     * Default behavior: queries every registered `IHttpMiddlewareProvider`
+     * via the `PluginManager` (no-op if no plugin manager is initialized).
+     *
+     * Override in a subclass if you want to inject middleware without going
+     * through the plugin system, or to filter the provider list.
+     *
+     * @protected
+     */
+    protected async _initExpressUsePlugins(): Promise<void> {
+        if (this._express === undefined) {
+            throw new Error('Express isnt init!');
+        }
+
+        const handlers = await this._getMiddlewareFromPlugins();
+
+        for (const mw of handlers) {
+            this._express.use(mw);
+        }
+    }
+
+    /**
+     * Resolve middleware contributed by plugins. Returns an empty array if no
+     * plugin manager has been initialized (typical in tests or pure single-process
+     * setups without plugins).
+     *
+     * @protected
+     */
+    protected async _getMiddlewareFromPlugins(): Promise<express.RequestHandler[]> {
+        if (!PluginManager.hasInstance()) {
+            return [];
+        }
+
+        try {
+            const providers = new HttpMiddlewareProviders();
+            return await providers.getProvidersMiddleware();
+        } catch (err) {
+            Logger.getLogger().warn('BaseHttpServer::_getMiddlewareFromPlugins: failed to load plugin middleware', err);
+            return [];
+        }
     }
 
     protected async _initServer(): Promise<void> {

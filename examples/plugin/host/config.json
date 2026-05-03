@@ -1,0 +1,11 @@
+{
+    "logging": {
+        "dirname": "./logs",
+        "level": "info"
+    },
+    "db": {},
+    "httpserver": {
+        "port": 3000,
+        "publicdir": "./public"
+    }
+}

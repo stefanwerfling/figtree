@@ -6,6 +6,8 @@ import {Config} from '../Config/Config.js';
 import {ConfigBackend} from '../Config/ConfigBackend.js';
 import {Args} from '../Env/Args.js';
 import {Logger} from '../Logger/Logger.js';
+import {OnBackendLifecycleEvent} from '../Plugins/OnBackendLifecycleEvent.js';
+import {PluginManager} from '../Plugins/PluginManager.js';
 import {ServiceManager} from '../Service/ServiceManager.js';
 import {FileHelper} from '../Utils/FileHelper.js';
 import exitHook from 'async-exit-hook';
@@ -181,6 +183,8 @@ export abstract class BackendApp<A extends DefaultArgs, _C extends ConfigOptions
             try {
                 Logger.getLogger().info('Stop %s Service ...', Config.getInstance().getAppName());
 
+                await this._fireLifecycleEvents('stop');
+
                 if (ClusterRegistry.hasInstance()) {
                     await ClusterRegistry.getInstance().stop();
                 }
@@ -209,6 +213,40 @@ export abstract class BackendApp<A extends DefaultArgs, _C extends ConfigOptions
             const registry = ClusterRegistry.getInstance();
             registry.register(this._serviceManager);
             await registry.start();
+        }
+
+        // Plugin lifecycle hooks — fired after services and the cluster
+        // registry are fully up.
+        await this._fireLifecycleEvents('start');
+    }
+
+    /**
+     * Fire `OnBackendLifecycleEvent.onStart` / `onStop` on every registered
+     * plugin event. Errors in individual hooks are logged but do not abort
+     * the lifecycle.
+     * @param {'start'|'stop'} phase
+     * @private
+     */
+    private async _fireLifecycleEvents(phase: 'start' | 'stop'): Promise<void> {
+        if (!PluginManager.hasInstance()) {
+            return;
+        }
+
+        const events = PluginManager.getInstance().getAllEvents(OnBackendLifecycleEvent);
+
+        for (const event of events) {
+            try {
+                if (phase === 'start') {
+                    // sequential by design — earlier plugins may set up state later ones depend on
+                    // eslint-disable-next-line no-await-in-loop
+                    await event.onStart();
+                } else {
+                    // eslint-disable-next-line no-await-in-loop
+                    await event.onStop();
+                }
+            } catch (err) {
+                Logger.getLogger().error(`BackendApp::lifecycle::${phase}: plugin event ${event.getName()} failed`, err);
+            }
         }
     }
 

@@ -59,6 +59,8 @@ export declare class BaseHttpServer {
     protected _initExpressUseMain(): void;
     protected _getSessionStore(): Store;
     setup(): Promise<void>;
+    protected _initExpressUsePlugins(): Promise<void>;
+    protected _getMiddlewareFromPlugins(): Promise<express.RequestHandler[]>;
     protected _initServer(): Promise<void>;
     private _routesUse;
     private _assets;

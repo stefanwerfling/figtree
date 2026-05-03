@@ -4,6 +4,8 @@ import { Config } from '../Config/Config.js';
 import { ConfigBackend } from '../Config/ConfigBackend.js';
 import { Args } from '../Env/Args.js';
 import { Logger } from '../Logger/Logger.js';
+import { OnBackendLifecycleEvent } from '../Plugins/OnBackendLifecycleEvent.js';
+import { PluginManager } from '../Plugins/PluginManager.js';
 import { ServiceManager } from '../Service/ServiceManager.js';
 import { FileHelper } from '../Utils/FileHelper.js';
 import exitHook from 'async-exit-hook';
@@ -95,6 +97,7 @@ export class BackendApp {
             });
             try {
                 Logger.getLogger().info('Stop %s Service ...', Config.getInstance().getAppName());
+                await this._fireLifecycleEvents('stop');
                 if (ClusterRegistry.hasInstance()) {
                     await ClusterRegistry.getInstance().stop();
                 }
@@ -116,6 +119,26 @@ export class BackendApp {
             const registry = ClusterRegistry.getInstance();
             registry.register(this._serviceManager);
             await registry.start();
+        }
+        await this._fireLifecycleEvents('start');
+    }
+    async _fireLifecycleEvents(phase) {
+        if (!PluginManager.hasInstance()) {
+            return;
+        }
+        const events = PluginManager.getInstance().getAllEvents(OnBackendLifecycleEvent);
+        for (const event of events) {
+            try {
+                if (phase === 'start') {
+                    await event.onStart();
+                }
+                else {
+                    await event.onStop();
+                }
+            }
+            catch (err) {
+                Logger.getLogger().error(`BackendApp::lifecycle::${phase}: plugin event ${event.getName()} failed`, err);
+            }
         }
     }
     getServiceManager() {

@@ -126,6 +126,7 @@ export {ServiceManager} from './Service/ServiceManager.js';
 export {PluginInformation} from './Plugins/PluginInformation.js';
 export {APlugin} from './Plugins/APlugin.js';
 export {APluginEvent} from './Plugins/APluginEvent.js';
+export {OnBackendLifecycleEvent} from './Plugins/OnBackendLifecycleEvent.js';
 export {PluginManagerOptions, PluginManager} from './Plugins/PluginManager.js';
 
 // Provider ------------------------------------------------------------------------------------------------------------
@@ -138,6 +139,9 @@ export {BaseProviders} from './Provider/BaseProviders.js';
 export {HttpRouteProviderType} from './Server/HttpServer/HttpRouteProviderType.js';
 export {IHttpRouteProvider} from './Server/HttpServer/IHttpRouteProvider.js';
 export {HttpRouteProviders} from './Server/HttpServer/HttpRouteProviders.js';
+export {HttpMiddlewareProviderType} from './Server/HttpServer/HttpMiddlewareProviderType.js';
+export {IHttpMiddlewareProvider} from './Server/HttpServer/IHttpMiddlewareProvider.js';
+export {HttpMiddlewareProviders} from './Server/HttpServer/HttpMiddlewareProviders.js';
 
 // ACL -----------------------------------------------------------------------------------------------------------------
 

@@ -51,6 +51,14 @@ All notable changes to this project are documented in this file.
 ### Fixed
 - `bootstrap()`: now resolves the config file via `--config=<path>` from the CLI (parsed via `Args.get(SchemaDefaultArgs)`) and applies `CLUSTER_*` env variables on top. Previously the master only looked at `./config.json` in the current working directory, which meant `npx tsx examples/cluster/main.ts --config=examples/cluster/config.json` would silently fall through to single-process mode because the master never saw the flag. Cluster mode can now also be enabled with env vars alone (no config file required).
 - 3 new tests covering the new env-override and CLI-flag pathways.
+
+### Plugin extension points
+
+- `PluginManager`: package.json key is now configurable via `pluginKey` option (default `'figtree'`, was hard-coded `'flyingfish'`). Plugins shipping for a specific host can choose a host-specific key.
+- New `IHttpMiddlewareProvider` / `HttpMiddlewareProviders` / `HttpMiddlewareProviderType`: plugins can contribute Express middleware that auto-installs in `BaseHttpServer._initExpressUsePlugins()` between the standard pre-route middleware and the application routes.
+- `BaseHttpServer._initExpressUsePlugins()`: new step in `setup()` — queries `HttpMiddlewareProviders` via `PluginManager` and `app.use()`s every returned handler. No-op when no `PluginManager` is initialized.
+- New `OnBackendLifecycleEvent` (`src/Plugins/OnBackendLifecycleEvent.ts`): plugin event with `onStart()` / `onStop()` hooks. `BackendApp.start()` fires `onStart` after services are up and the cluster registry is running; the exit hook fires `onStop` BEFORE `ServiceManager.stopAll()`, so plugins can flush state while the backend is still operational.
+- `examples/plugin/`: new self-contained example with a host backend and a plugin (`my-plugin`). The plugin demonstrates all three extension points — a route (`HelloRoute` via `IHttpRouteProvider`), middleware (`X-Request-Id` via `IHttpMiddlewareProvider`), and lifecycle hooks (`OnBackendLifecycleEvent`).
 - `tests/unit/Application/BackendCluster.test.ts`, `tests/unit/Service/ServiceManager.test.ts`, `tests/unit/SharedStore/IPCSharedStore.test.ts`: Unit tests for worker identity, role helpers, the role filter, and IPC Pub/Sub behavior (21 new tests).
 - `doc/cluster.md`: Comprehensive cluster guide covering startup, crash respawn (backoff + circuit breaker), graceful shutdown, worker roles, Pub/Sub, layered cluster architecture, shared state, and roadmap.
 - `CLAUDE.md`: ESLint commands and lint conventions documented.

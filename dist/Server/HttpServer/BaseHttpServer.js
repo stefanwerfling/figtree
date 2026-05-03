@@ -9,7 +9,9 @@ import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import { PemHelper } from '../../Crypto/PemHelper.js';
 import { Logger } from '../../Logger/Logger.js';
+import { PluginManager } from '../../Plugins/PluginManager.js';
 import { FileHelper } from '../../Utils/FileHelper.js';
+import { HttpMiddlewareProviders } from './HttpMiddlewareProviders.js';
 export class BaseHttpServer {
     static _listenHost = 'localhost';
     _port = 3000;
@@ -125,8 +127,31 @@ export class BaseHttpServer {
         await this._initServer();
         this._initSession();
         this._initExpressUsePre();
+        await this._initExpressUsePlugins();
         this._initExpressUseMain();
         this._initExpressUseAfter();
+    }
+    async _initExpressUsePlugins() {
+        if (this._express === undefined) {
+            throw new Error('Express isnt init!');
+        }
+        const handlers = await this._getMiddlewareFromPlugins();
+        for (const mw of handlers) {
+            this._express.use(mw);
+        }
+    }
+    async _getMiddlewareFromPlugins() {
+        if (!PluginManager.hasInstance()) {
+            return [];
+        }
+        try {
+            const providers = new HttpMiddlewareProviders();
+            return await providers.getProvidersMiddleware();
+        }
+        catch (err) {
+            Logger.getLogger().warn('BaseHttpServer::_getMiddlewareFromPlugins: failed to load plugin middleware', err);
+            return [];
+        }
     }
     async _initServer() {
         if (this._express === undefined) {

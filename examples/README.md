@@ -4,8 +4,9 @@ Two complete, self-contained backends:
 
 | Example | What it shows |
 |---|---|
-| [`single-process`](./single-process) | Plain FigTree backend in one Node.js process — HTTP, login, plugins, Swagger UI. Start here. |
+| [`single-process`](./single-process) | Plain FigTree backend in one Node.js process — HTTP, login, Swagger UI. Start here. |
 | [`cluster`](./cluster) | Multi-process cluster with worker roles, the `ClusterRegistry`, and a leader-elected cron worker. |
+| [`plugin`](./plugin) | Plugin author + plugin host. The plugin contributes a route, a global middleware, and lifecycle hooks. |
 
 ## Running
 
@@ -21,6 +22,11 @@ npx tsx examples/single-process/main.ts \
 # cluster
 npx tsx examples/cluster/main.ts \
     --config=examples/cluster/config.json
+
+# plugin (requires `npm install` inside host once to wire up file:-deps)
+( cd examples/plugin/host && npm install --no-package-lock --no-audit --no-fund )
+npx tsx examples/plugin/host/main.ts \
+    --config=examples/plugin/host/config.json
 ```
 
 ## Adapting to your own project

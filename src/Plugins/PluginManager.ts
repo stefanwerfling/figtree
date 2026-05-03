@@ -17,6 +17,12 @@ export type PluginManagerOptions = {
     checkDistHash?: boolean;
     // Path-to-modules directory
     appPath?: string;
+    /**
+     * Key in `package.json` under which plugin metadata is expected.
+     * Defaults to `'figtree'`. Override if you ship plugins for a specific
+     * host (e.g. `'flyingfish'`) and want to avoid name collisions.
+     */
+    pluginKey?: string;
 };
 
 /**
@@ -41,6 +47,12 @@ export class PluginManager {
      * @protected
      */
     protected _checkDistHash: boolean = false;
+
+    /**
+     * package.json key under which plugin metadata is expected.
+     * @protected
+     */
+    protected _pluginKey: string = 'figtree';
 
     /**
      * Service name from service instance (name of the system in which the plugin works).
@@ -94,6 +106,10 @@ export class PluginManager {
 
         if (options.checkDistHash) {
             this._checkDistHash = true;
+        }
+
+        if (options.pluginKey) {
+            this._pluginKey = options.pluginKey;
         }
 
         this._serviceName = serviceName;
@@ -164,12 +180,14 @@ export class PluginManager {
                     const packetData = await FileHelper.readJsonFile(packageFile);
 
                     if (packetData) {
-                        if (packetData.flyingfish) {
+                        const definition = packetData[this._pluginKey];
+
+                        if (definition) {
                             const errors: SchemaErrors = [];
 
-                            if (SchemaPluginDefinition.validate(packetData.flyingfish, errors)) {
+                            if (SchemaPluginDefinition.validate(definition, errors)) {
                                 informations.push({
-                                    definition: packetData.flyingfish,
+                                    definition: definition,
                                     path: packageJsonPath
                                 });
                             } else {

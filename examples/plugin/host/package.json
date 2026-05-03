@@ -1,0 +1,11 @@
+{
+    "name": "example-plugin-host",
+    "private": true,
+    "version": "0.0.0",
+    "description": "FigTree plugin-host example.",
+    "type": "module",
+    "dependencies": {
+        "figtree": "file:../../..",
+        "my-plugin": "file:../my-plugin"
+    }
+}

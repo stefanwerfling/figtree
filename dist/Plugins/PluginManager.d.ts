@@ -4,11 +4,13 @@ import { PluginInformation } from './PluginInformation.js';
 export type PluginManagerOptions = {
     checkDistHash?: boolean;
     appPath?: string;
+    pluginKey?: string;
 };
 export declare class PluginManager {
     protected static _instance: PluginManager | null;
     protected _appPath: string;
     protected _checkDistHash: boolean;
+    protected _pluginKey: string;
     protected _serviceName: string;
     protected _plugins: APlugin[];
     protected _events: Map<string, APluginEvent[]>;

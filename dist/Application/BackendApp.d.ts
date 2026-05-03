@@ -15,5 +15,6 @@ export declare abstract class BackendApp<A extends DefaultArgs, _C extends Confi
     protected _initLogger(): void;
     protected _initServices(): Promise<void>;
     start(): Promise<void>;
+    private _fireLifecycleEvents;
     getServiceManager(): ServiceManager;
 }
