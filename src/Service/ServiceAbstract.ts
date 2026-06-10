@@ -138,6 +138,40 @@ export class ServiceAbstract {
     }
 
     /**
+     * Probe whether the service is currently healthy. Default implementation
+     * mirrors `getStatus() === Success`, so services that have no external
+     * resource to probe automatically report healthy once started.
+     *
+     * Subclasses that own an external resource (DB connection, socket,
+     * remote API) should override this to perform a cheap liveness check
+     * (e.g. `SELECT 1`). Returning `false` causes `ServiceManager`'s health
+     * monitor to mark the service as Error and retry `start()` on the next
+     * monitor tick.
+     *
+     * The default uses `>=` to keep ordering-tolerant implementations
+     * trivial — anything past `Success` is considered healthy.
+     *
+     * @return {Promise<boolean>}
+     */
+    public async healthCheck(): Promise<boolean> {
+        return this._status === ServiceStatus.Success;
+    }
+
+    /**
+     * Framework-internal: flip the service into the Error state with the
+     * given reason. Called by `ServiceManager` when a periodic
+     * `healthCheck()` reports the service as unhealthy. App code should
+     * not call this directly — change status by overriding `start()` /
+     * `stop()` instead.
+     *
+     * @param {string} reason
+     */
+    public markUnhealthy(reason: string): void {
+        this._status = ServiceStatus.Error;
+        this._statusMsg = reason;
+    }
+
+    /**
      * Start the service
      * @throws Error
      */
