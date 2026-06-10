@@ -46,6 +46,13 @@ export class ServiceAbstract {
     getStatusMsg() {
         return this._statusMsg;
     }
+    async healthCheck() {
+        return this._status === ServiceStatus.Success;
+    }
+    markUnhealthy(reason) {
+        this._status = ServiceStatus.Error;
+        this._statusMsg = reason;
+    }
     async start() {
     }
     async invoke() {

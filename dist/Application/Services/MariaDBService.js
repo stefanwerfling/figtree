@@ -80,6 +80,16 @@ export class MariaDBService extends ServiceAbstract {
         this._status = ServiceStatus.Success;
         this._inProcess = false;
     }
+    async healthCheck() {
+        try {
+            const dataSource = await DBHelper.getDataSource();
+            await dataSource.query('SELECT 1');
+            return true;
+        }
+        catch (_error) {
+            return false;
+        }
+    }
     async stop() {
         try {
             await DBHelper.closeAllSources();

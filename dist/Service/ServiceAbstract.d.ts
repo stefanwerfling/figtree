@@ -17,6 +17,8 @@ export declare class ServiceAbstract {
     isProcess(): boolean;
     getStatus(): ServiceStatus;
     getStatusMsg(): string;
+    healthCheck(): Promise<boolean>;
+    markUnhealthy(reason: string): void;
     start(): Promise<void>;
     invoke(): Promise<void>;
     stop(_forced?: boolean): Promise<void>;

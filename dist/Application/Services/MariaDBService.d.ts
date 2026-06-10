@@ -16,5 +16,6 @@ export declare class MariaDBService extends ServiceAbstract {
     registerSetupHook(hook: DBSetupHook): void;
     protected _runSetupHooks(): Promise<void>;
     start(): Promise<void>;
+    healthCheck(): Promise<boolean>;
     stop(): Promise<void>;
 }

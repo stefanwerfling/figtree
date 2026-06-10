@@ -4,6 +4,23 @@ All notable changes to this project are documented in this file.
 
 ---
 
+## [1.1.0] - 2026-06-10
+
+### Added
+- `ServiceAbstract.healthCheck(): Promise<boolean>` — new method, default implementation returns `_status === Success`. Subclasses that own an external resource (DB, socket, remote API) override to perform a real liveness probe.
+- `ServiceAbstract.markUnhealthy(reason)` — framework-internal hook used by the monitor to flip a Success service to Error when its probe fails.
+- `ServiceManager`: health monitor — interval-driven loop (`startMonitor` / `stopMonitor`, default 5 s cadence) that retries Important services in `Error` / `None` once their dependencies become `Success`, and periodically probes Important services in `Success` via `healthCheck()` (per-service throttled by `healthCheckIntervalMs`, default 30 s). A failing probe flips status to Error so the next tick can attempt recovery.
+- `ServiceManager` constructor options: `startAllTimeoutMs`, `monitorIntervalMs`, `healthCheckIntervalMs`, `autoStartMonitor`. Backward-compatible — the no-arg constructor still works.
+- `ServiceManager.runMonitorTick()` — public hook to drive the monitor synchronously in tests.
+- `MariaDBService.healthCheck()` override — probes the default DataSource with `SELECT 1`. With `DBHelper.ensureInitialized`'s 5×3 s reconnect, brief MariaDB blips (backup-induced or otherwise) recover inside the probe itself.
+- `doc/service-lifecycle.md` — new documentation page covering status model, startup/runtime/shutdown phases, the monitor contract, and how to write a service that participates in health monitoring.
+- 16 new tests (`ServiceAbstract.test.ts` × 5, `ServiceManager.test.ts` × 8 monitor scenarios, `MariaDBService.test.ts` × 3).
+
+### Changed
+- `ServiceManager.startAll()` waiting loop is now **bounded** by `startAllTimeoutMs` (default 30 s). The previous unbounded loop polled forever — a service whose `start()` failed once was never retried, so every dependent stayed in the wait queue indefinitely (observed: a backend restart during a MariaDB backup left every cron job permanently absent). Services still waiting after the deadline are handed off to the new health monitor.
+- `ServiceManager.startAll()` poll cadence reduced from 1 s to 500 ms inside the bounded window, since the budget is now finite.
+- `ServiceManager.stopAll()` calls `stopMonitor()` before walking the services, so a shutdown mid-monitor-tick doesn't race against incoming retries.
+
 ## [Unreleased] - 2026-05-03
 
 ### Added

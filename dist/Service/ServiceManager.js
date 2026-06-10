@@ -3,8 +3,24 @@ import { Logger } from '../Logger/Logger.js';
 import { DateHelper } from '../Utils/DateHelper.js';
 import { ServiceJobAbstract } from './ServiceJobAbstract.js';
 export const SERVICE_MANAGER_NAMESPACE = 'service-manager';
+export const DEFAULT_START_ALL_TIMEOUT_MS = 30_000;
+export const DEFAULT_MONITOR_INTERVAL_MS = 5_000;
+export const DEFAULT_HEALTH_CHECK_INTERVAL_MS = 30_000;
 export class ServiceManager {
     _services = [];
+    _startAllTimeoutMs;
+    _monitorIntervalMs;
+    _healthCheckIntervalMs;
+    _autoStartMonitor;
+    _monitor = null;
+    _inTick = false;
+    _lastHealthCheckAt = new Map();
+    constructor(options) {
+        this._startAllTimeoutMs = options?.startAllTimeoutMs ?? DEFAULT_START_ALL_TIMEOUT_MS;
+        this._monitorIntervalMs = options?.monitorIntervalMs ?? DEFAULT_MONITOR_INTERVAL_MS;
+        this._healthCheckIntervalMs = options?.healthCheckIntervalMs ?? DEFAULT_HEALTH_CHECK_INTERVAL_MS;
+        this._autoStartMonitor = options?.autoStartMonitor ?? true;
+    }
     add(service, roles) {
         if (roles && roles.length > 0) {
             const currentRole = process.env.WORKER_ROLE;
@@ -78,73 +94,56 @@ export class ServiceManager {
         }
         stack.delete(name);
     }
+    _areAllDepsSuccess(service) {
+        for (const depName of service.getServiceDependencies()) {
+            const dep = this.getByName(depName);
+            if (!dep || dep.getStatus() !== ServiceStatus.Success) {
+                return false;
+            }
+        }
+        return true;
+    }
     async startAll() {
         for (const service of this._services) {
             this._checkForCycles(service);
         }
         let waitingServices = [];
         for await (const service of this._services) {
-            const deps = service.getServiceDependencies();
-            if (deps.length > 0) {
-                let isReady = true;
-                for (const dep of deps) {
-                    const tservice = this.getByName(dep);
-                    if (tservice) {
-                        if (tservice.getStatus() !== ServiceStatus.Success) {
-                            isReady = false;
-                        }
-                    }
-                    else {
-                        isReady = false;
-                    }
-                }
-                if (isReady) {
-                    await this._startService(service);
-                }
-                else {
-                    waitingServices.push(service.getServiceName());
-                }
-            }
-            else {
+            if (service.getServiceDependencies().length === 0 || this._areAllDepsSuccess(service)) {
                 await this._startService(service);
             }
+            else {
+                waitingServices.push(service.getServiceName());
+            }
         }
-        while (waitingServices.length > 0) {
+        const deadline = Date.now() + this._startAllTimeoutMs;
+        while (waitingServices.length > 0 && Date.now() < deadline) {
             await new Promise((resolve) => {
-                setTimeout(resolve, 1000);
+                setTimeout(resolve, 500);
             });
             for (const waitService of [...waitingServices]) {
                 const mService = this.getByName(waitService);
                 if (mService === null) {
-                    waitingServices = waitingServices.filter(service => service !== waitService);
-                    break;
+                    waitingServices = waitingServices.filter((s) => s !== waitService);
+                    continue;
                 }
-                const deps = mService.getServiceDependencies();
-                if (deps.length === 0) {
-                    waitingServices = waitingServices.filter(service => service !== waitService);
-                    break;
-                }
-                let isReady = true;
-                for (const dep of deps) {
-                    const tservice = this.getByName(dep);
-                    if (tservice) {
-                        if (tservice.getStatus() !== ServiceStatus.Success) {
-                            isReady = false;
-                        }
-                    }
-                    else {
-                        isReady = false;
-                    }
-                }
-                if (isReady) {
+                if (mService.getServiceDependencies().length === 0 || this._areAllDepsSuccess(mService)) {
                     await this._startService(mService);
-                    waitingServices = waitingServices.filter(service => service !== waitService);
-                    break;
+                    waitingServices = waitingServices.filter((s) => s !== waitService);
                 }
             }
         }
+        if (waitingServices.length > 0) {
+            Logger.getLogger().warn(`ServiceManager.startAll: ${waitingServices.length} service(s) still waiting after ` +
+                `${this._startAllTimeoutMs}ms [${waitingServices.join(', ')}]. ` +
+                'Health monitor will retry once their dependencies become healthy.');
+        }
+        if (this._autoStartMonitor) {
+            this.startMonitor();
+        }
     }
     async stopAll() {
+        this.stopMonitor();
         const services = [...this._services].reverse();
         for await (const service of services) {
             try {
@@ -154,6 +153,72 @@ export class ServiceManager {
             catch (error) {
                 Logger.getLogger().warn(`Error stopping '${service.constructor.name}':`, error);
             }
+        }
+    }
+    startMonitor() {
+        if (this._monitor !== null) {
+            return;
+        }
+        this._monitor = setInterval(() => {
+            this._monitorTick().catch((error) => {
+                Logger.getLogger().error('ServiceManager: monitor tick threw uncaught:', error);
+            });
+        }, this._monitorIntervalMs);
+        this._monitor.unref();
+    }
+    stopMonitor() {
+        if (this._monitor !== null) {
+            clearInterval(this._monitor);
+            this._monitor = null;
+        }
+    }
+    async runMonitorTick() {
+        await this._monitorTick();
+    }
+    async _monitorTick() {
+        if (this._inTick) {
+            return;
+        }
+        this._inTick = true;
+        try {
+            for (const service of this._services) {
+                if (service.isProcess()) {
+                    continue;
+                }
+                if (service.getImportance() !== ServiceImportance.Important) {
+                    continue;
+                }
+                const status = service.getStatus();
+                if (status === ServiceStatus.Error || status === ServiceStatus.None) {
+                    if (this._areAllDepsSuccess(service)) {
+                        await this._startService(service);
+                    }
+                    continue;
+                }
+                if (status === ServiceStatus.Success) {
+                    const name = service.getServiceName();
+                    const last = this._lastHealthCheckAt.get(name) ?? 0;
+                    if (Date.now() - last < this._healthCheckIntervalMs) {
+                        continue;
+                    }
+                    this._lastHealthCheckAt.set(name, Date.now());
+                    let ok = false;
+                    try {
+                        ok = await service.healthCheck();
+                    }
+                    catch (error) {
+                        Logger.getLogger().warn(`ServiceManager: healthCheck threw for '${name}', treating as unhealthy:`, error);
+                        ok = false;
+                    }
+                    if (!ok) {
+                        Logger.getLogger().warn(`ServiceManager: '${name}' became unhealthy`);
+                        service.markUnhealthy('healthCheck reported unhealthy');
+                    }
+                }
+            }
+        }
+        finally {
+            this._inTick = false;
         }
     }
     async start(name) {
