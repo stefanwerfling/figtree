@@ -18,6 +18,19 @@ export const SERVICE_MANAGER_NAMESPACE = 'service-manager';
 export const DEFAULT_START_ALL_TIMEOUT_MS = 30_000;
 
 /**
+ * Default monitor tick cadence — how often the manager re-evaluates
+ * Important services for retry / health-check.
+ */
+export const DEFAULT_MONITOR_INTERVAL_MS = 5_000;
+
+/**
+ * Default per-service throttle on `healthCheck()` probes. Independent
+ * of the monitor tick: probes cost real work (DB round-trip etc.) so
+ * we don't run them on every tick.
+ */
+export const DEFAULT_HEALTH_CHECK_INTERVAL_MS = 30_000;
+
+/**
  * ServiceManager constructor options.
  */
 export type ServiceManagerOptions = {
@@ -28,6 +41,25 @@ export type ServiceManagerOptions = {
      * monitor. Default: {@link DEFAULT_START_ALL_TIMEOUT_MS}.
      */
     startAllTimeoutMs?: number;
+
+    /**
+     * Monitor tick cadence in ms.
+     * Default: {@link DEFAULT_MONITOR_INTERVAL_MS}.
+     */
+    monitorIntervalMs?: number;
+
+    /**
+     * Minimum gap between two `healthCheck()` probes of the same
+     * service in ms.
+     * Default: {@link DEFAULT_HEALTH_CHECK_INTERVAL_MS}.
+     */
+    healthCheckIntervalMs?: number;
+
+    /**
+     * If false, `startAll()` will not auto-start the monitor.
+     * Useful in tests. Default: true.
+     */
+    autoStartMonitor?: boolean;
 
 };
 
@@ -49,11 +81,53 @@ export class ServiceManager implements ClusterPublishable {
     protected readonly _startAllTimeoutMs: number;
 
     /**
+     * Monitor tick cadence in ms.
+     * @protected
+     */
+    protected readonly _monitorIntervalMs: number;
+
+    /**
+     * Minimum gap between two probes of the same service.
+     * @protected
+     */
+    protected readonly _healthCheckIntervalMs: number;
+
+    /**
+     * Whether {@link startAll} kicks off the monitor when it returns.
+     * @protected
+     */
+    protected readonly _autoStartMonitor: boolean;
+
+    /**
+     * Active monitor handle, or null when stopped.
+     * @protected
+     */
+    protected _monitor: NodeJS.Timeout|null = null;
+
+    /**
+     * Re-entry guard for {@link _monitorTick}. A tick may take longer
+     * than {@link _monitorIntervalMs} (slow healthCheck, slow start),
+     * so we skip overlapping ticks.
+     * @protected
+     */
+    protected _inTick: boolean = false;
+
+    /**
+     * Per-service timestamp (epoch ms) of the last successful
+     * `healthCheck()` invocation. Used to throttle probes.
+     * @protected
+     */
+    protected _lastHealthCheckAt: Map<string, number> = new Map();
+
+    /**
      * Constructor
      * @param {ServiceManagerOptions} options
      */
     public constructor(options?: ServiceManagerOptions) {
         this._startAllTimeoutMs = options?.startAllTimeoutMs ?? DEFAULT_START_ALL_TIMEOUT_MS;
+        this._monitorIntervalMs = options?.monitorIntervalMs ?? DEFAULT_MONITOR_INTERVAL_MS;
+        this._healthCheckIntervalMs = options?.healthCheckIntervalMs ?? DEFAULT_HEALTH_CHECK_INTERVAL_MS;
+        this._autoStartMonitor = options?.autoStartMonitor ?? true;
     }
 
     /**
@@ -264,12 +338,18 @@ export class ServiceManager implements ClusterPublishable {
                 'Health monitor will retry once their dependencies become healthy.'
             );
         }
+
+        if (this._autoStartMonitor) {
+            this.startMonitor();
+        }
     }
 
     /**
      * Stop all Services
      */
     public async stopAll(): Promise<void> {
+        this.stopMonitor();
+
         const services = [...this._services].reverse();
 
         for await (const service of services) {
@@ -280,6 +360,130 @@ export class ServiceManager implements ClusterPublishable {
             } catch (error) {
                 Logger.getLogger().warn(`Error stopping '${service.constructor.name}':`, error);
             }
+        }
+    }
+
+    /**
+     * Start the periodic health monitor. The monitor runs every
+     * {@link _monitorIntervalMs} ms and:
+     *
+     * - Retries `start()` on Important services that are currently in
+     *   `Error` or `None` state and whose dependencies are now ready.
+     * - Probes Important services in `Success` state via
+     *   `service.healthCheck()`, throttled per service by
+     *   {@link _healthCheckIntervalMs}. A `false` result flips the
+     *   service to `Error`, which makes the next monitor tick attempt
+     *   to restart it.
+     *
+     * Optional services are never monitored — one-shot best-effort at
+     * startup is the contract.
+     *
+     * Re-entrant calls are no-ops. The interval handle is unref'd so
+     * it never holds the process open on its own.
+     */
+    public startMonitor(): void {
+        if (this._monitor !== null) {
+            return;
+        }
+
+        this._monitor = setInterval(() => {
+            this._monitorTick().catch((error) => {
+                Logger.getLogger().error('ServiceManager: monitor tick threw uncaught:', error);
+            });
+        }, this._monitorIntervalMs);
+
+        // Don't pin the event loop open for the sake of the monitor —
+        // shutdown should still happen even if stopMonitor isn't called.
+        this._monitor.unref();
+    }
+
+    /**
+     * Stop the periodic health monitor. Idempotent.
+     */
+    public stopMonitor(): void {
+        if (this._monitor !== null) {
+            clearInterval(this._monitor);
+            this._monitor = null;
+        }
+    }
+
+    /**
+     * Run a single monitor tick. Public for tests; production code
+     * should rely on the interval set up by {@link startMonitor}.
+     */
+    public async runMonitorTick(): Promise<void> {
+        await this._monitorTick();
+    }
+
+    /**
+     * One monitor pass. Iterates every Important service exactly once,
+     * picking the appropriate action (retry / probe / defer-start)
+     * based on the current status. Guarded against re-entry so a slow
+     * tick doesn't overlap with the next interval firing.
+     *
+     * @protected
+     */
+    protected async _monitorTick(): Promise<void> {
+        if (this._inTick) {
+            return;
+        }
+
+        this._inTick = true;
+
+        try {
+            // sequential by design — health probes and retries on shared
+            // resources (DB pool) should not overlap inside a tick
+            /* eslint-disable no-await-in-loop */
+            for (const service of this._services) {
+                if (service.isProcess()) {
+                    continue;
+                }
+
+                if (service.getImportance() !== ServiceImportance.Important) {
+                    continue;
+                }
+
+                const status = service.getStatus();
+
+                if (status === ServiceStatus.Error || status === ServiceStatus.None) {
+                    if (this._areAllDepsSuccess(service)) {
+                        await this._startService(service);
+                    }
+
+                    continue;
+                }
+
+                if (status === ServiceStatus.Success) {
+                    const name = service.getServiceName();
+                    const last = this._lastHealthCheckAt.get(name) ?? 0;
+
+                    if (Date.now() - last < this._healthCheckIntervalMs) {
+                        continue;
+                    }
+
+                    this._lastHealthCheckAt.set(name, Date.now());
+
+                    let ok = false;
+
+                    try {
+                        ok = await service.healthCheck();
+                    } catch (error) {
+                        Logger.getLogger().warn(
+                            `ServiceManager: healthCheck threw for '${name}', treating as unhealthy:`,
+                            error
+                        );
+                        ok = false;
+                    }
+
+                    if (!ok) {
+                        Logger.getLogger().warn(`ServiceManager: '${name}' became unhealthy`);
+                        service.markUnhealthy('healthCheck reported unhealthy');
+                    }
+                }
+            }
+            /* eslint-enable no-await-in-loop */
+        } finally {
+            this._inTick = false;
         }
     }
 
