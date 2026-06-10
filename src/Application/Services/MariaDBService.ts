@@ -168,6 +168,32 @@ export class MariaDBService extends ServiceAbstract {
     }
 
     /**
+     * Liveness probe — issues a `SELECT 1` against the default
+     * DataSource. Used by `ServiceManager`'s health monitor to flip the
+     * service into Error if the database becomes unreachable while
+     * the backend is running.
+     *
+     * `DBHelper.getDataSource()` internally reconnects via
+     * `ensureInitialized()` (5×3s retry) on a stale DataSource, so a
+     * brief blip caused by e.g. a `mysqldump` backup will recover
+     * within the probe itself. Persistent failure → `false` → monitor
+     * flips to Error → next tick calls `start()` again, which builds
+     * a fresh DataSource via `DBHelper.init()`.
+     *
+     * @return {Promise<boolean>}
+     */
+    public override async healthCheck(): Promise<boolean> {
+        try {
+            const dataSource = await DBHelper.getDataSource();
+            await dataSource.query('SELECT 1');
+
+            return true;
+        } catch (_error) {
+            return false;
+        }
+    }
+
+    /**
      * Stop the service
      */
     public override async stop(): Promise<void> {
