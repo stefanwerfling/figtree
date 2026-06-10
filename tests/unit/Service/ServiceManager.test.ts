@@ -1,11 +1,32 @@
+/* eslint-disable max-classes-per-file */
+import {ServiceImportance, ServiceStatus} from 'figtree-schemas';
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {ServiceManager} from '../../../src/Service/ServiceManager.js';
 import {ServiceAbstract} from '../../../src/Service/ServiceAbstract.js';
 
 class FakeService extends ServiceAbstract {
 
+    public constructor(name: string, dependencies?: string[]) {
+        super(name, dependencies);
+    }
+
+}
+
+/**
+ * Service whose start() always fails — used to verify the bounded
+ * waiting loop in `startAll()` exits even when a dep stays in Error.
+ */
+class AlwaysFailingService extends ServiceAbstract {
+
+    protected override readonly _importance: ServiceImportance = ServiceImportance.Important;
+
     public constructor(name: string) {
         super(name);
+    }
+
+    public override async start(): Promise<void> {
+        this._status = ServiceStatus.Error;
+        throw new Error('boom');
     }
 
 }
@@ -96,6 +117,29 @@ describe('ServiceManager (ClusterPublishable)', () => {
     it('serialize() returns an empty list when no services are registered', () => {
         const mgr = new ServiceManager();
         expect(mgr.serialize()).toEqual([]);
+    });
+
+});
+
+describe('ServiceManager.startAll (bounded waiting loop)', () => {
+
+    it('exits within the configured timeout when a dep stays in Error', async() => {
+        // 200ms ceiling so the test stays snappy. AlwaysFailingService
+        // never reaches Success, so the dependent service `consumer`
+        // would block forever under the old infinite-loop semantics.
+        const mgr = new ServiceManager({startAllTimeoutMs: 200});
+        mgr.add(new AlwaysFailingService('flaky'));
+        mgr.add(new FakeService('consumer', ['flaky']));
+
+        const t0 = Date.now();
+        await mgr.startAll();
+        const elapsed = Date.now() - t0;
+
+        // The bounded loop should give up within a sane margin of the
+        // configured timeout. We allow 1.5s of slack for slow CI hosts.
+        expect(elapsed).toBeLessThan(1700);
+        expect(mgr.getByName('flaky')!.getStatus()).toBe(ServiceStatus.Error);
+        expect(mgr.getByName('consumer')!.getStatus()).toBe(ServiceStatus.None);
     });
 
 });

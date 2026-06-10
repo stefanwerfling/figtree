@@ -11,6 +11,27 @@ import {ServiceJobAbstract} from './ServiceJobAbstract.js';
 export const SERVICE_MANAGER_NAMESPACE = 'service-manager';
 
 /**
+ * Default ceiling on the synchronous "wait for deferred dependencies"
+ * phase of `startAll()`. After this many milliseconds, any service whose
+ * deps are still not Success is left to the health monitor.
+ */
+export const DEFAULT_START_ALL_TIMEOUT_MS = 30_000;
+
+/**
+ * ServiceManager constructor options.
+ */
+export type ServiceManagerOptions = {
+
+    /**
+     * Ceiling on the bounded waiting loop in `startAll()`. After this
+     * many ms, services with not-yet-ready deps are left to the
+     * monitor. Default: {@link DEFAULT_START_ALL_TIMEOUT_MS}.
+     */
+    startAllTimeoutMs?: number;
+
+};
+
+/**
  * Service Manager
  */
 export class ServiceManager implements ClusterPublishable {
@@ -20,6 +41,20 @@ export class ServiceManager implements ClusterPublishable {
      * @protected
      */
     protected _services: ServiceAbstract[] = [];
+
+    /**
+     * Ceiling on the bounded waiting loop in {@link startAll}.
+     * @protected
+     */
+    protected readonly _startAllTimeoutMs: number;
+
+    /**
+     * Constructor
+     * @param {ServiceManagerOptions} options
+     */
+    public constructor(options?: ServiceManagerOptions) {
+        this._startAllTimeoutMs = options?.startAllTimeoutMs ?? DEFAULT_START_ALL_TIMEOUT_MS;
+    }
 
     /**
      * Add a Service.
@@ -151,6 +186,26 @@ export class ServiceManager implements ClusterPublishable {
     }
 
     /**
+     * Are all named dependencies of `service` currently in Success state?
+     * Returns false if any dep is missing from the registry.
+     *
+     * @param {ServiceAbstract} service
+     * @return {boolean}
+     * @protected
+     */
+    protected _areAllDepsSuccess(service: ServiceAbstract): boolean {
+        for (const depName of service.getServiceDependencies()) {
+            const dep = this.getByName(depName);
+
+            if (!dep || dep.getStatus() !== ServiceStatus.Success) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Start all Services
      */
     public async startAll(): Promise<void> {
@@ -165,78 +220,50 @@ export class ServiceManager implements ClusterPublishable {
         let waitingServices: string[] = [];
 
         for await (const service of this._services) {
-            const deps = service.getServiceDependencies();
-
-            if (deps.length > 0 ) {
-                let isReady = true;
-
-                for (const dep of deps) {
-                    const tservice = this.getByName(dep);
-
-                    if (tservice) {
-                        if (tservice.getStatus() !== ServiceStatus.Success) {
-                            isReady = false;
-                        }
-                    } else {
-                        isReady = false;
-                    }
-                }
-
-                if (isReady) {
-                    await this._startService(service);
-                } else {
-                    waitingServices.push(service.getServiceName());
-                }
-            } else {
+            if (service.getServiceDependencies().length === 0 || this._areAllDepsSuccess(service)) {
                 await this._startService(service);
+            } else {
+                waitingServices.push(service.getServiceName());
             }
         }
 
+        // Bounded waiting loop: keep trying to start deferred services as
+        // their deps come up, but cap at `_startAllTimeoutMs` so a
+        // permanently-failed Important dep doesn't spin startAll() forever.
+        // Anything still waiting after the deadline is handed off to the
+        // health monitor (see commits introducing startMonitor()).
+        const deadline = Date.now() + this._startAllTimeoutMs;
+
         // sequential by design — poll-and-start loop respects service dependency order
         /* eslint-disable no-await-in-loop */
-        while (waitingServices.length > 0) {
+        while (waitingServices.length > 0 && Date.now() < deadline) {
             await new Promise<void>((resolve) => {
-                setTimeout(resolve, 1000);
+                setTimeout(resolve, 500);
             });
 
             for (const waitService of [...waitingServices]) {
                 const mService = this.getByName(waitService);
 
                 if (mService === null) {
-                    waitingServices = waitingServices.filter(service => service !== waitService);
-                    break;
+                    waitingServices = waitingServices.filter((s) => s !== waitService);
+                    continue;
                 }
 
-                const deps = mService.getServiceDependencies();
-
-                if (deps.length === 0 ) {
-                    waitingServices = waitingServices.filter(service => service !== waitService);
-                    break;
-                }
-
-                let isReady = true;
-
-                for (const dep of deps) {
-                    const tservice = this.getByName(dep);
-
-                    if (tservice) {
-                        if (tservice.getStatus() !== ServiceStatus.Success) {
-                            isReady = false;
-                        }
-                    } else {
-                        isReady = false;
-                    }
-                }
-
-                if (isReady) {
+                if (mService.getServiceDependencies().length === 0 || this._areAllDepsSuccess(mService)) {
                     await this._startService(mService);
-                    waitingServices = waitingServices.filter(service => service !== waitService);
-                    break;
+                    waitingServices = waitingServices.filter((s) => s !== waitService);
                 }
             }
         }
         /* eslint-enable no-await-in-loop */
 
+        if (waitingServices.length > 0) {
+            Logger.getLogger().warn(
+                `ServiceManager.startAll: ${waitingServices.length} service(s) still waiting after ` +
+                `${this._startAllTimeoutMs}ms [${waitingServices.join(', ')}]. ` +
+                'Health monitor will retry once their dependencies become healthy.'
+            );
+        }
     }
 
     /**
