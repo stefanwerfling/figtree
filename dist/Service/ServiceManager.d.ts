@@ -1,6 +1,6 @@
 import { ServiceInfoEntry } from 'figtree-schemas';
 import { ClusterPublishable } from '../Cluster/ClusterPublishable.js';
-import { ServiceAbstract } from './ServiceAbstract.js';
+import { ServiceAbstract, ServiceLogSnapshot } from './ServiceAbstract.js';
 export declare const SERVICE_MANAGER_NAMESPACE = "service-manager";
 export declare const DEFAULT_START_ALL_TIMEOUT_MS = 30000;
 export declare const DEFAULT_MONITOR_INTERVAL_MS = 5000;
@@ -39,4 +39,7 @@ export declare class ServiceManager implements ClusterPublishable {
     getNamespace(): string;
     serialize(): ServiceInfoEntry[];
     invokeService(name: string): Promise<void>;
+    enableServiceLog(name: string, maxLines?: number): void;
+    disableServiceLog(name: string): void;
+    getServiceLog(name: string): ServiceLogSnapshot;
 }

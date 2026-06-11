@@ -1,4 +1,29 @@
-import {ServiceImportance, ServiceStatus, ServiceType} from 'figtree-schemas';
+import {format} from 'util';
+import {ServiceImportance, ServiceLogEntry, ServiceLogLevel, ServiceStatus, ServiceType} from 'figtree-schemas';
+import {Logger} from '../Logger/Logger.js';
+import {ServiceLogBuffer} from './ServiceLogBuffer.js';
+
+/**
+ * Logger facade returned by {@link ServiceAbstract.getLogger}. Every
+ * call writes to the shared winston logger and, when the per-service
+ * buffer is enabled, also captures the formatted message there.
+ */
+export interface ServiceLogger {
+    info(msg: unknown, ...meta: unknown[]): void;
+    warn(msg: unknown, ...meta: unknown[]): void;
+    error(msg: unknown, ...meta: unknown[]): void;
+    debug(msg: unknown, ...meta: unknown[]): void;
+}
+
+/**
+ * Snapshot of one service's log buffer, returned by
+ * {@link ServiceAbstract.getServiceLog}.
+ */
+export interface ServiceLogSnapshot {
+    active: boolean;
+    maxLines: number;
+    lines: ServiceLogEntry[];
+}
 
 /**
  * Service Abstract
@@ -45,6 +70,40 @@ export class ServiceAbstract {
      * @protected
      */
     protected _serviceDependencies: string[] = [];
+
+    /**
+     * Wall-clock time of the most recent successful `start()`. Null
+     * until the service has ever started. Re-set every time
+     * {@link markStarted} runs.
+     * @protected
+     */
+    protected _startedAt: Date | null = null;
+
+    /**
+     * Number of times the health monitor has restarted this service
+     * after the initial `startAll()` pass. Stays 0 across the first
+     * successful start; increments only when `markStarted()` runs on
+     * an already-started service.
+     * @protected
+     */
+    protected _restartCount: number = 0;
+
+    /**
+     * Per-service in-memory ring buffer used by the `service.getLogger`
+     * facade and the `/v1/service/log/*` admin endpoints. Off by
+     * default; turning it on costs nothing for callers that don't use
+     * it (`push` short-circuits when `_active === false`).
+     * @protected
+     */
+    protected _logBuffer: ServiceLogBuffer = new ServiceLogBuffer();
+
+    /**
+     * Cached logger facade. Lazy-initialized on first `getLogger()`
+     * call so subclasses constructed without a name don't allocate
+     * one unless they actually log.
+     * @protected
+     */
+    protected _logger: ServiceLogger | null = null;
 
     /**
      * Constructor
@@ -135,6 +194,108 @@ export class ServiceAbstract {
      */
     public getStatusMsg(): string {
         return this._statusMsg;
+    }
+
+    /**
+     * Return when the service most recently started successfully, or
+     * null if it has never started.
+     * @return {Date|null}
+     */
+    public getStartedAt(): Date | null {
+        return this._startedAt;
+    }
+
+    /**
+     * Return how often the health monitor restarted this service
+     * after the initial `startAll()` pass.
+     * @return {number}
+     */
+    public getRestartCount(): number {
+        return this._restartCount;
+    }
+
+    /**
+     * Framework-internal: stamp `_startedAt` and bump `_restartCount`
+     * after a successful `start()`. Called by `ServiceManager`. App
+     * code should not call this directly — manage status by overriding
+     * `start()` instead.
+     */
+    public markStarted(): void {
+        if (this._startedAt !== null) {
+            this._restartCount += 1;
+        }
+
+        this._startedAt = new Date();
+    }
+
+    /**
+     * Tee logger for this service. Always writes to the shared winston
+     * logger (so `LOGGING_LEVEL` and the file rotation still apply);
+     * additionally captures into the per-service ring buffer when the
+     * buffer is active. Use this in place of `Logger.getLogger()` for
+     * any log line that belongs semantically to one service so the
+     * `/v1/service/log/:name` admin route can serve it.
+     *
+     * @return {ServiceLogger}
+     */
+    public getLogger(): ServiceLogger {
+        if (this._logger !== null) {
+            return this._logger;
+        }
+
+        const buf = this._logBuffer;
+        const winston = (): ReturnType<typeof Logger.getLogger> => Logger.getLogger();
+
+        this._logger = {
+            info: (msg: unknown, ...meta: unknown[]): void => {
+                buf.push(ServiceLogLevel.info, format(msg, ...meta));
+                winston().info(msg as string, ...meta);
+            },
+            warn: (msg: unknown, ...meta: unknown[]): void => {
+                buf.push(ServiceLogLevel.warn, format(msg, ...meta));
+                winston().warn(msg as string, ...meta);
+            },
+            error: (msg: unknown, ...meta: unknown[]): void => {
+                buf.push(ServiceLogLevel.error, format(msg, ...meta));
+                winston().error(msg as string, ...meta);
+            },
+            debug: (msg: unknown, ...meta: unknown[]): void => {
+                buf.push(ServiceLogLevel.debug, format(msg, ...meta));
+                winston().debug(msg as string, ...meta);
+            },
+        };
+
+        return this._logger;
+    }
+
+    /**
+     * Turn on per-service log capture. `maxLines` is the ring-buffer
+     * size; omitting it keeps the previously configured size (or the
+     * default if this is the first enable). Always starts from an
+     * empty buffer.
+     */
+    public enableServiceLogging(maxLines?: number): void {
+        this._logBuffer.enable(maxLines);
+    }
+
+    /**
+     * Turn off per-service log capture and drop the captured lines.
+     * Idempotent.
+     */
+    public disableServiceLogging(): void {
+        this._logBuffer.disable();
+    }
+
+    /**
+     * Snapshot of the current buffer state, suitable for direct return
+     * from the `/v1/service/log/:name` route.
+     */
+    public getServiceLog(): ServiceLogSnapshot {
+        return {
+            active: this._logBuffer.isActive(),
+            maxLines: this._logBuffer.getMaxLines(),
+            lines: this._logBuffer.getLines(),
+        };
     }
 
     /**

@@ -2,7 +2,7 @@ import {ServiceImportance, ServiceInfoEntry, ServiceInfoScheduler, ServiceStatus
 import {ClusterPublishable} from '../Cluster/ClusterPublishable.js';
 import {Logger} from '../Logger/Logger.js';
 import {DateHelper} from '../Utils/DateHelper.js';
-import {ServiceAbstract} from './ServiceAbstract.js';
+import {ServiceAbstract, ServiceLogSnapshot} from './ServiceAbstract.js';
 import {ServiceJobAbstract} from './ServiceJobAbstract.js';
 
 /**
@@ -181,6 +181,11 @@ export class ServiceManager implements ClusterPublishable {
                     status: service.getStatusScheduler(),
                     inProcess: service.isProcessScheduler(),
                     lastRun: DateHelper.toStrOrNull(service.getLastRun()),
+                    lastSuccessAt: DateHelper.toStrOrNull(service.getLastSuccessAt()),
+                    nextRun: DateHelper.toStrOrNull(service.getNextRun()),
+                    lastDurationMs: service.getLastDurationMs(),
+                    runCount: service.getRunCount(),
+                    failCount: service.getFailCount(),
                     cron: service.getCron()
                 };
             }
@@ -193,6 +198,9 @@ export class ServiceManager implements ClusterPublishable {
                 importance: service.getImportance(),
                 inProcess: service.isProcess(),
                 dependencies: service.getServiceDependencies(),
+                startedAt: DateHelper.toStrOrNull(service.getStartedAt()),
+                restartCount: service.getRestartCount(),
+                logBufferActive: service.getServiceLog().active,
                 scheduler: schedulerInfo
             };
         });
@@ -208,18 +216,19 @@ export class ServiceManager implements ClusterPublishable {
 
         try {
             await service.start();
-            Logger.getLogger().info(`Service started: ${name}`);
+            service.markStarted();
+            service.getLogger().info(`Service started: ${name}`);
         } catch (error) {
             switch (service.getImportance()) {
                 case ServiceImportance.Critical:
                     throw new Error(`Critical service '${name}' could not be started: ${error}`, {cause: error});
 
                 case ServiceImportance.Important:
-                    Logger.getLogger().error(`Important service '${name}' could not be started:`, error);
+                    service.getLogger().error(`Important service '${name}' could not be started:`, error);
                     break;
 
                 case ServiceImportance.Optional:
-                    Logger.getLogger().warn(`Optional service '${name}' could not be started:`, error);
+                    service.getLogger().warn(`Optional service '${name}' could not be started:`, error);
                     break;
             }
         }
@@ -613,12 +622,65 @@ export class ServiceManager implements ClusterPublishable {
         }
 
         if (service.isProcess()) {
-            Logger.getLogger().warn(`Service ${name} is already running`);
+            service.getLogger().warn(`Service ${name} is already running`);
             return;
         }
 
         await service.invoke();
-        Logger.getLogger().info(`Service ${name} invoked manually`);
+        service.getLogger().info(`Service ${name} invoked manually`);
+    }
+
+    /**
+     * Turn on per-service log capture. Thin proxy to
+     * `service.enableServiceLogging` so the admin route can address
+     * services by name without holding the instance.
+     *
+     * @param {string} name
+     * @param {number} [maxLines] Ring-buffer size; omit to keep the
+     *     existing size or the default.
+     * @throws {Error} if the service name is not registered
+     */
+    public enableServiceLog(name: string, maxLines?: number): void {
+        const service = this.getByName(name);
+
+        if (!service) {
+            throw new Error(`Service not found: ${name}`);
+        }
+
+        service.enableServiceLogging(maxLines);
+    }
+
+    /**
+     * Turn off per-service log capture and drop the captured lines.
+     *
+     * @param {string} name
+     * @throws {Error} if the service name is not registered
+     */
+    public disableServiceLog(name: string): void {
+        const service = this.getByName(name);
+
+        if (!service) {
+            throw new Error(`Service not found: ${name}`);
+        }
+
+        service.disableServiceLogging();
+    }
+
+    /**
+     * Snapshot of one service's log buffer.
+     *
+     * @param {string} name
+     * @return {ServiceLogSnapshot}
+     * @throws {Error} if the service name is not registered
+     */
+    public getServiceLog(name: string): ServiceLogSnapshot {
+        const service = this.getByName(name);
+
+        if (!service) {
+            throw new Error(`Service not found: ${name}`);
+        }
+
+        return service.getServiceLog();
     }
 
 }

@@ -1,4 +1,4 @@
-import { SchemaDefaultReturn, SchemaServiceByNameRequest, SchemaServiceInfoEntry, SchemaServiceStatusResponse, StatusCodes } from 'figtree-schemas';
+import { SchemaDefaultReturn, SchemaServiceByNameRequest, SchemaServiceInfoEntry, SchemaServiceLogResponse, SchemaServiceLogStartRequest, SchemaServiceStatusResponse, StatusCodes } from 'figtree-schemas';
 import { Vts } from 'vts';
 import { BackendApp } from '../../../Application/BackendApp.js';
 import { BackendCluster } from '../../../Application/BackendCluster.js';
@@ -124,6 +124,90 @@ export class ServiceRoute extends DefaultRoute {
             tags: ['service'],
             responseBodySchema: SchemaServiceClusterStatusResponse,
             aclRight: this._accessRights?.clusterStatus ?? this._accessRights?.status
+        });
+        this._post(this._getUrl('v1', 'service', 'log/start'), this._onlyUserAccess, async (_request, _response, data) => {
+            const backend = BackendApp.getInstance(this._backendInstanceName);
+            if (backend) {
+                try {
+                    backend.getServiceManager().enableServiceLog(data.body.name, data.body.maxLines);
+                    return {
+                        statusCode: StatusCodes.OK,
+                    };
+                }
+                catch (e) {
+                    return {
+                        statusCode: StatusCodes.INTERNAL_ERROR,
+                        msg: e instanceof Error ? e.message : String(e),
+                    };
+                }
+            }
+            return {
+                statusCode: StatusCodes.INTERNAL_ERROR,
+                msg: 'Backend not found, no information for services',
+            };
+        }, {
+            description: 'Turn on the per-service log ring buffer',
+            tags: ['service'],
+            bodySchema: SchemaServiceLogStartRequest,
+            responseBodySchema: SchemaDefaultReturn,
+            aclRight: this._accessRights?.logStart ?? this._accessRights?.status
+        });
+        this._post(this._getUrl('v1', 'service', 'log/stop'), this._onlyUserAccess, async (_request, _response, data) => {
+            const backend = BackendApp.getInstance(this._backendInstanceName);
+            if (backend) {
+                try {
+                    backend.getServiceManager().disableServiceLog(data.body.name);
+                    return {
+                        statusCode: StatusCodes.OK,
+                    };
+                }
+                catch (e) {
+                    return {
+                        statusCode: StatusCodes.INTERNAL_ERROR,
+                        msg: e instanceof Error ? e.message : String(e),
+                    };
+                }
+            }
+            return {
+                statusCode: StatusCodes.INTERNAL_ERROR,
+                msg: 'Backend not found, no information for services',
+            };
+        }, {
+            description: 'Turn off the per-service log ring buffer and discard captured lines',
+            tags: ['service'],
+            bodySchema: SchemaServiceByNameRequest,
+            responseBodySchema: SchemaDefaultReturn,
+            aclRight: this._accessRights?.logStop ?? this._accessRights?.status
+        });
+        this._get(this._getUrl('v1', 'service', 'log/fetch'), this._onlyUserAccess, async (_request, _response, data) => {
+            const backend = BackendApp.getInstance(this._backendInstanceName);
+            if (!backend) {
+                return {
+                    statusCode: StatusCodes.INTERNAL_ERROR,
+                    msg: 'Backend not found, no information for services',
+                };
+            }
+            try {
+                const snapshot = backend.getServiceManager().getServiceLog(data.query.name);
+                return {
+                    statusCode: StatusCodes.OK,
+                    active: snapshot.active,
+                    maxLines: snapshot.maxLines,
+                    lines: snapshot.lines,
+                };
+            }
+            catch (e) {
+                return {
+                    statusCode: StatusCodes.INTERNAL_ERROR,
+                    msg: e instanceof Error ? e.message : String(e),
+                };
+            }
+        }, {
+            description: 'Snapshot of one service\'s log buffer (active flag + captured lines)',
+            tags: ['service'],
+            querySchema: SchemaServiceByNameRequest,
+            responseBodySchema: SchemaServiceLogResponse,
+            aclRight: this._accessRights?.logFetch ?? this._accessRights?.status
         });
         this._post(this._getUrl('v1', 'service', 'invoke'), this._onlyUserAccess, async (_request, _response, data) => {
             const backend = BackendApp.getInstance(this._backendInstanceName);

@@ -8,6 +8,10 @@ export declare abstract class ServiceJobAbstract extends ServiceAbstract {
     protected _type: ServiceType;
     protected _statusScheduler: ServiceStatus;
     protected _inProcessScheduler: boolean;
+    protected _lastSuccessAt: Date | null;
+    protected _lastDurationMs: number | null;
+    protected _runCount: number;
+    protected _failCount: number;
     constructor(serviceName?: string, serviceDependencies?: string[]);
     isProcessScheduler(): boolean;
     getStatusScheduler(): ServiceStatus;
@@ -17,6 +21,11 @@ export declare abstract class ServiceJobAbstract extends ServiceAbstract {
     reload(): Promise<void>;
     changeSchedule(cronExpression: string): Promise<void>;
     getLastRun(): Date | null;
+    getLastSuccessAt(): Date | null;
+    getNextRun(): Date | null;
+    getLastDurationMs(): number | null;
+    getRunCount(): number;
+    getFailCount(): number;
     getCron(): string;
     static buildCron({ minute, hour, day }: {
         minute?: string | number;

@@ -14,10 +14,18 @@ export declare const SchemaServiceClusterStatusResponse: import("vts").ObjectSch
         importance: import("vts").EnumSchema<import("figtree-schemas").ServiceImportance>;
         inProcess: import("vts").BooleanSchema;
         dependencies: import("vts").ArraySchema<import("vts").StringSchema<import("vts").StringSchemaOptions>>;
+        startedAt: import("vts").OrSchema<import("vts").NullSchema | import("vts").StringSchema<import("vts").StringSchemaOptions>>;
+        restartCount: import("vts").NumberSchema;
+        logBufferActive: import("vts").BooleanSchema;
         scheduler: import("vts").OptionalSchema<import("vts").ObjectSchema<{
             status: import("vts").EnumSchema<import("figtree-schemas").ServiceStatus>;
             inProcess: import("vts").BooleanSchema;
-            lastRun: import("vts").OrSchema<import("vts").StringSchema<import("vts").StringSchemaOptions> | import("vts").NullSchema>;
+            lastRun: import("vts").OrSchema<import("vts").NullSchema | import("vts").StringSchema<import("vts").StringSchemaOptions>>;
+            lastSuccessAt: import("vts").OrSchema<import("vts").NullSchema | import("vts").StringSchema<import("vts").StringSchemaOptions>>;
+            nextRun: import("vts").OrSchema<import("vts").NullSchema | import("vts").StringSchema<import("vts").StringSchemaOptions>>;
+            lastDurationMs: import("vts").OrSchema<import("vts").NullSchema | import("vts").NumberSchema>;
+            runCount: import("vts").NumberSchema;
+            failCount: import("vts").NumberSchema;
             cron: import("vts").StringSchema<import("vts").StringSchemaOptions>;
         }>>;
     }>>>;
@@ -29,6 +37,9 @@ export type ServiceRouteACLRights = {
     stop: ACLRight;
     invoke: ACLRight;
     clusterStatus?: ACLRight;
+    logStart?: ACLRight;
+    logStop?: ACLRight;
+    logFetch?: ACLRight;
 };
 export declare class ServiceRoute extends DefaultRoute {
     protected _backendInstanceName: string;

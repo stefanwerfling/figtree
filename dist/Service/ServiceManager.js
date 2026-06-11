@@ -41,6 +41,11 @@ export class ServiceManager {
                     status: service.getStatusScheduler(),
                     inProcess: service.isProcessScheduler(),
                     lastRun: DateHelper.toStrOrNull(service.getLastRun()),
+                    lastSuccessAt: DateHelper.toStrOrNull(service.getLastSuccessAt()),
+                    nextRun: DateHelper.toStrOrNull(service.getNextRun()),
+                    lastDurationMs: service.getLastDurationMs(),
+                    runCount: service.getRunCount(),
+                    failCount: service.getFailCount(),
                     cron: service.getCron()
                 };
             }
@@ -52,6 +57,9 @@ export class ServiceManager {
                 importance: service.getImportance(),
                 inProcess: service.isProcess(),
                 dependencies: service.getServiceDependencies(),
+                startedAt: DateHelper.toStrOrNull(service.getStartedAt()),
+                restartCount: service.getRestartCount(),
+                logBufferActive: service.getServiceLog().active,
                 scheduler: schedulerInfo
             };
         });
@@ -60,17 +68,18 @@ export class ServiceManager {
         const name = service.constructor.name;
         try {
             await service.start();
-            Logger.getLogger().info(`Service started: ${name}`);
+            service.markStarted();
+            service.getLogger().info(`Service started: ${name}`);
         }
         catch (error) {
             switch (service.getImportance()) {
                 case ServiceImportance.Critical:
                     throw new Error(`Critical service '${name}' could not be started: ${error}`, { cause: error });
                 case ServiceImportance.Important:
-                    Logger.getLogger().error(`Important service '${name}' could not be started:`, error);
+                    service.getLogger().error(`Important service '${name}' could not be started:`, error);
                     break;
                 case ServiceImportance.Optional:
-                    Logger.getLogger().warn(`Optional service '${name}' could not be started:`, error);
+                    service.getLogger().warn(`Optional service '${name}' could not be started:`, error);
                     break;
             }
         }
@@ -282,11 +291,32 @@ export class ServiceManager {
             throw new Error(`Service not found: ${name}`);
         }
         if (service.isProcess()) {
-            Logger.getLogger().warn(`Service ${name} is already running`);
+            service.getLogger().warn(`Service ${name} is already running`);
             return;
         }
         await service.invoke();
-        Logger.getLogger().info(`Service ${name} invoked manually`);
+        service.getLogger().info(`Service ${name} invoked manually`);
+    }
+    enableServiceLog(name, maxLines) {
+        const service = this.getByName(name);
+        if (!service) {
+            throw new Error(`Service not found: ${name}`);
+        }
+        service.enableServiceLogging(maxLines);
+    }
+    disableServiceLog(name) {
+        const service = this.getByName(name);
+        if (!service) {
+            throw new Error(`Service not found: ${name}`);
+        }
+        service.disableServiceLogging();
+    }
+    getServiceLog(name) {
+        const service = this.getByName(name);
+        if (!service) {
+            throw new Error(`Service not found: ${name}`);
+        }
+        return service.getServiceLog();
     }
 }
 //# sourceMappingURL=ServiceManager.js.map
