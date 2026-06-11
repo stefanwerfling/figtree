@@ -36,12 +36,9 @@ export class ServiceJobAbstract extends ServiceAbstract {
             }
             catch (e) {
                 this._statusScheduler = ServiceStatus.Error;
-                if (e instanceof Error) {
-                    this._statusMsg = e.message || 'Unknown error';
-                }
-                else {
-                    this._statusMsg = 'Unknown error';
-                }
+                const msg = e instanceof Error ? (e.message || 'Unknown error') : 'Unknown error';
+                this._statusMsg = msg;
+                Logger.getLogger().error(`Service '${this.getServiceName()}' scheduled run failed: ${msg}`, e);
             }
             finally {
                 this._inProcessScheduler = false;
@@ -76,10 +73,12 @@ export class ServiceJobAbstract extends ServiceAbstract {
         return `${minute} ${hour} ${day} * *`;
     }
     async invoke() {
-        if (this._scheduler !== null) {
-            Logger.getLogger().info(`Job ${this.getServiceName()} invoked manually`);
-            this._scheduler.invoke();
+        if (this._scheduler === null) {
+            Logger.getLogger().error(`Service '${this.getServiceName()}' is not running — start the service before invoking`);
+            return;
         }
+        Logger.getLogger().info(`Job ${this.getServiceName()} invoked manually`);
+        this._scheduler.invoke();
     }
 }
 //# sourceMappingURL=ServiceJobAbstract.js.map
