@@ -185,17 +185,15 @@ export class ServiceManager {
                 if (service.isProcess()) {
                     continue;
                 }
-                if (service.getImportance() !== ServiceImportance.Important) {
-                    continue;
-                }
                 const status = service.getStatus();
+                const importance = service.getImportance();
                 if (status === ServiceStatus.Error || status === ServiceStatus.None) {
                     if (this._areAllDepsSuccess(service)) {
                         await this._startService(service);
                     }
                     continue;
                 }
-                if (status === ServiceStatus.Success) {
+                if (status === ServiceStatus.Success && importance === ServiceImportance.Important) {
                     const name = service.getServiceName();
                     const last = this._lastHealthCheckAt.get(name) ?? 0;
                     if (Date.now() - last < this._healthCheckIntervalMs) {

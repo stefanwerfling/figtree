@@ -307,15 +307,22 @@ describe('ServiceManager (health monitor)', () => {
         expect(svc.getStatus()).toBe(ServiceStatus.Error);
     });
 
-    it('does not monitor Optional services', async() => {
+    it('retries Optional services in Error/None state, but does not healthCheck them', async() => {
         class OptionalFlaky extends FakeService {
 
             public retryCount: number = 0;
+
+            public probeCallCount: number = 0;
 
             public override async start(): Promise<void> {
                 this.retryCount += 1;
                 this._status = ServiceStatus.Error;
                 throw new Error('boom');
+            }
+
+            public override async healthCheck(): Promise<boolean> {
+                this.probeCallCount += 1;
+                return true;
             }
 
         }
@@ -332,9 +339,52 @@ describe('ServiceManager (health monitor)', () => {
         await mgr.runMonitorTick();
         await mgr.runMonitorTick();
 
-        // Optional services get a one-shot best-effort start during
-        // startAll(). The monitor never retries them.
-        expect(svc.retryCount).toBe(baselineRetries);
+        // Restart path is shared between Important + Optional: each
+        // tick sees status=Error and retries start().
+        expect(svc.retryCount).toBe(baselineRetries + 2);
+
+        // healthCheck stays Important-only — Optional services
+        // shouldn't pay for periodic probes.
+        expect(svc.probeCallCount).toBe(0);
+    });
+
+    it('restarts Optional dependents once a previously-failed dep recovers', async() => {
+        class OptionalConsumer extends FakeService {
+
+            public startCallCount: number = 0;
+
+            public override async start(): Promise<void> {
+                this.startCallCount += 1;
+                this._status = ServiceStatus.Success;
+            }
+
+        }
+
+        const mgr = new ServiceManager({
+            startAllTimeoutMs: 50,
+            autoStartMonitor: false,
+            healthCheckIntervalMs: 60_000
+        });
+        const flaky = new FlakyStartService('flaky', 2);
+        const consumer = new OptionalConsumer('consumer', ['flaky']);
+        mgr.add(flaky);
+        mgr.add(consumer);
+
+        await mgr.startAll();
+
+        // After startAll: flaky failed, consumer never started because
+        // its dep wasn't Success in time.
+        expect(consumer.getStatus()).not.toBe(ServiceStatus.Success);
+        expect(consumer.startCallCount).toBe(0);
+
+        for (let i = 0; i < 5; i += 1) {
+            // eslint-disable-next-line no-await-in-loop
+            await mgr.runMonitorTick();
+        }
+
+        expect(flaky.getStatus()).toBe(ServiceStatus.Success);
+        expect(consumer.getStatus()).toBe(ServiceStatus.Success);
+        expect(consumer.startCallCount).toBe(1);
     });
 
     it('skips services where isProcess() is true (in-flight start)', async() => {

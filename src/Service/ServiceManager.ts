@@ -367,16 +367,17 @@ export class ServiceManager implements ClusterPublishable {
      * Start the periodic health monitor. The monitor runs every
      * {@link _monitorIntervalMs} ms and:
      *
-     * - Retries `start()` on Important services that are currently in
-     *   `Error` or `None` state and whose dependencies are now ready.
+     * - Retries `start()` on Important AND Optional services that are
+     *   currently in `Error` or `None` state and whose dependencies are
+     *   now ready. This is the "restart-on-deps-recovered" path — e.g.
+     *   a cron service whose MariaDB dep was briefly unavailable during
+     *   `startAll()` gets picked up automatically once the DB is back.
      * - Probes Important services in `Success` state via
      *   `service.healthCheck()`, throttled per service by
      *   {@link _healthCheckIntervalMs}. A `false` result flips the
      *   service to `Error`, which makes the next monitor tick attempt
-     *   to restart it.
-     *
-     * Optional services are never monitored — one-shot best-effort at
-     * startup is the contract.
+     *   to restart it. Optional services are NOT probed — they
+     *   shouldn't generate periodic load.
      *
      * Re-entrant calls are no-ops. The interval handle is unref'd so
      * it never holds the process open on its own.
@@ -416,10 +417,16 @@ export class ServiceManager implements ClusterPublishable {
     }
 
     /**
-     * One monitor pass. Iterates every Important service exactly once,
-     * picking the appropriate action (retry / probe / defer-start)
-     * based on the current status. Guarded against re-entry so a slow
-     * tick doesn't overlap with the next interval firing.
+     * One monitor pass. Iterates every service exactly once, picking
+     * the appropriate action (retry / probe / defer-start) based on
+     * the current status and importance. Guarded against re-entry so a
+     * slow tick doesn't overlap with the next interval firing.
+     *
+     * Restart-on-Error/None covers both Important AND Optional — a
+     * cron job whose DB dep was briefly unavailable during the initial
+     * `startAll()` would otherwise stay dead forever. `healthCheck` is
+     * still Important-only so Optional services don't generate
+     * periodic load.
      *
      * @protected
      */
@@ -439,11 +446,8 @@ export class ServiceManager implements ClusterPublishable {
                     continue;
                 }
 
-                if (service.getImportance() !== ServiceImportance.Important) {
-                    continue;
-                }
-
                 const status = service.getStatus();
+                const importance = service.getImportance();
 
                 if (status === ServiceStatus.Error || status === ServiceStatus.None) {
                     if (this._areAllDepsSuccess(service)) {
@@ -453,7 +457,7 @@ export class ServiceManager implements ClusterPublishable {
                     continue;
                 }
 
-                if (status === ServiceStatus.Success) {
+                if (status === ServiceStatus.Success && importance === ServiceImportance.Important) {
                     const name = service.getServiceName();
                     const last = this._lastHealthCheckAt.get(name) ?? 0;
 
