@@ -417,10 +417,9 @@ export class DefaultRoute implements IDefaultRoute {
                             )
                         );
                     }
-                } else {
+                } else if (!res.headersSent) {
                     // no content
                     res.sendStatus(204);
-                    
                 }
             } catch (ie) {
                 if (ie instanceof VtsSchemaError) {
@@ -428,10 +427,12 @@ export class DefaultRoute implements IDefaultRoute {
                 }
 
                 if (ie instanceof RouteError) {
-                    if (ie.asJson()) {
-                        res.status(200).json(ie.defaultReturn());
-                    } else {
-                        res.status(parseInt(ie.getStatus(), 10) ?? 500).send(ie.getRawMsg());
+                    if (!res.headersSent) {
+                        if (ie.asJson()) {
+                            res.status(200).json(ie.defaultReturn());
+                        } else {
+                            res.status(parseInt(ie.getStatus(), 10) ?? 500).send(ie.getRawMsg());
+                        }
                     }
 
                     return;
@@ -447,11 +448,12 @@ export class DefaultRoute implements IDefaultRoute {
                     )
                 );
 
-                res.status(200).json({
-                    statusCode: StatusCodes.INTERNAL_ERROR,
-                    msg: 'Internal error, check the server logs.'
-                } as DefaultReturn);
-                
+                if (!res.headersSent) {
+                    res.status(200).json({
+                        statusCode: StatusCodes.INTERNAL_ERROR,
+                        msg: 'Internal error, check the server logs.'
+                    } as DefaultReturn);
+                }
             }
         };
 

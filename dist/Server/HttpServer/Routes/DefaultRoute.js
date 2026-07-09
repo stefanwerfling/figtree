@@ -135,7 +135,7 @@ export class DefaultRoute {
                         throw new Error(StringHelper.sprintf('The result have a error in: %s', description.responseBodySchema.describe().description));
                     }
                 }
-                else {
+                else if (!res.headersSent) {
                     res.sendStatus(204);
                 }
             }
@@ -144,19 +144,23 @@ export class DefaultRoute {
                     Logger.getLogger().error(ie.toString());
                 }
                 if (ie instanceof RouteError) {
-                    if (ie.asJson()) {
-                        res.status(200).json(ie.defaultReturn());
-                    }
-                    else {
-                        res.status(parseInt(ie.getStatus(), 10) ?? 500).send(ie.getRawMsg());
+                    if (!res.headersSent) {
+                        if (ie.asJson()) {
+                            res.status(200).json(ie.defaultReturn());
+                        }
+                        else {
+                            res.status(parseInt(ie.getStatus(), 10) ?? 500).send(ie.getRawMsg());
+                        }
                     }
                     return;
                 }
                 Logger.getLogger().error(StringHelper.sprintf('DefaultRoute::_all<%s>::routeHandle: Exception intern, path can not call: %s sessionid: %s error: %e', cMethod, uriPath, req.session.id ?? 'none', ie));
-                res.status(200).json({
-                    statusCode: StatusCodes.INTERNAL_ERROR,
-                    msg: 'Internal error, check the server logs.'
-                });
+                if (!res.headersSent) {
+                    res.status(200).json({
+                        statusCode: StatusCodes.INTERNAL_ERROR,
+                        msg: 'Internal error, check the server logs.'
+                    });
+                }
             }
         };
         for (const url of urls) {
