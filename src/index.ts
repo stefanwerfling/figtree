@@ -56,6 +56,15 @@ export {RedisClientOptions, FunChannelCallback, RedisClient} from './Db/RedisDb/
 export {ChromaDbCollection} from './Db/ChromaDb/ChromaDbCollection.js';
 export {ChromaDbCollectionLoader} from './Db/ChromaDb/ChromaDbCollectionLoader.js';
 export {ChromaDbClientOptions, ChromaDbClient} from './Db/ChromaDb/ChromaDbClient.js';
+export {
+    QdrantDbCollection,
+    QdrantDbCollectionOptions,
+    QdrantDistance,
+    QdrantPoint,
+    QdrantHit
+} from './Db/QdrantDb/QdrantDbCollection.js';
+export {QdrantDbCollectionLoader} from './Db/QdrantDb/QdrantDbCollectionLoader.js';
+export {QdrantDbClientOptions, QdrantDbClient} from './Db/QdrantDb/QdrantDbClient.js';
 
 // SharedStore ---------------------------------------------------------------------------------------------------------
 export {SharedStore, SharedStoreSubscriber} from './SharedStore/SharedStore.js';
@@ -185,4 +194,5 @@ export {MariaDBServiceOptions, MariaDBService} from './Application/Services/Mari
 export {InfluxDBService} from './Application/Services/InfluxDBService.js';
 export {RedisDBService} from './Application/Services/RedisDBService.js';
 export {ChromaDBService} from './Application/Services/ChromaDBService.js';
+export {QdrantDBService} from './Application/Services/QdrantDBService.js';
 export {HttpService, HttpServiceWebSocketOptions} from './Application/Services/HttpService.js';

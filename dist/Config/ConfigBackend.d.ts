@@ -12,6 +12,7 @@ export declare class ConfigBackend<T extends ConfigBackendOptions = ConfigBacken
     static readonly DEFAULT_DB_MYSQL_PORT = 3306;
     static readonly DEFAULT_DB_REDIS_URL = "redis://127.0.0.1:6379";
     static readonly DEFAULT_DB_CHROMA_URL = "http://localhost:8000/";
+    static readonly DEFAULT_DB_QDRANT_URL = "http://localhost:6333/";
     static getInstance(): ConfigBackend;
     protected _loadEnv(aConfig: T | null): T | null;
     protected _loadEnvCluster(config: T): T;
@@ -19,6 +20,7 @@ export declare class ConfigBackend<T extends ConfigBackendOptions = ConfigBacken
     protected _loadEnvInfluxDb(config: T): T;
     protected _loadEnvRedisDb(config: T): T;
     protected _loadEnvChromaDb(config: T): T;
+    protected _loadEnvQdrantDb(config: T): T;
     protected _loadEnvHttpserver(config: T): T;
     protected _loadEnvLogging(config: T): T;
 }

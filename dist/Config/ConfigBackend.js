@@ -13,6 +13,7 @@ export class ConfigBackend extends Config {
     static DEFAULT_DB_MYSQL_PORT = 3306;
     static DEFAULT_DB_REDIS_URL = 'redis://127.0.0.1:6379';
     static DEFAULT_DB_CHROMA_URL = 'http://localhost:8000/';
+    static DEFAULT_DB_QDRANT_URL = 'http://localhost:6333/';
     static getInstance() {
         if (!Config._instance) {
             Config._instance = new ConfigBackend(SchemaConfigBackendOptions);
@@ -37,6 +38,7 @@ export class ConfigBackend extends Config {
         config = this._loadEnvRedisDb(config);
         config = this._loadEnvInfluxDb(config);
         config = this._loadEnvChromaDb(config);
+        config = this._loadEnvQdrantDb(config);
         config = this._loadEnvHttpserver(config);
         config = this._loadEnvLogging(config);
         config = this._loadEnvCluster(config);
@@ -185,6 +187,19 @@ export class ConfigBackend extends Config {
         if (config.db.chroma) {
             if (process.env[ENV_DB.DB_CHROMA_URL]) {
                 config.db.chroma.url = process.env[ENV_DB.DB_CHROMA_URL];
+            }
+        }
+        return config;
+    }
+    _loadEnvQdrantDb(config) {
+        if (process.env[ENV_DB.DB_QDRANT_URL]) {
+            config.db.qdrant = {
+                url: ConfigBackend.DEFAULT_DB_QDRANT_URL
+            };
+        }
+        if (config.db.qdrant) {
+            if (process.env[ENV_DB.DB_QDRANT_URL]) {
+                config.db.qdrant.url = process.env[ENV_DB.DB_QDRANT_URL];
             }
         }
         return config;

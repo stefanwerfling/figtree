@@ -56,6 +56,7 @@
   "name": "figtree",
   "peerDependencies": {
     "@influxdata/influxdb-client": "^1.35.0",
+    "@qdrant/js-client-rest": "^1.18.0",
     "async-exit-hook": "^2.0.1",
     "chromadb": "^3.0.3",
     "cookie-parser": "^1.4.6",

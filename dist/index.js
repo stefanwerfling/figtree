@@ -35,6 +35,9 @@ export { RedisClient } from './Db/RedisDb/RedisClient.js';
 export { ChromaDbCollection } from './Db/ChromaDb/ChromaDbCollection.js';
 export { ChromaDbCollectionLoader } from './Db/ChromaDb/ChromaDbCollectionLoader.js';
 export { ChromaDbClient } from './Db/ChromaDb/ChromaDbClient.js';
+export { QdrantDbCollection } from './Db/QdrantDb/QdrantDbCollection.js';
+export { QdrantDbCollectionLoader } from './Db/QdrantDb/QdrantDbCollectionLoader.js';
+export { QdrantDbClient } from './Db/QdrantDb/QdrantDbClient.js';
 export { SharedStore } from './SharedStore/SharedStore.js';
 export { IPCSharedStore } from './SharedStore/IPCSharedStore.js';
 export { RedisSharedStore } from './SharedStore/RedisSharedStore.js';
@@ -92,5 +95,6 @@ export { MariaDBService } from './Application/Services/MariaDBService.js';
 export { InfluxDBService } from './Application/Services/InfluxDBService.js';
 export { RedisDBService } from './Application/Services/RedisDBService.js';
 export { ChromaDBService } from './Application/Services/ChromaDBService.js';
+export { QdrantDBService } from './Application/Services/QdrantDBService.js';
 export { HttpService } from './Application/Services/HttpService.js';
 //# sourceMappingURL=index.js.map
