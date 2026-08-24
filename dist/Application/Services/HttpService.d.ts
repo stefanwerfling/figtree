@@ -1,4 +1,5 @@
 import { ServiceImportance } from 'figtree-schemas';
+import { BaseHttpServerOptions } from '../../Server/HttpServer/BaseHttpServer.js';
 import { HttpRouteLoaderType } from '../../Server/HttpServer/HttpRouteLoader.js';
 import { HttpServer } from '../../Server/HttpServer/HttpServer.js';
 import { WebSocketEndpointLoaderType } from '../../Server/HttpServer/WebSocket/WebSocketEndpointLoader.js';
@@ -18,6 +19,7 @@ export declare class HttpService extends ServiceAbstract {
     constructor(loader: HttpRouteLoaderType, serviceName?: string, serviceDependencies?: string[], wsOptions?: HttpServiceWebSocketOptions);
     getServer(): HttpServer | null;
     getWebSocketServer(): WebSocketServer | null;
+    protected _createServer(options: BaseHttpServerOptions): HttpServer;
     start(): Promise<void>;
     stop(): Promise<void>;
 }

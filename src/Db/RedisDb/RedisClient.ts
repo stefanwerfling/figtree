@@ -57,6 +57,15 @@ export class RedisClient {
     protected _client: RedisClientType;
 
     /**
+     * Return the underlying node-redis client. Useful for libraries that expect
+     * a raw client instance (e.g. connect-redis's session store).
+     * @return {RedisClientType}
+     */
+    public getClient(): RedisClientType {
+        return this._client;
+    }
+
+    /**
      * Stored options — used by duplicate().
      * @protected
      */

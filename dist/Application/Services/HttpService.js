@@ -25,6 +25,9 @@ export class HttpService extends ServiceAbstract {
     getWebSocketServer() {
         return this._wsServer;
     }
+    _createServer(options) {
+        return new HttpServer(options);
+    }
     async start() {
         this._inProcess = true;
         this._status = ServiceStatus.Progress;
@@ -76,7 +79,7 @@ export class HttpService extends ServiceAbstract {
                     cookie: tConfig.httpserver.csrf.cookie
                 };
             }
-            this._server = new HttpServer({
+            const serverOptions = {
                 realm: Config.getInstance().getAppTitle(),
                 port: aport,
                 session: {
@@ -94,7 +97,8 @@ export class HttpService extends ServiceAbstract {
                 },
                 proxy: proxy,
                 csrf: csrf
-            });
+            };
+            this._server = this._createServer(serverOptions);
             await this._server.setupAndListen();
             if (this._wsOptions) {
                 this._wsServer = new WebSocketServer(this._server, this._wsOptions.server);

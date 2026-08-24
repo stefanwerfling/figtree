@@ -93,6 +93,24 @@ export class BaseHttpServer {
     protected static _listenHost: string = 'localhost';
 
     /**
+     * Set the host address used in the HTTP->HTTPS redirect Location header.
+     * Lets an application point the redirect at the real host IP (e.g. from a
+     * host-info update) instead of the 'localhost' default.
+     * @param {string} host
+     */
+    public static setListenHost(host: string): void {
+        BaseHttpServer._listenHost = host;
+    }
+
+    /**
+     * Return the host address used in the HTTP->HTTPS redirect Location header.
+     * @return {string}
+     */
+    public static getListenHost(): string {
+        return BaseHttpServer._listenHost;
+    }
+
+    /**
      * server default port
      * @private
      */

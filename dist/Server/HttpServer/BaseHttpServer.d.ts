@@ -40,6 +40,8 @@ export type BaseHttpCertKey = {
 };
 export declare class BaseHttpServer {
     protected static _listenHost: string;
+    static setListenHost(host: string): void;
+    static getListenHost(): string;
     protected readonly _port: number;
     protected _express?: Application;
     protected _server: http.Server | null;

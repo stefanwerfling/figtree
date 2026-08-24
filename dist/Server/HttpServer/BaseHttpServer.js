@@ -14,6 +14,12 @@ import { FileHelper } from '../../Utils/FileHelper.js';
 import { HttpMiddlewareProviders } from './HttpMiddlewareProviders.js';
 export class BaseHttpServer {
     static _listenHost = 'localhost';
+    static setListenHost(host) {
+        BaseHttpServer._listenHost = host;
+    }
+    static getListenHost() {
+        return BaseHttpServer._listenHost;
+    }
     _port = 3000;
     _express;
     _server = null;

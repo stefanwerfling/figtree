@@ -10,6 +10,7 @@ export declare class RedisClient {
     static getInstance(options?: RedisClientOptions): RedisClient;
     static hasInstance(): boolean;
     protected _client: RedisClientType;
+    getClient(): RedisClientType;
     protected _options: RedisClientOptions;
     protected _isConnect: boolean;
     constructor(options: RedisClientOptions);

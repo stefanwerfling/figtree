@@ -17,6 +17,9 @@ export class RedisClient {
         return RedisClient._instance !== null;
     }
     _client;
+    getClient() {
+        return this._client;
+    }
     _options;
     _isConnect = false;
     constructor(options) {
