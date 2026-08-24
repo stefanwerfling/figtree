@@ -2,9 +2,15 @@ import { ServiceImportance } from 'figtree-schemas';
 import { DBLoaderType } from './MariaDBService/DBLoader.js';
 import { ServiceAbstract } from '../../Service/ServiceAbstract.js';
 import { DBSetupHook } from './MariaDBService/DBSetupHook.js';
+export type MariaDBServiceBaseline = {
+    legacyTable: string;
+    migrationName: string;
+    timestamp: number;
+};
 export type MariaDBServiceOptions = {
     migrationsRun?: boolean;
     synchronize?: boolean;
+    baseline?: MariaDBServiceBaseline;
 };
 export declare class MariaDBService extends ServiceAbstract {
     static NAME: string;

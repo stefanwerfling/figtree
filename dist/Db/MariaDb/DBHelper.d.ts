@@ -7,5 +7,10 @@ export declare class DBHelper {
     private static ensureInitialized;
     static getDataSource(sourceName?: string): Promise<DataSource>;
     static getRepository<Entity extends ObjectLiteral>(target: EntityTarget<Entity>, sourceName?: string): Promise<Repository<Entity>>;
+    static runMigrations(sourceName?: string, baseline?: {
+        legacyTable: string;
+        migrationName: string;
+        timestamp: number;
+    }): Promise<void>;
     static closeAllSources(): Promise<void>;
 }

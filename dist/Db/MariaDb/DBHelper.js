@@ -52,6 +52,18 @@ export class DBHelper {
         const dataSource = await DBHelper.getDataSource(sourceName);
         return dataSource.getRepository(target);
     }
+    static async runMigrations(sourceName, baseline) {
+        const dataSource = await DBHelper.getDataSource(sourceName);
+        if (baseline) {
+            const legacy = await dataSource.query(`SHOW TABLES LIKE '${baseline.legacyTable}'`);
+            const migrationsTable = await dataSource.query('SHOW TABLES LIKE \'migrations\'');
+            if (legacy.length > 0 && migrationsTable.length === 0) {
+                await dataSource.query('CREATE TABLE `migrations` (`id` int NOT NULL AUTO_INCREMENT, `timestamp` bigint NOT NULL, `name` varchar(255) NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB');
+                await dataSource.query('INSERT INTO `migrations`(`timestamp`, `name`) VALUES (?, ?)', [baseline.timestamp, baseline.migrationName]);
+            }
+        }
+        await dataSource.runMigrations();
+    }
     static async closeAllSources() {
         for await (const [key, dataSource] of DBHelper._sources) {
             await dataSource.destroy();

@@ -10,11 +10,26 @@ import {StringHelper} from '../../Utils/StringHelper.js';
 import {DBSetupHook} from './MariaDBService/DBSetupHook.js';
 
 /**
+ * Auto-baseline descriptor for pre-existing (pre-migration) schemas.
+ *
+ * When set, the initial migration is stamped as already applied for databases
+ * whose schema was created by a former `synchronize: true` (the legacy table
+ * exists but the `migrations` table does not yet), so migrations can be adopted
+ * without recreating the schema.
+ */
+export type MariaDBServiceBaseline = {
+    legacyTable: string;
+    migrationName: string;
+    timestamp: number;
+};
+
+/**
  * Maria DB Service Options
  */
 export type MariaDBServiceOptions = {
     migrationsRun?: boolean;
     synchronize?: boolean;
+    baseline?: MariaDBServiceBaseline;
 };
 
 /**
@@ -134,6 +149,9 @@ export class MariaDBService extends ServiceAbstract {
                 );
             }
 
+            const migrationsRun = this._options.migrationsRun ?? true;
+            const baseline = this._options.baseline;
+
             await DBHelper.init({
                 type: 'mysql',
                 host: tConfig.db.mysql.host,
@@ -143,9 +161,16 @@ export class MariaDBService extends ServiceAbstract {
                 database: tConfig.db.mysql.database,
                 entities: await this._loader.loadEntities(),
                 migrations: this._loader.loadMigrations(),
-                migrationsRun: this._options.migrationsRun ?? true,
+                // With a baseline configured, defer migrations out of
+                // DataSource.initialize() so the legacy schema can be stamped
+                // before any migration runs.
+                migrationsRun: baseline ? false : migrationsRun,
                 synchronize: this._options.synchronize ?? true,
             });
+
+            if (baseline && migrationsRun) {
+                await DBHelper.runMigrations(undefined, baseline);
+            }
 
             await this._runSetupHooks();
         } catch (error) {

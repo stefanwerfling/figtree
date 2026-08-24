@@ -117,6 +117,39 @@ export class DBHelper {
     }
 
     /**
+     * Run pending migrations on a data source.
+     *
+     * When a baseline is provided and a legacy schema is detected (the legacy
+     * table exists but the `migrations` table does not yet), the initial
+     * migration is stamped as already applied instead of being executed. This
+     * lets existing databases (whose schema was created by a former
+     * `synchronize: true`) adopt migrations without recreating their schema.
+     *
+     * The DataSource must have been initialized with `migrationsRun: false`, so
+     * the stamping happens before any migration is run.
+     * @param {string} [sourceName] - data source name (defaults to `default`)
+     * @param {{legacyTable: string; migrationName: string; timestamp: number}} [baseline] - auto-baseline descriptor for pre-existing schemas
+     */
+    public static async runMigrations(
+        sourceName?: string,
+        baseline?: {legacyTable: string; migrationName: string; timestamp: number;}
+    ): Promise<void> {
+        const dataSource = await DBHelper.getDataSource(sourceName);
+
+        if (baseline) {
+            const legacy = await dataSource.query(`SHOW TABLES LIKE '${baseline.legacyTable}'`);
+            const migrationsTable = await dataSource.query('SHOW TABLES LIKE \'migrations\'');
+
+            if (legacy.length > 0 && migrationsTable.length === 0) {
+                await dataSource.query('CREATE TABLE `migrations` (`id` int NOT NULL AUTO_INCREMENT, `timestamp` bigint NOT NULL, `name` varchar(255) NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB');
+                await dataSource.query('INSERT INTO `migrations`(`timestamp`, `name`) VALUES (?, ?)', [baseline.timestamp, baseline.migrationName]);
+            }
+        }
+
+        await dataSource.runMigrations();
+    }
+
+    /**
      * Close all sources connection
      */
     public static async closeAllSources(): Promise<void> {
