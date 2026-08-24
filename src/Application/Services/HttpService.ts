@@ -2,7 +2,7 @@ import {ConfigBackendOptions, SchemaConfigHttpServer, ServiceImportance, Service
 import {v4 as uuid} from 'uuid';
 import {Config} from '../../Config/Config.js';
 import {Logger} from '../../Logger/Logger.js';
-import {BaseHttpServerOptionCsrf, BaseHttpServerOptionProxy} from '../../Server/HttpServer/BaseHttpServer.js';
+import {BaseHttpServerOptionCsrf, BaseHttpServerOptionProxy, BaseHttpServerOptions} from '../../Server/HttpServer/BaseHttpServer.js';
 import {HttpRouteLoaderType} from '../../Server/HttpServer/HttpRouteLoader.js';
 import {HttpServer} from '../../Server/HttpServer/HttpServer.js';
 import {WebSocketEndpointLoaderType} from '../../Server/HttpServer/WebSocket/WebSocketEndpointLoader.js';
@@ -94,6 +94,19 @@ export class HttpService extends ServiceAbstract {
     }
 
     /**
+     * Create the HTTP server instance. Override in a subclass to return a
+     * custom `HttpServer` (e.g. one with a Redis-backed session store via an
+     * overridden `_getSessionStore()`, or application-specific crypt file
+     * names). The default returns a plain figtree `HttpServer`.
+     * @param {BaseHttpServerOptions} options
+     * @return {HttpServer}
+     * @protected
+     */
+    protected _createServer(options: BaseHttpServerOptions): HttpServer {
+        return new HttpServer(options);
+    }
+
+    /**
      * Start the service
      */
     public override async start(): Promise<void> {
@@ -168,7 +181,7 @@ export class HttpService extends ServiceAbstract {
                 };
             }
 
-            this._server = new HttpServer({
+            const serverOptions: BaseHttpServerOptions = {
                 realm: Config.getInstance().getAppTitle(),
                 port: aport,
                 session: {
@@ -186,7 +199,9 @@ export class HttpService extends ServiceAbstract {
                 },
                 proxy: proxy,
                 csrf: csrf
-            });
+            };
+
+            this._server = this._createServer(serverOptions);
 
             await this._server.setupAndListen();
 
