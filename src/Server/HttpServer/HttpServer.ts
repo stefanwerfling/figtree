@@ -1,6 +1,8 @@
 import rateLimit, {RateLimitRequestHandler} from 'express-rate-limit';
 import helmet from 'helmet';
 import {Request, Response} from 'express';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import {Config} from '../../Config/Config.js';
 import {CertificateHelper} from '../../Crypto/CertificateHelper.js';
 import {Logger} from '../../Logger/Logger.js';
@@ -201,6 +203,14 @@ export class HttpServer extends BaseHttpServer {
 
     /**
      * Get Cert and key
+     *
+     * When `sslPath` is set together with `key`/`crt`, those are treated as
+     * filenames inside `sslPath` (not PEM strings/absolute paths) and joined
+     * before the lookup, so a persisted cert on disk is actually found on
+     * restart. If nothing is found there, a temporary self-signed cert is
+     * generated and — when `sslPath` is set — persisted to that same location,
+     * so it survives process restarts instead of being re-generated (with a
+     * new key) on every boot.
      * @param {BaseHttpServerOptionCrypt} options
      * @return {BaseHttpCertKey|null}
      * @protected
@@ -208,15 +218,20 @@ export class HttpServer extends BaseHttpServer {
     protected async _getCertAndKey(options: BaseHttpServerOptionCrypt): Promise<BaseHttpCertKey|null> {
         let ck: BaseHttpCertKey|null = null;
 
-        if (options.key && options.crt) {
-            ck = await super._getCertAndKey(options);
-        } else if(options.sslPath) {
+        if (options.sslPath && options.key && options.crt) {
             try {
                 await DirHelper.mkdir(options.sslPath, true);
-                ck = await super._getCertAndKey(options);
+
+                ck = await super._getCertAndKey({
+                    sslPath: options.sslPath,
+                    key: path.join(options.sslPath, options.key),
+                    crt: path.join(options.sslPath, options.crt)
+                });
             } catch (_e) {
                 Logger.getLogger().error(`HttpServer::_getCertAndKey: Can not create key and cert by ssl path: ${options.sslPath}`);
             }
+        } else if (options.key && options.crt) {
+            ck = await super._getCertAndKey(options);
         }
 
         // -------------------------------------------------------------------------------------------------------------
@@ -227,6 +242,17 @@ export class HttpServer extends BaseHttpServer {
             );
 
             ck = await this._generateCertAndKey();
+
+            if (options.sslPath && options.key && options.crt) {
+                try {
+                    await fs.writeFile(path.join(options.sslPath, options.key), ck.key);
+                    await fs.writeFile(path.join(options.sslPath, options.crt), ck.crt);
+                } catch (_e) {
+                    Logger.getLogger().warn(
+                        `HttpServer::_getCertAndKey: Could not persist the generated temporary certificate to ssl path: ${options.sslPath}`
+                    );
+                }
+            }
         }
 
         return ck;

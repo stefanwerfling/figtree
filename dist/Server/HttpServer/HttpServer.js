@@ -1,5 +1,7 @@
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import { Config } from '../../Config/Config.js';
 import { CertificateHelper } from '../../Crypto/CertificateHelper.js';
 import { Logger } from '../../Logger/Logger.js';
@@ -137,21 +139,34 @@ export class HttpServer extends BaseHttpServer {
     }
     async _getCertAndKey(options) {
         let ck = null;
-        if (options.key && options.crt) {
-            ck = await super._getCertAndKey(options);
-        }
-        else if (options.sslPath) {
+        if (options.sslPath && options.key && options.crt) {
             try {
                 await DirHelper.mkdir(options.sslPath, true);
-                ck = await super._getCertAndKey(options);
+                ck = await super._getCertAndKey({
+                    sslPath: options.sslPath,
+                    key: path.join(options.sslPath, options.key),
+                    crt: path.join(options.sslPath, options.crt)
+                });
             }
             catch (_e) {
                 Logger.getLogger().error(`HttpServer::_getCertAndKey: Can not create key and cert by ssl path: ${options.sslPath}`);
             }
         }
+        else if (options.key && options.crt) {
+            ck = await super._getCertAndKey(options);
+        }
         if (ck === null) {
             Logger.getLogger().error('HttpServer::_getCertAndKey: Key and Certificat can not read/parse by config! Create a temporary memory Key & Certificate');
             ck = await this._generateCertAndKey();
+            if (options.sslPath && options.key && options.crt) {
+                try {
+                    await fs.writeFile(path.join(options.sslPath, options.key), ck.key);
+                    await fs.writeFile(path.join(options.sslPath, options.crt), ck.crt);
+                }
+                catch (_e) {
+                    Logger.getLogger().warn(`HttpServer::_getCertAndKey: Could not persist the generated temporary certificate to ssl path: ${options.sslPath}`);
+                }
+            }
         }
         return ck;
     }
