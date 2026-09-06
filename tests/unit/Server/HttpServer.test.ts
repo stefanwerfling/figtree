@@ -1,5 +1,6 @@
 import {describe, it, expect, afterEach} from 'vitest';
 import fs from 'node:fs/promises';
+import {X509Certificate} from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
 import {HttpServer} from '../../../src/Server/HttpServer/HttpServer.js';
@@ -47,6 +48,16 @@ describe('HttpServer::_getCertAndKey', () => {
 
         expect(persistedKey).toBe(first!.key);
         expect(persistedCrt).toBe(first!.crt);
+    }, 30_000);
+
+    it('includes the machine hostname in the generated certificate\'s subjectAltName', async() => {
+        const server = new TestableHttpServer();
+
+        const ck = await server.getCertAndKey({sslPath: '', key: '', crt: ''});
+        const cert = new X509Certificate(ck!.crt);
+
+        expect(cert.subjectAltName).toContain(`DNS:${os.hostname()}`);
+        expect(cert.subjectAltName).toContain('DNS:localhost');
     }, 30_000);
 
     it('generates a fresh in-memory certificate every call when no sslPath is set', async() => {

@@ -8,6 +8,7 @@ export declare class HttpServer extends BaseHttpServer {
     protected _limiterSkip(request: Request): Promise<boolean>;
     protected _limiterLimit(_request: Request): Promise<number>;
     protected _limiterHandler(req: Request, res: Response): Promise<void>;
+    private static _buildSubjectAltNames;
     protected _generateCertAndKey(): Promise<BaseHttpCertKey>;
     protected _getCertAndKey(options: BaseHttpServerOptionCrypt): Promise<BaseHttpCertKey | null>;
     getLimiter(): RateLimitRequestHandler | null;

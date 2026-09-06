@@ -1,6 +1,7 @@
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import fs from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 import { Config } from '../../Config/Config.js';
 import { CertificateHelper } from '../../Crypto/CertificateHelper.js';
@@ -58,6 +59,34 @@ export class HttpServer extends BaseHttpServer {
         Logger.getLogger().warn('HttpServer::_limiterHandler: Too Many Requests: %s is blocked for %s.', req.ip, req.url);
         res.status(429).json({ message: 'Too Many Requests' });
     }
+    static _buildSubjectAltNames() {
+        const altNames = [
+            {
+                type: 7,
+                ip: '127.0.0.1'
+            },
+            {
+                type: 7,
+                ip: '::1'
+            },
+            {
+                type: 2,
+                value: 'localhost'
+            },
+            {
+                type: 6,
+                value: 'https://localhost'
+            }
+        ];
+        const hostname = os.hostname();
+        if (hostname && hostname !== 'localhost') {
+            altNames.push({
+                type: 2,
+                value: hostname
+            });
+        }
+        return altNames;
+    }
     async _generateCertAndKey() {
         const appTitle = Config.getInstance().getAppTitle();
         const keyPair = await CertificateHelper.generateKeyPair(2048);
@@ -109,24 +138,7 @@ export class HttpServer extends BaseHttpServer {
             },
             {
                 name: 'subjectAltName',
-                altNames: [
-                    {
-                        type: 7,
-                        ip: '127.0.0.1'
-                    },
-                    {
-                        type: 7,
-                        ip: '::1'
-                    },
-                    {
-                        type: 2,
-                        value: 'localhost'
-                    },
-                    {
-                        type: 6,
-                        value: 'https://localhost'
-                    }
-                ]
+                altNames: HttpServer._buildSubjectAltNames()
             },
             {
                 name: 'subjectKeyIdentifier'

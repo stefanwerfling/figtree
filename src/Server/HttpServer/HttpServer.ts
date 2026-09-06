@@ -2,6 +2,7 @@ import rateLimit, {RateLimitRequestHandler} from 'express-rate-limit';
 import helmet from 'helmet';
 import {Request, Response} from 'express';
 import fs from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 import {Config} from '../../Config/Config.js';
 import {CertificateHelper} from '../../Crypto/CertificateHelper.js';
@@ -107,6 +108,50 @@ export class HttpServer extends BaseHttpServer {
     }
 
     /**
+     * Build the subjectAltName list for the generated temporary certificate:
+     * the usual loopback entries plus the machine's own hostname, so a
+     * self-signed cert is also valid when reached by that name (e.g. a
+     * container's compose/k8s service DNS name) instead of only localhost.
+     * @return {Array<{type: number; ip?: string; value?: string}>}
+     * @private
+     */
+    private static _buildSubjectAltNames(): Array<{type: number; ip?: string; value?: string}> {
+        const altNames: Array<{type: number; ip?: string; value?: string}> = [
+            {
+                // IP
+                type: 7,
+                ip: '127.0.0.1'
+            },
+            {
+                // IP6
+                type: 7,
+                ip: '::1'
+            },
+            {
+                // DNS
+                type: 2,
+                value: 'localhost'
+            },
+            {
+                // URI
+                type: 6,
+                value: 'https://localhost'
+            }
+        ];
+
+        const hostname = os.hostname();
+
+        if (hostname && hostname !== 'localhost') {
+            altNames.push({
+                type: 2,
+                value: hostname
+            });
+        }
+
+        return altNames;
+    }
+
+    /**
      * Generate Cert and Key
      * @return {BaseHttpCertKey}
      * @protected
@@ -166,28 +211,12 @@ export class HttpServer extends BaseHttpServer {
                 },
                 {
                     name: 'subjectAltName',
-                    altNames: [
-                        {
-                            // IP
-                            type: 7,
-                            ip: '127.0.0.1'
-                        },
-                        {
-                            // IP6
-                            type: 7,
-                            ip: '::1'
-                        },
-                        {
-                            // DNS
-                            type: 2,
-                            value: 'localhost'
-                        },
-                        {
-                            // URI
-                            type: 6,
-                            value: 'https://localhost'
-                        }
-                    ]
+                    // Includes the machine's own hostname (e.g. a Docker container's
+                    // hostname, which compose/k8s also register as the resolvable
+                    // service DNS name on the internal network) so other services
+                    // reaching this server by that name - not just localhost - still
+                    // pass hostname verification against this self-signed cert.
+                    altNames: HttpServer._buildSubjectAltNames()
                 },
                 {
                     name: 'subjectKeyIdentifier'
