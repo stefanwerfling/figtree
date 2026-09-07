@@ -172,37 +172,70 @@ export class PluginManager {
         const informations: PluginInformation[] = [];
 
         for await (const aModule of modules) {
-            const packageJsonPath = path.join(nodeModulesPath, aModule);
+            const modulePath = path.join(nodeModulesPath, aModule);
 
-            if (await DirHelper.directoryExist(packageJsonPath)) {
-                try {
-                    const packageFile = path.join(packageJsonPath, 'package.json');
-                    const packetData = await FileHelper.readJsonFile(packageFile);
-
-                    if (packetData) {
-                        const definition = packetData[this._pluginKey];
-
-                        if (definition) {
-                            const errors: SchemaErrors = [];
-
-                            if (SchemaPluginDefinition.validate(definition, errors)) {
-                                informations.push({
-                                    definition: definition,
-                                    path: packageJsonPath
-                                });
-                            } else {
-                                console.log('PluginManager::scan: Config file error:', errors);
-                            }
-                        }
-                    }
-                } catch (e) {
-                    Logger.getLogger().warn('PluginManager::scan: package.json can not read/parse');
-                    Logger.getLogger().warn(e);
-                }
+            if (!await DirHelper.directoryExist(modulePath)) {
+                continue;
             }
+
+            // Scoped packages (@scope/name) live one level deeper: @scope itself
+            // is a plain directory with no package.json of its own, so recurse
+            // into its entries instead of trying (and failing) to read one here.
+            if (aModule.startsWith('@')) {
+                const scopedModules = await DirHelper.getFiles(modulePath);
+
+                for await (const scopedModule of scopedModules) {
+                    await this._scanModule(
+                        path.join(modulePath, scopedModule),
+                        informations
+                    );
+                }
+
+                continue;
+            }
+
+            await this._scanModule(modulePath, informations);
         }
 
         return informations;
+    }
+
+    /**
+     * Read a single node_modules package's package.json and, if it carries a
+     * valid plugin definition, add it to `informations`.
+     * @param {string} packagePath
+     * @param {PluginInformation[]} informations
+     * @private
+     */
+    private async _scanModule(packagePath: string, informations: PluginInformation[]): Promise<void> {
+        if (!await DirHelper.directoryExist(packagePath)) {
+            return;
+        }
+
+        try {
+            const packageFile = path.join(packagePath, 'package.json');
+            const packetData = await FileHelper.readJsonFile(packageFile);
+
+            if (packetData) {
+                const definition = packetData[this._pluginKey];
+
+                if (definition) {
+                    const errors: SchemaErrors = [];
+
+                    if (SchemaPluginDefinition.validate(definition, errors)) {
+                        informations.push({
+                            definition: definition,
+                            path: packagePath
+                        });
+                    } else {
+                        console.log('PluginManager::scan: Config file error:', errors);
+                    }
+                }
+            }
+        } catch (e) {
+            Logger.getLogger().warn('PluginManager::scan: package.json can not read/parse');
+            Logger.getLogger().warn(e);
+        }
     }
 
     /**

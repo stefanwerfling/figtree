@@ -40,6 +40,10 @@ export class Logger {
      * @param {number} maxDays
      */
     public static async cleanLogfiles(logPath: string, maxDays: number): Promise<void> {
+        if (!await DirHelper.directoryExist(logPath)) {
+            return;
+        }
+
         const files = await DirHelper.getFiles(logPath);
 
         for await (const file of files) {

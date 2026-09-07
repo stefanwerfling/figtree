@@ -64,34 +64,48 @@ export class PluginManager {
         const modules = await DirHelper.getFiles(nodeModulesPath);
         const informations = [];
         for await (const aModule of modules) {
-            const packageJsonPath = path.join(nodeModulesPath, aModule);
-            if (await DirHelper.directoryExist(packageJsonPath)) {
-                try {
-                    const packageFile = path.join(packageJsonPath, 'package.json');
-                    const packetData = await FileHelper.readJsonFile(packageFile);
-                    if (packetData) {
-                        const definition = packetData[this._pluginKey];
-                        if (definition) {
-                            const errors = [];
-                            if (SchemaPluginDefinition.validate(definition, errors)) {
-                                informations.push({
-                                    definition: definition,
-                                    path: packageJsonPath
-                                });
-                            }
-                            else {
-                                console.log('PluginManager::scan: Config file error:', errors);
-                            }
-                        }
-                    }
+            const modulePath = path.join(nodeModulesPath, aModule);
+            if (!await DirHelper.directoryExist(modulePath)) {
+                continue;
+            }
+            if (aModule.startsWith('@')) {
+                const scopedModules = await DirHelper.getFiles(modulePath);
+                for await (const scopedModule of scopedModules) {
+                    await this._scanModule(path.join(modulePath, scopedModule), informations);
                 }
-                catch (e) {
-                    Logger.getLogger().warn('PluginManager::scan: package.json can not read/parse');
-                    Logger.getLogger().warn(e);
+                continue;
+            }
+            await this._scanModule(modulePath, informations);
+        }
+        return informations;
+    }
+    async _scanModule(packagePath, informations) {
+        if (!await DirHelper.directoryExist(packagePath)) {
+            return;
+        }
+        try {
+            const packageFile = path.join(packagePath, 'package.json');
+            const packetData = await FileHelper.readJsonFile(packageFile);
+            if (packetData) {
+                const definition = packetData[this._pluginKey];
+                if (definition) {
+                    const errors = [];
+                    if (SchemaPluginDefinition.validate(definition, errors)) {
+                        informations.push({
+                            definition: definition,
+                            path: packagePath
+                        });
+                    }
+                    else {
+                        console.log('PluginManager::scan: Config file error:', errors);
+                    }
                 }
             }
         }
-        return informations;
+        catch (e) {
+            Logger.getLogger().warn('PluginManager::scan: package.json can not read/parse');
+            Logger.getLogger().warn(e);
+        }
     }
     async load(plugin) {
         try {

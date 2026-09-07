@@ -18,6 +18,9 @@ export class Logger {
         return Logger._logger !== null;
     }
     static async cleanLogfiles(logPath, maxDays) {
+        if (!await DirHelper.directoryExist(logPath)) {
+            return;
+        }
         const files = await DirHelper.getFiles(logPath);
         for await (const file of files) {
             try {

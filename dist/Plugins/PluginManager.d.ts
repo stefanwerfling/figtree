@@ -21,6 +21,7 @@ export declare class PluginManager {
     start(): Promise<void>;
     stop(): Promise<void>;
     scan(): Promise<PluginInformation[]>;
+    private _scanModule;
     load(plugin: PluginInformation): Promise<boolean>;
     getPlugins(): APlugin[];
     getPlugin(name: string): APlugin | null;
