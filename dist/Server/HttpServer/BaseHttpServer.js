@@ -31,6 +31,7 @@ export class BaseHttpServer {
     _crypt;
     _proxy;
     _csrf;
+    _mtls;
     constructor(serverInit) {
         if (serverInit.port) {
             this._port = serverInit.port;
@@ -47,6 +48,9 @@ export class BaseHttpServer {
         }
         if (serverInit.crypt) {
             this._crypt = serverInit.crypt;
+        }
+        if (serverInit.mtls) {
+            this._mtls = serverInit.mtls;
         }
         if (serverInit.publicDir) {
             this._publicDir = serverInit.publicDir;
@@ -166,10 +170,16 @@ export class BaseHttpServer {
         if (this._crypt) {
             const ck = await this._getCertAndKey(this._crypt);
             if (ck) {
-                this._server = https.createServer({
+                const tlsOptions = {
                     key: ck.key,
                     cert: ck.crt
-                }, this._express);
+                };
+                if (this._mtls) {
+                    tlsOptions.requestCert = true;
+                    tlsOptions.ca = this._mtls.ca;
+                    tlsOptions.rejectUnauthorized = this._mtls.rejectUnauthorized ?? false;
+                }
+                this._server = https.createServer(tlsOptions, this._express);
                 this._server.on('tlsClientError', (err, atlsSocket) => {
                     const tlsError = err;
                     if (tlsError.reason === 'http request') {

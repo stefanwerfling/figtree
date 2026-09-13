@@ -24,6 +24,10 @@ export type BaseHttpServerOptionProxy = {
 export type BaseHttpServerOptionCsrf = {
     cookie: boolean;
 };
+export type BaseHttpServerOptionMutualTls = {
+    ca: string | string[];
+    rejectUnauthorized?: boolean;
+};
 export type BaseHttpServerOptions = {
     realm: string;
     port?: number;
@@ -33,6 +37,7 @@ export type BaseHttpServerOptions = {
     crypt?: BaseHttpServerOptionCrypt;
     proxy?: BaseHttpServerOptionProxy;
     csrf?: BaseHttpServerOptionCsrf;
+    mtls?: BaseHttpServerOptionMutualTls;
 };
 export type BaseHttpCertKey = {
     key: string;
@@ -53,6 +58,7 @@ export declare class BaseHttpServer {
     protected readonly _crypt?: BaseHttpServerOptionCrypt;
     protected readonly _proxy?: BaseHttpServerOptionProxy;
     protected readonly _csrf?: BaseHttpServerOptionCsrf;
+    protected readonly _mtls?: BaseHttpServerOptionMutualTls;
     constructor(serverInit: BaseHttpServerOptions);
     protected _initSession(): void;
     protected _initExpress(): void;
