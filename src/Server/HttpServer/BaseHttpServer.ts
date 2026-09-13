@@ -60,6 +60,18 @@ export type BaseHttpServerOptionCsrf = {
 };
 
 /**
+ * Base http server option mutual TLS. When set (and crypt is configured), the
+ * HTTPS server requests a client certificate and verifies it against `ca`. Keep
+ * `rejectUnauthorized` false to make mTLS optional (the server captures the peer
+ * certificate but still serves clients without one, so an application layer can
+ * decide) — set it true to require a trusted client certificate at the transport.
+ */
+export type BaseHttpServerOptionMutualTls = {
+    ca: string|string[];
+    rejectUnauthorized?: boolean;
+};
+
+/**
  * Base http server options
  */
 export type BaseHttpServerOptions = {
@@ -71,6 +83,7 @@ export type BaseHttpServerOptions = {
     crypt?: BaseHttpServerOptionCrypt;
     proxy?: BaseHttpServerOptionProxy;
     csrf?: BaseHttpServerOptionCsrf;
+    mtls?: BaseHttpServerOptionMutualTls;
 };
 
 /**
@@ -177,6 +190,12 @@ export class BaseHttpServer {
     protected readonly _csrf?: BaseHttpServerOptionCsrf;
 
     /**
+     * use mutual TLS (request + verify client certificates)
+     * @protected
+     */
+    protected readonly _mtls?: BaseHttpServerOptionMutualTls;
+
+    /**
      * constructor
      * @param {BaseHttpServerOptions} serverInit
      */
@@ -201,6 +220,10 @@ export class BaseHttpServer {
 
         if (serverInit.crypt) {
             this._crypt = serverInit.crypt;
+        }
+
+        if (serverInit.mtls) {
+            this._mtls = serverInit.mtls;
         }
 
         if (serverInit.publicDir) {
@@ -417,10 +440,22 @@ export class BaseHttpServer {
             const ck = await this._getCertAndKey(this._crypt);
 
             if (ck) {
-                this._server = https.createServer({
+                const tlsOptions: https.ServerOptions = {
                     key: ck.key,
                     cert: ck.crt
-                }, this._express);
+                };
+
+                // Mutual TLS: request a client certificate and verify it against
+                // the configured CA. rejectUnauthorized defaults to false so the
+                // server still serves certless clients (optional mTLS) and an
+                // application layer decides based on the captured peer certificate.
+                if (this._mtls) {
+                    tlsOptions.requestCert = true;
+                    tlsOptions.ca = this._mtls.ca;
+                    tlsOptions.rejectUnauthorized = this._mtls.rejectUnauthorized ?? false;
+                }
+
+                this._server = https.createServer(tlsOptions, this._express);
 
                 this._server.on('tlsClientError', (err, atlsSocket) => {
                     const tlsError = err as ITlsClientError;
