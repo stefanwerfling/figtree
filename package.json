@@ -52,7 +52,7 @@
     "db",
     "raw-server"
   ],
-  "name": "figtree",
+  "name": "@stefanwerfling/figtree",
   "peerDependencies": {
     "@influxdata/influxdb-client": "^1.35.0",
     "@qdrant/js-client-rest": "^1.18.0",
