@@ -116,16 +116,13 @@ export class HttpServer extends BaseHttpServer {
      * @private
      */
     private static _buildSubjectAltNames(): Array<{type: number; ip?: string; value?: string}> {
-        const altNames: Array<{type: number; ip?: string; value?: string}> = [
+        const altNames: Array<{type: number; value?: string}> = [
             {
-                // IP
+                // IP (IPv4). X509Rsa._subjectAltName reads `value` (not `ip`) and
+                // its _ipv4 encoder only supports IPv4 — an IPv6 SAN (::1) would
+                // throw, so it is intentionally omitted here.
                 type: 7,
-                ip: '127.0.0.1'
-            },
-            {
-                // IP6
-                type: 7,
-                ip: '::1'
+                value: '127.0.0.1'
             },
             {
                 // DNS
@@ -200,16 +197,6 @@ export class HttpServer extends BaseHttpServer {
                     timeStamping: true
                 },
                 {
-                    name: 'nsCertType',
-                    client: true,
-                    server: true,
-                    email: true,
-                    objsign: true,
-                    sslCA: true,
-                    emailCA: true,
-                    objCA: true
-                },
-                {
                     name: 'subjectAltName',
                     // Includes the machine's own hostname (e.g. a Docker container's
                     // hostname, which compose/k8s also register as the resolvable
@@ -217,9 +204,6 @@ export class HttpServer extends BaseHttpServer {
                     // reaching this server by that name - not just localhost - still
                     // pass hostname verification against this self-signed cert.
                     altNames: HttpServer._buildSubjectAltNames()
-                },
-                {
-                    name: 'subjectKeyIdentifier'
                 }
             ]
         );
