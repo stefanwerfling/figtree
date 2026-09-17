@@ -63,11 +63,7 @@ export class HttpServer extends BaseHttpServer {
         const altNames = [
             {
                 type: 7,
-                ip: '127.0.0.1'
-            },
-            {
-                type: 7,
-                ip: '::1'
+                value: '127.0.0.1'
             },
             {
                 type: 2,
@@ -127,21 +123,8 @@ export class HttpServer extends BaseHttpServer {
                 timeStamping: true
             },
             {
-                name: 'nsCertType',
-                client: true,
-                server: true,
-                email: true,
-                objsign: true,
-                sslCA: true,
-                emailCA: true,
-                objCA: true
-            },
-            {
                 name: 'subjectAltName',
                 altNames: HttpServer._buildSubjectAltNames()
-            },
-            {
-                name: 'subjectKeyIdentifier'
             }
         ]);
         return {
