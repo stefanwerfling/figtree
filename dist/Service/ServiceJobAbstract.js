@@ -49,7 +49,7 @@ export class ServiceJobAbstract extends ServiceAbstract {
             catch (e) {
                 this._statusScheduler = ServiceStatus.Error;
                 this._failCount += 1;
-                const msg = e instanceof Error ? (e.message || 'Unknown error') : 'Unknown error';
+                const msg = e instanceof Error ? e.message || 'Unknown error' : 'Unknown error';
                 this._statusMsg = msg;
                 this.getLogger().error(`Service '${this.getServiceName()}' scheduled run failed: ${msg}`, e);
             }

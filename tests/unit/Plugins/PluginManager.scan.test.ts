@@ -8,10 +8,7 @@ describe('PluginManager::scan', () => {
     const tmpDirs: string[] = [];
 
     afterEach(async() => {
-        while (tmpDirs.length > 0) {
-            const dir = tmpDirs.pop()!;
-            await fs.rm(dir, {recursive: true, force: true});
-        }
+        await Promise.all(tmpDirs.splice(0).map((dir) => fs.rm(dir, {recursive: true, force: true})));
     });
 
     it('finds a plugin defined by a scoped package (@scope/name) without warning', async() => {
@@ -40,7 +37,7 @@ describe('PluginManager::scan', () => {
         await fs.mkdir(plainPkg, {recursive: true});
         await fs.writeFile(path.join(plainPkg, 'package.json'), JSON.stringify({name: 'lodash', version: '1.0.0'}));
 
-        const manager = new PluginManager('test-service', {appPath});
+        const manager = new PluginManager('test-service', {appPath: appPath});
         const infos = await manager.scan();
 
         expect(infos).toHaveLength(1);

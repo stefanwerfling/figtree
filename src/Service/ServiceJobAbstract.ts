@@ -142,7 +142,7 @@ export abstract class ServiceJobAbstract extends ServiceAbstract {
                 this._statusScheduler = ServiceStatus.Error;
                 this._failCount += 1;
 
-                const msg = e instanceof Error ? (e.message || 'Unknown error') : 'Unknown error';
+                const msg = e instanceof Error ? e.message || 'Unknown error' : 'Unknown error';
                 this._statusMsg = msg;
 
                 this.getLogger().error(

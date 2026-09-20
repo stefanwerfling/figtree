@@ -25,10 +25,7 @@ describe('HttpServer::_getCertAndKey', () => {
     const tmpDirs: string[] = [];
 
     afterEach(async() => {
-        while (tmpDirs.length > 0) {
-            const dir = tmpDirs.pop()!;
-            await fs.rm(dir, {recursive: true, force: true});
-        }
+        await Promise.all(tmpDirs.splice(0).map((dir) => fs.rm(dir, {recursive: true, force: true})));
     });
 
     it('persists a generated temporary certificate to sslPath and reuses it on the next call', async() => {
@@ -37,8 +34,8 @@ describe('HttpServer::_getCertAndKey', () => {
 
         const server = new TestableHttpServer();
 
-        const first = await server.getCertAndKey({sslPath, key: 'server.pem', crt: 'server.crt'});
-        const second = await server.getCertAndKey({sslPath, key: 'server.pem', crt: 'server.crt'});
+        const first = await server.getCertAndKey({sslPath: sslPath, key: 'server.pem', crt: 'server.crt'});
+        const second = await server.getCertAndKey({sslPath: sslPath, key: 'server.pem', crt: 'server.crt'});
 
         expect(first).not.toBeNull();
         expect(second).toEqual(first);

@@ -8,14 +8,11 @@ describe('Logger::cleanLogfiles', () => {
     const tmpDirs: string[] = [];
 
     afterEach(async() => {
-        while (tmpDirs.length > 0) {
-            const dir = tmpDirs.pop()!;
-            await fs.rm(dir, {recursive: true, force: true});
-        }
+        await Promise.all(tmpDirs.splice(0).map((dir) => fs.rm(dir, {recursive: true, force: true})));
     });
 
     it('resolves without throwing when the log directory does not exist yet', async() => {
-        const missingDir = path.join(os.tmpdir(), 'figtree-logs-does-not-exist-' + Date.now());
+        const missingDir = path.join(os.tmpdir(), `figtree-logs-does-not-exist-${  Date.now()}`);
 
         await expect(Logger.cleanLogfiles(missingDir, 14)).resolves.toBeUndefined();
     });

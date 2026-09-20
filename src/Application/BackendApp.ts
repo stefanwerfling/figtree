@@ -1,6 +1,8 @@
 import {ConfigOptions, DefaultArgs} from 'figtree-schemas';
 import path from 'path';
 import {Schema} from 'vts';
+import {ACL} from '../ACL/ACL.js';
+import {ACLContributionProviders} from '../ACL/ACLContributionProviders.js';
 import {ClusterRegistry} from '../Cluster/ClusterRegistry.js';
 import {Config} from '../Config/Config.js';
 import {ConfigBackend} from '../Config/ConfigBackend.js';
@@ -8,7 +10,9 @@ import {Args} from '../Env/Args.js';
 import {Logger} from '../Logger/Logger.js';
 import {OnBackendLifecycleEvent} from '../Plugins/OnBackendLifecycleEvent.js';
 import {PluginManager} from '../Plugins/PluginManager.js';
+import {CronJobProviders} from '../Service/CronJobProviders.js';
 import {ServiceManager} from '../Service/ServiceManager.js';
+import {ServiceProviders} from '../Service/ServiceProviders.js';
 import {FileHelper} from '../Utils/FileHelper.js';
 import exitHook from 'async-exit-hook';
 
@@ -153,6 +157,92 @@ export abstract class BackendApp<A extends DefaultArgs, _C extends ConfigOptions
     }
 
     /**
+     * Register services contributed by plugins via `IServiceProvider` and cron
+     * jobs contributed via `ICronJobProvider`.
+     *
+     * Runs after `_initServices()` (so host services are registered first) and
+     * before `ServiceManager.startAll()` (so plugin services take part in the
+     * normal dependency-ordered startup). A no-op when no plugin manager has
+     * been initialized. Errors while collecting providers are logged but do not
+     * abort startup; a plugin service whose name collides with an already
+     * registered service is skipped with a warning. Cron jobs are normalized to
+     * the same shape and default to the `cron` cluster role.
+     * @protected
+     */
+    protected async _initServicesFromPlugins(): Promise<void> {
+        if (!PluginManager.hasInstance()) {
+            return;
+        }
+
+        let services;
+
+        try {
+            const [plainServices, cronJobs] = await Promise.all([
+                new ServiceProviders().getProvidersServices(),
+                new CronJobProviders().getProvidersJobs()
+            ]);
+
+            services = [...plainServices, ...cronJobs];
+        } catch (err) {
+            Logger.getLogger().warn('BackendApp::_initServicesFromPlugins: failed to load plugin services', err);
+            return;
+        }
+
+        for (const {service, roles} of services) {
+            const name = service.getServiceName();
+
+            if (this._serviceManager.getByName(name) !== null) {
+                Logger.getLogger().warn(
+                    'BackendApp::_initServicesFromPlugins: skipping plugin service "%s" — a service with that name is already registered',
+                    name
+                );
+
+                continue;
+            }
+
+            this._serviceManager.add(service, roles);
+            Logger.getLogger().info('BackendApp::_initServicesFromPlugins: registered plugin service "%s"', name);
+        }
+    }
+
+    /**
+     * Register ACL controllers contributed by plugins via
+     * `IACLContributionProvider`.
+     *
+     * Runs before `ServiceManager.startAll()` so the controllers are in place
+     * before the HTTP/WebSocket services begin serving traffic. Controllers are
+     * appended to the process-wide `ACL` singleton in provider registration
+     * order (`ACL.checkAccess` consults them in that order, first match wins). A
+     * no-op when no plugin manager has been initialized; errors while collecting
+     * providers are logged but do not abort startup.
+     * @protected
+     */
+    protected async _initACLFromPlugins(): Promise<void> {
+        if (!PluginManager.hasInstance()) {
+            return;
+        }
+
+        let controllers;
+
+        try {
+            controllers = await new ACLContributionProviders().getProvidersControllers();
+        } catch (err) {
+            Logger.getLogger().warn('BackendApp::_initACLFromPlugins: failed to load plugin ACL controllers', err);
+            return;
+        }
+
+        const acl = ACL.getInstance();
+
+        for (const controller of controllers) {
+            acl.addController(controller);
+        }
+
+        if (controllers.length > 0) {
+            Logger.getLogger().info('BackendApp::_initACLFromPlugins: registered %d plugin ACL controller(s)', controllers.length);
+        }
+    }
+
+    /**
      * Start backend app
      */
     public async start(): Promise<void> {
@@ -204,6 +294,8 @@ export abstract class BackendApp<A extends DefaultArgs, _C extends ConfigOptions
 
         Logger.getLogger().info('Start %s Service ...', Config.getInstance().getAppName());
         await this._initServices();
+        await this._initServicesFromPlugins();
+        await this._initACLFromPlugins();
         await this._serviceManager.startAll();
 
         // If the consumer initialized a ClusterRegistry singleton in _initServices,

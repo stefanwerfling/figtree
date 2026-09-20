@@ -115,8 +115,8 @@ export class HttpServer extends BaseHttpServer {
      * @return {Array<{type: number; ip?: string; value?: string}>}
      * @private
      */
-    private static _buildSubjectAltNames(): Array<{type: number; ip?: string; value?: string}> {
-        const altNames: Array<{type: number; value?: string}> = [
+    private static _buildSubjectAltNames(): {type: number; ip?: string; value?: string;}[] {
+        const altNames: {type: number; value?: string;}[] = [
             {
                 // IP (IPv4). X509Rsa._subjectAltName reads `value` (not `ip`) and
                 // its _ipv4 encoder only supports IPv4 — an IPv6 SAN (::1) would
