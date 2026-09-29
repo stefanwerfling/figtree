@@ -2,6 +2,8 @@ import rateLimit from 'express-rate-limit';
 export const createBruteForceProtection = (options) => rateLimit({
     windowMs: options?.windowMs ?? 15 * 60 * 1000,
     limit: options?.limit ?? 10,
+    skipSuccessfulRequests: options?.skipSuccessfulRequests ?? false,
+    skipFailedRequests: options?.skipFailedRequests ?? false,
     standardHeaders: 'draft-8',
     legacyHeaders: false,
     handler: (_req, res) => {

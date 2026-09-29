@@ -11,6 +11,17 @@ export type BruteForceProtectionOptions = {
     windowMs?: number;
     /** Message returned when limit is exceeded. Default: 'Too many attempts, please try again later.' */
     message?: string;
+    /**
+     * When true, successful responses (status < 400) are not counted towards
+     * the limit. Use for login/brute-force guards so legitimate users are not
+     * throttled — only failed attempts count. Default: false.
+     */
+    skipSuccessfulRequests?: boolean;
+    /**
+     * When true, failed responses (status >= 400) are not counted towards the
+     * limit. Default: false.
+     */
+    skipFailedRequests?: boolean;
 };
 
 /**
@@ -34,6 +45,8 @@ export type BruteForceProtectionOptions = {
 export const createBruteForceProtection = (options?: BruteForceProtectionOptions): RequestHandler => rateLimit({
     windowMs: options?.windowMs ?? 15 * 60 * 1000,
     limit: options?.limit ?? 10,
+    skipSuccessfulRequests: options?.skipSuccessfulRequests ?? false,
+    skipFailedRequests: options?.skipFailedRequests ?? false,
     standardHeaders: 'draft-8',
     legacyHeaders: false,
     handler: (_req, res) => {
