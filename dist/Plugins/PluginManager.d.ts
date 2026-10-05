@@ -13,6 +13,8 @@ export declare class PluginManager {
     protected _pluginKey: string;
     protected _serviceName: string;
     protected _plugins: APlugin[];
+    protected _loaded: Map<string, APlugin>;
+    protected _informations: PluginInformation[];
     protected _events: Map<string, APluginEvent[]>;
     static getInstance(): PluginManager;
     static hasInstance(): boolean;
@@ -25,6 +27,10 @@ export declare class PluginManager {
     load(plugin: PluginInformation): Promise<boolean>;
     getPlugins(): APlugin[];
     getPlugin(name: string): APlugin | null;
+    getInformations(): PluginInformation[];
+    getLoadedPlugin(name: string): APlugin | null;
+    enablePlugin(name: string): Promise<boolean>;
+    disablePlugin(name: string): Promise<boolean>;
     registerEvents(listner: APluginEvent, plugin: APlugin): void;
     getAllEvents<T extends APluginEvent>(aClass: abstract new (...args: any[]) => T): T[];
 }

@@ -141,9 +141,20 @@ export {CronJobProviders, DEFAULT_CRON_ROLES} from './Service/CronJobProviders.j
 // Plugin --------------------------------------------------------------------------------------------------------------
 export {PluginInformation} from './Plugins/PluginInformation.js';
 export {APlugin} from './Plugins/APlugin.js';
+export {AUiPlugin} from './Plugins/AUiPlugin.js';
 export {APluginEvent} from './Plugins/APluginEvent.js';
 export {OnBackendLifecycleEvent} from './Plugins/OnBackendLifecycleEvent.js';
 export {PluginManagerOptions, PluginManager} from './Plugins/PluginManager.js';
+// Re-export the plugin config-UI schema types from figtree-schemas so consumers
+// can name the public return type of APlugin.getUiSchema() without depending on
+// figtree-schemas directly.
+export {
+    PluginUiFieldType,
+    SchemaPluginUiFieldOption,
+    PluginUiFieldOption,
+    SchemaPluginUiField,
+    PluginUiField
+} from 'figtree-schemas';
 
 // Provider ------------------------------------------------------------------------------------------------------------
 export {IProvider} from './Provider/IProvider.js';

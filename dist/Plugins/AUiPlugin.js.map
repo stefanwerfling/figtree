@@ -1,0 +1,1 @@
+{"version":3,"file":"AUiPlugin.js","sourceRoot":"","sources":["../../src/Plugins/AUiPlugin.ts"],"names":[],"mappings":"AACA,OAAO,EAAC,OAAO,EAAC,MAAM,cAAc,CAAC;AAcrC,MAAM,OAAgB,SAAU,SAAQ,OAAO;IAgBpC,KAAK,CAAC,OAAO;QAChB,OAAO,EAAE,CAAC;IACd,CAAC;IAUM,KAAK,CAAC,OAAO,CAAC,OAAgC;QACjD,OAAO,KAAK,CAAC;IACjB,CAAC;CAEJ"}

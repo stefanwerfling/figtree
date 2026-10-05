@@ -12,6 +12,8 @@ export class PluginManager {
     _pluginKey = 'figtree';
     _serviceName;
     _plugins = [];
+    _loaded = new Map();
+    _informations = [];
     _events = new Map();
     static getInstance() {
         if (PluginManager._instance === null) {
@@ -41,6 +43,7 @@ export class PluginManager {
     }
     async start() {
         const pluginInfos = await this.scan();
+        this._informations = pluginInfos;
         for await (const pluginInfo of pluginInfos) {
             Logger.getLogger().silly('PluginManager::start: found plugin: %s (%s)', pluginInfo.definition.name, pluginInfo.definition.version);
             await this.load(pluginInfo);
@@ -52,6 +55,7 @@ export class PluginManager {
         }
         this._events.clear();
         this._plugins = [];
+        this._loaded.clear();
     }
     async scan() {
         let nodeModulesPath = path.join(this._appPath, 'node_modules');
@@ -147,6 +151,7 @@ export class PluginManager {
             const object = new oPlugin.default(plugin, this);
             if (object) {
                 this._plugins.push(object);
+                this._loaded.set(plugin.definition.name, object);
                 await object.onEnable();
                 Logger.getLogger().info('PluginManager::load: Plugin is loaded %s', plugin.definition.name);
             }
@@ -166,6 +171,42 @@ export class PluginManager {
             return plugin;
         }
         return null;
+    }
+    getInformations() {
+        return this._informations;
+    }
+    getLoadedPlugin(name) {
+        return this._loaded.get(name) ?? null;
+    }
+    async enablePlugin(name) {
+        if (this._loaded.has(name)) {
+            return true;
+        }
+        if (this._informations.length === 0) {
+            this._informations = await this.scan();
+        }
+        const info = this._informations.find((e) => e.definition.name === name);
+        if (!info) {
+            Logger.getLogger().warn('PluginManager::enablePlugin: plugin not found: %s', name);
+            return false;
+        }
+        return this.load(info);
+    }
+    async disablePlugin(name) {
+        const plugin = this._loaded.get(name);
+        if (!plugin) {
+            return true;
+        }
+        try {
+            await plugin.onDisable();
+        }
+        catch (e) {
+            Logger.getLogger().error('PluginManager::disablePlugin: onDisable failed for %s: %s', name, Ets.formate(e, true));
+        }
+        this._events.delete(plugin.getName());
+        this._loaded.delete(name);
+        this._plugins = this._plugins.filter((e) => e !== plugin);
+        return true;
     }
     registerEvents(listner, plugin) {
         const pluginName = plugin.getName();

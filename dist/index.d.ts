@@ -81,9 +81,11 @@ export { ICronJobProvider, CronJobProviderJob } from './Service/ICronJobProvider
 export { CronJobProviders, DEFAULT_CRON_ROLES } from './Service/CronJobProviders.js';
 export { PluginInformation } from './Plugins/PluginInformation.js';
 export { APlugin } from './Plugins/APlugin.js';
+export { AUiPlugin } from './Plugins/AUiPlugin.js';
 export { APluginEvent } from './Plugins/APluginEvent.js';
 export { OnBackendLifecycleEvent } from './Plugins/OnBackendLifecycleEvent.js';
 export { PluginManagerOptions, PluginManager } from './Plugins/PluginManager.js';
+export { PluginUiFieldType, SchemaPluginUiFieldOption, PluginUiFieldOption, SchemaPluginUiField, PluginUiField } from 'figtree-schemas';
 export { IProvider } from './Provider/IProvider.js';
 export { IProviders } from './Provider/IProviders.js';
 export { AProviderOnLoadEvent } from './Provider/AProviderOnLoadEvent.js';

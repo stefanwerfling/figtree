@@ -67,6 +67,22 @@ export class PluginManager {
     protected _plugins: APlugin[] = [];
 
     /**
+     * Loaded plugin instances keyed by their manifest name (`definition.name`).
+     * Kept alongside {@link _plugins} so a plugin can be addressed by the same
+     * stable name the host persists its enabled/config state under, even though
+     * the runtime {@link APlugin.getName} may differ from the manifest name.
+     * @member {Map<string, APlugin>}
+     */
+    protected _loaded: Map<string, APlugin> = new Map<string, APlugin>();
+
+    /**
+     * Last scan result, cached so disabled (not loaded) plugins can still be
+     * listed and later enabled without re-scanning.
+     * @member {PluginInformation[]}
+     */
+    protected _informations: PluginInformation[] = [];
+
+    /**
      * events
      * @member {Map<string, APluginEvent[]>}
      */
@@ -131,6 +147,11 @@ export class PluginManager {
     public async start(): Promise<void> {
         const pluginInfos = await this.scan();
 
+        // Cache the scan so the host can enumerate every discovered (signed)
+        // plugin later — including ones it may disable at runtime — without
+        // re-scanning node_modules.
+        this._informations = pluginInfos;
+
         for await (const pluginInfo of pluginInfos) {
             Logger.getLogger().silly(
                 'PluginManager::start: found plugin: %s (%s)',
@@ -151,6 +172,7 @@ export class PluginManager {
 
         this._events.clear();
         this._plugins = [];
+        this._loaded.clear();
     }
 
     /**
@@ -298,6 +320,7 @@ export class PluginManager {
 
             if (object) {
                 this._plugins.push(object);
+                this._loaded.set(plugin.definition.name, object);
                 await object.onEnable();
 
                 Logger.getLogger().info('PluginManager::load: Plugin is loaded %s', plugin.definition.name);
@@ -331,6 +354,80 @@ export class PluginManager {
         }
 
         return null;
+    }
+
+    /**
+     * Return the cached scan result: every discovered (signed) plugin, whether
+     * currently loaded or not. Populated by {@link start}; empty before the
+     * first scan.
+     * @returns {PluginInformation[]}
+     */
+    public getInformations(): PluginInformation[] {
+        return this._informations;
+    }
+
+    /**
+     * Return a loaded plugin instance by its manifest name (`definition.name`),
+     * or null when it is not loaded.
+     * @param {string} name - Manifest name of a plugin.
+     * @returns {APlugin|null}
+     */
+    public getLoadedPlugin(name: string): APlugin|null {
+        return this._loaded.get(name) ?? null;
+    }
+
+    /**
+     * Enable (load) a plugin at runtime by its manifest name. No-op returning
+     * true when it is already loaded. Scans first when the cache is empty so a
+     * plugin can be enabled without a prior {@link start}.
+     * @param {string} name - Manifest name of a plugin.
+     * @returns {Promise<boolean>} true when the plugin is loaded afterwards.
+     */
+    public async enablePlugin(name: string): Promise<boolean> {
+        if (this._loaded.has(name)) {
+            return true;
+        }
+
+        if (this._informations.length === 0) {
+            this._informations = await this.scan();
+        }
+
+        const info = this._informations.find((e) => e.definition.name === name);
+
+        if (!info) {
+            Logger.getLogger().warn('PluginManager::enablePlugin: plugin not found: %s', name);
+            return false;
+        }
+
+        return this.load(info);
+    }
+
+    /**
+     * Disable (unload) a plugin at runtime by its manifest name: calls its
+     * `onDisable`, then drops its instance and registered events. The plugin
+     * stays in the scan cache so it can be enabled again. No-op returning true
+     * when it is not loaded.
+     * @param {string} name - Manifest name of a plugin.
+     * @returns {Promise<boolean>} true when the plugin is unloaded afterwards.
+     */
+    public async disablePlugin(name: string): Promise<boolean> {
+        const plugin = this._loaded.get(name);
+
+        if (!plugin) {
+            return true;
+        }
+
+        try {
+            await plugin.onDisable();
+        } catch (e) {
+            Logger.getLogger().error('PluginManager::disablePlugin: onDisable failed for %s: %s', name, Ets.formate(e, true));
+        }
+
+        this._events.delete(plugin.getName());
+        this._loaded.delete(name);
+        this._plugins = this._plugins.filter((e) => e !== plugin);
+
+        return true;
     }
 
     /**
