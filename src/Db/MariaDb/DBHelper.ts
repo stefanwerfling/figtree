@@ -120,10 +120,12 @@ export class DBHelper {
      * Run pending migrations on a data source.
      *
      * When a baseline is provided and a legacy schema is detected (the legacy
-     * table exists but the `migrations` table does not yet), the initial
-     * migration is stamped as already applied instead of being executed. This
-     * lets existing databases (whose schema was created by a former
-     * `synchronize: true`) adopt migrations without recreating their schema.
+     * table exists), the baseline migration is stamped as already applied
+     * instead of being executed — unless it is already stamped. The check is
+     * keyed on the baseline migration ROW, so a pre-existing (possibly empty)
+     * `migrations` table does not defeat it. This lets existing databases
+     * (whose schema was created by a former `synchronize: true`) adopt
+     * migrations without recreating their schema.
      *
      * The DataSource must have been initialized with `migrationsRun: false`, so
      * the stamping happens before any migration is run.
@@ -138,11 +140,33 @@ export class DBHelper {
 
         if (baseline) {
             const legacy = await dataSource.query(`SHOW TABLES LIKE '${baseline.legacyTable}'`);
-            const migrationsTable = await dataSource.query('SHOW TABLES LIKE \'migrations\'');
 
-            if (legacy.length > 0 && migrationsTable.length === 0) {
-                await dataSource.query('CREATE TABLE `migrations` (`id` int NOT NULL AUTO_INCREMENT, `timestamp` bigint NOT NULL, `name` varchar(255) NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB');
-                await dataSource.query('INSERT INTO `migrations`(`timestamp`, `name`) VALUES (?, ?)', [baseline.timestamp, baseline.migrationName]);
+            if (legacy.length > 0) {
+                // Legacy schema present (built by a former `synchronize: true`).
+                // Make sure the `migrations` table exists so we can stamp the
+                // baseline. TypeORM would create it lazily, but we need it
+                // before `runMigrations()` so the stamp lands first.
+                const migrationsTable = await dataSource.query('SHOW TABLES LIKE \'migrations\'');
+
+                if (migrationsTable.length === 0) {
+                    await dataSource.query('CREATE TABLE `migrations` (`id` int NOT NULL AUTO_INCREMENT, `timestamp` bigint NOT NULL, `name` varchar(255) NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB');
+                }
+
+                // Stamp the baseline as applied, keyed on the baseline ROW — not
+                // on the mere existence of the `migrations` table. A leftover
+                // empty `migrations` table (e.g. from an earlier aborted boot,
+                // where TypeORM auto-created it via non-rollbackable DDL before
+                // the first migration failed) would otherwise slip past the old
+                // table-existence check and re-run the baseline CREATE
+                // statements against an already-populated schema.
+                const stamped = await dataSource.query(
+                    'SELECT 1 FROM `migrations` WHERE `name` = ? LIMIT 1',
+                    [baseline.migrationName]
+                );
+
+                if (stamped.length === 0) {
+                    await dataSource.query('INSERT INTO `migrations`(`timestamp`, `name`) VALUES (?, ?)', [baseline.timestamp, baseline.migrationName]);
+                }
             }
         }
 
