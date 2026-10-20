@@ -32,6 +32,8 @@ export class BaseHttpServer {
     _proxy;
     _csrf;
     _mtls;
+    static DEFAULT_BODY_LIMIT = '25mb';
+    _bodyLimit;
     constructor(serverInit) {
         if (serverInit.port) {
             this._port = serverInit.port;
@@ -58,6 +60,7 @@ export class BaseHttpServer {
         if (serverInit.routes) {
             this._routes = serverInit.routes;
         }
+        this._bodyLimit = serverInit.bodyLimit ?? BaseHttpServer.DEFAULT_BODY_LIMIT;
     }
     _initSession() {
         if (this._session) {
@@ -89,8 +92,8 @@ export class BaseHttpServer {
         if (this._express === undefined) {
             throw new Error('Express isnt init!');
         }
-        this._express.use(bodyParser.urlencoded({ extended: true }));
-        this._express.use(bodyParser.json());
+        this._express.use(bodyParser.urlencoded({ extended: true, limit: this._bodyLimit }));
+        this._express.use(bodyParser.json({ limit: this._bodyLimit }));
         this._express.use(cookieParser());
         if (this._csrf) {
             this._express.use(csurf({ cookie: this._csrf.cookie }));

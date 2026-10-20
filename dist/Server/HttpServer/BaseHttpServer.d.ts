@@ -38,6 +38,7 @@ export type BaseHttpServerOptions = {
     proxy?: BaseHttpServerOptionProxy;
     csrf?: BaseHttpServerOptionCsrf;
     mtls?: BaseHttpServerOptionMutualTls;
+    bodyLimit?: string | number;
 };
 export type BaseHttpCertKey = {
     key: string;
@@ -59,6 +60,8 @@ export declare class BaseHttpServer {
     protected readonly _proxy?: BaseHttpServerOptionProxy;
     protected readonly _csrf?: BaseHttpServerOptionCsrf;
     protected readonly _mtls?: BaseHttpServerOptionMutualTls;
+    static readonly DEFAULT_BODY_LIMIT: string;
+    protected readonly _bodyLimit: string | number;
     constructor(serverInit: BaseHttpServerOptions);
     protected _initSession(): void;
     protected _initExpress(): void;

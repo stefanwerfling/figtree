@@ -84,6 +84,15 @@ export type BaseHttpServerOptions = {
     proxy?: BaseHttpServerOptionProxy;
     csrf?: BaseHttpServerOptionCsrf;
     mtls?: BaseHttpServerOptionMutualTls;
+    /**
+     * Maximum request body size for the built-in JSON and urlencoded body
+     * parsers, passed straight to body-parser's `limit` option (e.g. `'25mb'`
+     * or a byte count). Defaults to {@link BaseHttpServer.DEFAULT_BODY_LIMIT}
+     * when omitted — body-parser's own 100 KB default is too small for many
+     * real payloads (long JSON documents, forwarded e-mail threads, …), which
+     * otherwise fail with a 500 `PayloadTooLargeError`.
+     */
+    bodyLimit?: string | number;
 };
 
 /**
@@ -196,6 +205,20 @@ export class BaseHttpServer {
     protected readonly _mtls?: BaseHttpServerOptionMutualTls;
 
     /**
+     * Default request body limit for the built-in body parsers, used when
+     * {@link BaseHttpServerOptions.bodyLimit} is not set. Raised well above
+     * body-parser's 100 KB default so large but legitimate payloads are not
+     * rejected with a 500 `PayloadTooLargeError`.
+     */
+    public static readonly DEFAULT_BODY_LIMIT: string = '25mb';
+
+    /**
+     * request body limit for the built-in JSON/urlencoded body parsers
+     * @protected
+     */
+    protected readonly _bodyLimit: string | number;
+
+    /**
      * constructor
      * @param {BaseHttpServerOptions} serverInit
      */
@@ -233,6 +256,8 @@ export class BaseHttpServer {
         if (serverInit.routes) {
             this._routes = serverInit.routes;
         }
+
+        this._bodyLimit = serverInit.bodyLimit ?? BaseHttpServer.DEFAULT_BODY_LIMIT;
     }
 
     /**
@@ -282,8 +307,8 @@ export class BaseHttpServer {
             throw new Error('Express isnt init!');
         }
 
-        this._express.use(bodyParser.urlencoded({extended: true}));
-        this._express.use(bodyParser.json());
+        this._express.use(bodyParser.urlencoded({extended: true, limit: this._bodyLimit}));
+        this._express.use(bodyParser.json({limit: this._bodyLimit}));
         this._express.use(cookieParser());
 
         // -------------------------------------------------------------------------------------------------------------
