@@ -34,7 +34,12 @@ export class HttpServer extends BaseHttpServer {
                 return this._limiterHandler(req, res);
             }
         });
-        this._express.use('/json/', this._limiter);
+        for (const limiterPath of this._limiterPaths()) {
+            this._express.use(limiterPath, this._limiter);
+        }
+    }
+    _limiterPaths() {
+        return ['/json/'];
     }
     _getCspDirectives() {
         return {

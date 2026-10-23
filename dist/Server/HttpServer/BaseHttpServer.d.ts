@@ -17,6 +17,9 @@ export type BaseHttpServerOptionSession = {
     ssl_path: string;
     cookie_path: string;
     secret: string;
+    same_site?: boolean | 'lax' | 'strict' | 'none';
+    http_only?: boolean;
+    secure?: boolean;
 };
 export type BaseHttpServerOptionProxy = {
     trust: string | boolean | string[];

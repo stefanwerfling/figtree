@@ -43,6 +43,29 @@ export type BaseHttpServerOptionSession = {
     ssl_path: string;
     cookie_path: string;
     secret: string;
+
+    /**
+     * SameSite attribute for the session cookie. Defaults to `'lax'` when
+     * omitted — this blocks the cookie from riding cross-site POST requests
+     * (CSRF defence) while still allowing top-level navigation. Set `'strict'`
+     * for stronger isolation, or `'none'` (requires `secure`) for cross-site
+     * embedding. Non-browser clients (native/mobile HTTP) are unaffected.
+     */
+    same_site?: boolean | 'lax' | 'strict' | 'none';
+
+    /**
+     * httpOnly attribute for the session cookie. Defaults to `true` (keeps the
+     * cookie out of reach of document.cookie / XSS). Only set false if a client
+     * genuinely needs to read the cookie from script.
+     */
+    http_only?: boolean;
+
+    /**
+     * Secure attribute for the session cookie. When omitted it defaults to
+     * `ssl_path !== ''` (secure whenever TLS is terminated here). Set true
+     * explicitly when TLS is terminated by an upstream proxy.
+     */
+    secure?: boolean;
 };
 
 /**
@@ -274,7 +297,9 @@ export class BaseHttpServer {
                 store: this._getSessionStore(),
                 cookie: {
                     path: this._session.cookie_path,
-                    secure: this._session.ssl_path !== '',
+                    secure: this._session.secure ?? (this._session.ssl_path !== ''),
+                    httpOnly: this._session.http_only ?? true,
+                    sameSite: this._session.same_site ?? 'lax',
                     maxAge: this._session.max_age
                 }
             });

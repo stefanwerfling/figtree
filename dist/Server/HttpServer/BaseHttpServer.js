@@ -72,7 +72,9 @@ export class BaseHttpServer {
                 store: this._getSessionStore(),
                 cookie: {
                     path: this._session.cookie_path,
-                    secure: this._session.ssl_path !== '',
+                    secure: this._session.secure ?? (this._session.ssl_path !== ''),
+                    httpOnly: this._session.http_only ?? true,
+                    sameSite: this._session.same_site ?? 'lax',
                     maxAge: this._session.max_age
                 }
             });

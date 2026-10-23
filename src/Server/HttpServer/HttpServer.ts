@@ -53,7 +53,21 @@ export class HttpServer extends BaseHttpServer {
             }
         });
 
-        this._express.use('/json/', this._limiter);
+        for (const limiterPath of this._limiterPaths()) {
+            this._express.use(limiterPath, this._limiter);
+        }
+    }
+
+    /**
+     * Path prefixes the rate limiter is mounted on. Defaults to the JSON API
+     * (`/json/`). Override in a subclass to protect additional surfaces — e.g.
+     * a mobile API prefix whose login/credential endpoints would otherwise be
+     * unthrottled and brute-forceable.
+     * @return {string[]}
+     * @protected
+     */
+    protected _limiterPaths(): string[] {
+        return ['/json/'];
     }
 
     /**

@@ -4,6 +4,17 @@ All notable changes to this project are documented in this file.
 
 ---
 
+## [Unreleased]
+
+### Added
+- `BaseHttpServerOptionSession.same_site` / `http_only` / `secure` — the session cookie's `SameSite`, `httpOnly` and `Secure` attributes are now configurable. Defaults harden all consumers: `sameSite: 'lax'` (blocks the cookie from riding cross-site POST requests — a CSRF defence that is transparent to non-browser/native clients), `httpOnly: true`, and `secure` defaulting to `ssl_path !== ''` (override when TLS is terminated upstream).
+- `HttpServer._limiterPaths(): string[]` — protected hook for the path prefixes the rate limiter is mounted on (default `['/json/']`). Override to also throttle other surfaces (e.g. a `/mobile/` API whose login/credential endpoints would otherwise be unthrottled and brute-forceable).
+
+### Changed
+- The session cookie now carries `SameSite=Lax` and `HttpOnly` by default (previously neither was set explicitly). Set `same_site`/`http_only` in the session options to restore the old behaviour if a deployment relied on it.
+
+---
+
 ## [1.1.0] - 2026-06-10
 
 ### Added
